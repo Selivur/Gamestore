@@ -1,4 +1,14 @@
+using Gamestore.Database.Dbcontext;
+using Gamestore.Database.Services;
+using Gamestore.Database.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddTransient<IGameService, GameService>();
+
+builder.Services.AddDbContext<GamestoreContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Gamestore.Api")));
 
 // Add services to the container.
 builder.Services.AddControllers();

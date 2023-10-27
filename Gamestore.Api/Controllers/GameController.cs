@@ -32,7 +32,7 @@ public class GameController : ControllerBase
         var (isSuccess, errorMessage) = await _gameService.CreateGameAsync(game);
 
         return isSuccess
-            ? CreatedAtRoute("GetGame", new { gameAlias = game.GameAlias }, null)
+            ? Ok(game)
             : BadRequest(errorMessage);
     }
 

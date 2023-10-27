@@ -11,8 +11,10 @@ public class GameServiceTests
     public GameServiceTests()
     {
         _options = new DbContextOptionsBuilder<GamestoreContext>()
-            .UseInMemoryDatabase(databaseName: "GameStoreTest")
+            .UseInMemoryDatabase(databaseName: "Gamestore")
             .Options;
+        _context = new GamestoreContext(options);
+        _gameService = new GameService(_context);
     }
 
     [Fact]
