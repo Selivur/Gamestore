@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
 	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
+
 	  <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
@@ -33,6 +34,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Gamestore.Api\Gamestore.Api.csproj" />
     <ProjectReference Include="..\Gamestore.DataBase\Gamestore.Database.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Api\" />
   </ItemGroup>
 
 </Project>

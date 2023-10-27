@@ -3,7 +3,7 @@ using Gamestore.Database.Entities;
 using Gamestore.Database.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace Gamestore.Tests.ServiceTests;
+namespace Gamestore.Tests.Database.ServiceTests;
 public class GameServiceTests
 {
     private readonly DbContextOptions<GamestoreContext> _options;
@@ -13,8 +13,6 @@ public class GameServiceTests
         _options = new DbContextOptionsBuilder<GamestoreContext>()
             .UseInMemoryDatabase(databaseName: "Gamestore")
             .Options;
-        _context = new GamestoreContext(options);
-        _gameService = new GameService(_context);
     }
 
     [Fact]
