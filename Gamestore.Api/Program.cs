@@ -1,11 +1,14 @@
+using Gamestore.Api.Services;
+using Gamestore.Api.Services.Interfaces;
 using Gamestore.Database.Dbcontext;
-using Gamestore.Database.Services;
-using Gamestore.Database.Services.Interfaces;
+using Gamestore.Database.Repositories;
+using Gamestore.Database.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddTransient<IGameService, GameService>();
+builder.Services.AddScoped<IGameService, GameService>();
+builder.Services.AddScoped<IGameRepository, GameRepository>();
 
 builder.Services.AddDbContext<GamestoreContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Gamestore.Api")));

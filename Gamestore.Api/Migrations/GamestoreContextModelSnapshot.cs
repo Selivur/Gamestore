@@ -24,11 +24,18 @@ namespace Gamestore.Api.Migrations
 
             modelBuilder.Entity("Gamestore.Database.Entities.Game", b =>
                 {
-                    b.Property<string>("GameAlias")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GameAlias")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("GenreId")
                         .HasColumnType("int");
@@ -40,7 +47,10 @@ namespace Gamestore.Api.Migrations
                     b.Property<int?>("PlatformsId")
                         .HasColumnType("int");
 
-                    b.HasKey("GameAlias");
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameAlias")
+                        .IsUnique();
 
                     b.HasIndex("GenreId");
 

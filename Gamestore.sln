@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gamestore.Api", "Gamestore.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gamestore.Database", "Gamestore.DataBase\Gamestore.Database.csproj", "{6724E0ED-4737-4E5E-9981-FD12C088C9D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gamestore.Tests", "Gamestore.Tests\Gamestore.Tests.csproj", "{6FEE28C8-3020-4569-95BC-BF2BC3863817}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gamestore.Tests", "Gamestore.Tests\Gamestore.Tests.csproj", "{6FEE28C8-3020-4569-95BC-BF2BC3863817}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

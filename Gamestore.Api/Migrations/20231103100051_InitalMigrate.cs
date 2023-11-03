@@ -5,7 +5,7 @@
 namespace Gamestore.Api.Migrations;
 
 /// <inheritdoc />
-public partial class InitialCreate : Migration
+public partial class InitalMigrate : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
@@ -40,6 +40,8 @@ public partial class InitialCreate : Migration
             name: "Games",
             columns: table => new
             {
+                Id = table.Column<int>(type: "int", nullable: false)
+                    .Annotation("SqlServer:Identity", "1, 1"),
                 GameAlias = table.Column<string>(type: "nvarchar(450)", nullable: false),
                 Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                 Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -48,7 +50,7 @@ public partial class InitialCreate : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_Games", x => x.GameAlias);
+                table.PrimaryKey("PK_Games", x => x.Id);
                 table.ForeignKey(
                     name: "FK_Games_Genres_GenreId",
                     column: x => x.GenreId,
@@ -60,6 +62,12 @@ public partial class InitialCreate : Migration
                     principalTable: "Platforms",
                     principalColumn: "Id");
             });
+
+        migrationBuilder.CreateIndex(
+            name: "IX_Games_GameAlias",
+            table: "Games",
+            column: "GameAlias",
+            unique: true);
 
         migrationBuilder.CreateIndex(
             name: "IX_Games_GenreId",

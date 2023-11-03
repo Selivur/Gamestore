@@ -1,6 +1,6 @@
 ﻿using System.Text;
-using Gamestore.Database.Entities;
-using Gamestore.Database.Services.Interfaces;
+using Gamestore.Api.Models.DTO.GameDTO;
+using Gamestore.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gamestore.Api.Controllers;
@@ -22,7 +22,7 @@ public class GameController : ControllerBase
     /// <param name="game">The game object to be created.</param>
     /// <returns>An IActionResult indicating whether the creation was successful and an error message if applicable.</returns>
     [HttpPost("new")]
-    public async Task<IActionResult> CreateGame([FromBody] Game game)
+    public async Task<IActionResult> CreateGame([FromBody] GameRequest game)
     {
         if (!ModelState.IsValid)
         {
@@ -44,11 +44,11 @@ public class GameController : ControllerBase
     [HttpGet("{gameAlias}")]
     public async Task<IActionResult> GetGame(string gameAlias)
     {
-        var result = await _gameService.GetGameByAliasAsync(gameAlias);
+        var (isSuccess, errorMessage, game) = await _gameService.GetGameByAliasAsync(gameAlias);
 
-        return !result.IsSuccess
-            ? BadRequest(result.ErrorMessage)
-            : Ok(result.Game);
+        return !isSuccess
+            ? BadRequest(errorMessage)
+            : Ok(game);
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ public class GameController : ControllerBase
     /// <param name="game">The game object to update.</param>
     /// <returns>An IActionResult object representing the result of the update operation.</returns>
     [HttpPut("update")]
-    public async Task<IActionResult> UpdateGame([FromBody] Game game)
+    public async Task<IActionResult> UpdateGame([FromBody] GameRequest game)
     {
         if (!ModelState.IsValid)
         {
@@ -128,7 +128,7 @@ public class GameController : ControllerBase
     /// </summary>
     /// <param name="game">The game object to generate the content for.</param>
     /// <returns>A string containing the game alias, name, and description.</returns>
-    private static string GenerateGameFileContent(Game? game)
+    private static string GenerateGameFileContent(GameResponse? game)
     {
         string content = $"Game Alias: {game.GameAlias}\n" +
                          $"Name: {game.Name}\n" +

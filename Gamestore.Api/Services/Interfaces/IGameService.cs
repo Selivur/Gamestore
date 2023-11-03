@@ -1,6 +1,6 @@
-﻿using Gamestore.Database.Entities;
+﻿using Gamestore.Api.Models.DTO.GameDTO;
 
-namespace Gamestore.Database.Services.Interfaces;
+namespace Gamestore.Api.Services.Interfaces;
 
 public interface IGameService
 {
@@ -9,7 +9,7 @@ public interface IGameService
     /// </summary>
     /// <param name="game">The game object to be created.</param>
     /// <returns>A tuple indicating whether the creation was successful and an error message if applicable.</returns>
-    Task<(bool IsSuccess, string? ErrorMessage)> CreateGameAsync(Game game);
+    Task<(bool IsSuccess, string? ErrorMessage)> CreateGameAsync(GameRequest game);
 
     /// <summary>
     /// Retrieves a game from the database by its alias.
@@ -17,14 +17,14 @@ public interface IGameService
     /// <param name="gameAlias">The alias of the game to retrieve.</param>
     /// <returns>A tuple representing the result of the operation, including a boolean indicating success, an error message if applicable, and the retrieved game object.</returns>
     /// <remarks>If the game alias is null or empty, the method will return a tuple with a false success value and an error message. If the game is not found in the database, the method will return a tuple with a false success value and an error message. Otherwise, the method will return a tuple with a true success value and the retrieved game object.</remarks>
-    Task<(bool IsSuccess, string? ErrorMessage, Game? Game)> GetGameByAliasAsync(string gameAlias);
+    Task<(bool IsSuccess, string? ErrorMessage, GameResponse? Game)> GetGameByAliasAsync(string gameAlias);
 
     /// <summary>
     /// Updates an existing game in the database.
     /// </summary>
     /// <param name="game">The game object containing the updated properties.</param>
     /// <returns>A tuple indicating whether the update was successful and an error message if applicable.</returns>
-    Task<(bool IsSuccess, string? ErrorMessage)> UpdateGameAsync(Game game);
+    Task<(bool IsSuccess, string? ErrorMessage)> UpdateGameAsync(GameRequest game);
 
     /// <summary>
     /// Removes a game from the database based on its alias.
@@ -37,5 +37,5 @@ public interface IGameService
     /// Retrieves all games from the database.
     /// </summary>
     /// <returns>An IEnumerable of Game objects.</returns>
-    Task<IEnumerable<Game>> GetAllGamesAsync();
+    Task<IEnumerable<GameResponse>> GetAllGamesAsync();
 }
