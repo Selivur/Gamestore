@@ -33,7 +33,11 @@
 
   <ItemGroup>
     <Folder Include="Api\" />
-    <Folder Include="Database\RepositoriesTests\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Gamestore.Api\Gamestore.Api.csproj" />
+    <ProjectReference Include="..\Gamestore.DataBase\Gamestore.Database.csproj" />
   </ItemGroup>
 
 </Project>

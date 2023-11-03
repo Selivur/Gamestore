@@ -22,7 +22,7 @@ public class GameRepository : IGameRepository
 
     public async Task<Game> GetByAliasAsync(string gameAlias)
     {
-        return await _context.Games.SingleAsync(g => g.GameAlias == gameAlias);
+        return await _context.Games.SingleOrDefaultAsync(g => g.GameAlias == gameAlias);
     }
 
     public async Task<IEnumerable<Game>> GetAllAsync()
