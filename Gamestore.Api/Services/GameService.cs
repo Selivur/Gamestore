@@ -76,9 +76,9 @@ public class GameService : IGameService
         {
             game.GameAlias ??= NormalizeGameAlias(game.Name);
             Game existingGame = await _repository.GetByAliasAsync(game.GameAlias);
-            if (existingGame != null)
+            if (existingGame == null)
             {
-                return (false, "Can`t find the Game with this Alias");
+                return (false, "Can't find the Game with this Alias");
             }
 
             existingGame.Name = game.Name;

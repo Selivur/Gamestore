@@ -12,14 +12,14 @@ public interface IGameRepository
     /// </summary>
     /// <param name="id">The unique identifier of the game to retrieve.</param>
     /// <returns>An asynchronous task that returns the retrieved game.</returns>
-    Task<Game> GetByIdAsync(int id);
+    Task<Game?> GetByIdAsync(int id);
 
     /// <summary>
     /// Retrieves a game by its alias asynchronously.
     /// </summary>
     /// <param name="gameAlias">The alias of the game to retrieve.</param>
     /// <returns>An asynchronous task that returns the retrieved game.</returns>
-    Task<Game> GetByAliasAsync(string gameAlias);
+    Task<Game?> GetByAliasAsync(string gameAlias);
 
     /// <summary>
     /// Retrieves all games in the repository asynchronously.

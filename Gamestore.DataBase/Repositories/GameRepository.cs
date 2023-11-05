@@ -15,12 +15,12 @@ public class GameRepository : IGameRepository
         _context = context;
     }
 
-    public async Task<Game> GetByIdAsync(int id)
+    public async Task<Game?> GetByIdAsync(int id)
     {
         return await _context.Games.FindAsync(id);
     }
 
-    public async Task<Game> GetByAliasAsync(string gameAlias)
+    public async Task<Game?> GetByAliasAsync(string gameAlias)
     {
         return await _context.Games.SingleOrDefaultAsync(g => g.GameAlias == gameAlias);
     }

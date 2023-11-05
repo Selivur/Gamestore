@@ -10,6 +10,10 @@ public class GameRepositoryTests
             .Options;
     }
 
+    /// <summary>
+    /// Test to verify that the GetByIdAsync method of the GameRepository
+    /// returns a game when it exists in the database.
+    /// </summary>
     [Fact]
     public async Task GetByIdAsync_ShouldReturnGame()
     {
@@ -35,6 +39,27 @@ public class GameRepositoryTests
         Assert.Equal(game.Name, result.Name);
     }
 
+    /// <summary>
+    /// Test to verify that the GetByIdAsync method of the GameRepository
+    /// returns null when the game does not exist in the database.
+    /// </summary>
+    [Fact]
+    public async Task GetByIdAsync_ShouldReturnNull()
+    {
+        // Arrange
+        using var context = new GamestoreContext(_options);
+        var repository = new GameRepository(context);
+
+        // Act
+        var result = await repository.GetByIdAsync(1);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    /// <summary>
+    /// Test to verify that the GetByAliasAsync method of the GameRepository returns a game when it exists in the database.
+    /// </summary>
     [Fact]
     public async Task GetByAliasAsync_ShouldReturnGame()
     {
@@ -56,6 +81,28 @@ public class GameRepositoryTests
         Assert.Equal(game.Name, result.Name);
     }
 
+    /// <summary>
+    /// Test to verify that the GetByAliasAsync method of the GameRepository returns null when the game does not exist in the database.
+    /// </summary>
+    [Fact]
+    public async Task GetByAliasAsync_ShouldReturnNull()
+    {
+        // Arrange
+        using var context = new GamestoreContext(_options);
+        var repository = new GameRepository(context);
+
+        var gameAlias = "test-game";
+
+        // Act
+        var result = await repository.GetByAliasAsync(gameAlias);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    /// <summary>
+    /// Test to verify that the GetByAliasAsync method of the GameRepository returns null when the game does not exist in the database.
+    /// </summary>
     [Fact]
     public async Task GetByAliasAsync_ShouldReturnNullIfGameNotFound()
     {
@@ -72,6 +119,9 @@ public class GameRepositoryTests
         Assert.Null(result);
     }
 
+    /// <summary>
+    /// Test to verify that the GetAllAsync method of the GameRepository returns all games from the database.
+    /// </summary>
     [Fact]
     public async Task GetAllAsync_ShouldReturnAllGames()
     {
@@ -102,6 +152,9 @@ public class GameRepositoryTests
         }
     }
 
+    /// <summary>
+    /// Test to verify that the AddAsync method of the GameRepository adds a game to the database.
+    /// </summary>
     [Fact]
     public async Task AddAsync_ShouldAddGameToDatabase()
     {
@@ -125,6 +178,9 @@ public class GameRepositoryTests
         Assert.Equal(game.Name, savedGame.Name);
     }
 
+    /// <summary>
+    /// Test to verify that the UpdateAsync method of the GameRepository updates a game in the database.
+    /// </summary>
     [Fact]
     public async Task UpdateAsync_ShouldUpdateGameInDatabase()
     {
@@ -156,6 +212,9 @@ public class GameRepositoryTests
         Assert.Equal("Updated game description", updatedGame.Description);
     }
 
+    /// <summary>
+    /// Test to verify that the RemoveAsync method of the GameRepository removes a game from the database.
+    /// </summary>
     [Fact]
     public async Task RemoveAsync_ShouldRemoveGameFromDatabase()
     {
