@@ -81,8 +81,8 @@ public class GameController : ControllerBase
     {
         var (isSuccess, errorMessage) = await _gameService.RemoveGameAsync(gameAlias);
         return !isSuccess
-            ? NotFound(errorMessage) // Return 404 Not Found if the game doesn't exist
-            : NoContent(); // Return 204 No Content upon successful deletion
+            ? NotFound(errorMessage)
+            : NoContent();
     }
 
     /// <summary>
