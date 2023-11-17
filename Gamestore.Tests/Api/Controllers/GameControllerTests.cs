@@ -322,21 +322,4 @@ public class GameControllerTests
         var gameResponses = Assert.IsType<List<GameResponse>>(result.Value);
         Assert.Equal(2, gameResponses.Count);
     }
-
-    /// <summary>
-    /// Tests that the <see cref="GameController.GetAllGames"/> method returns a No Content result when no games exist.
-    /// </summary>
-    [Fact]
-    public async Task GetAllGames_WhenNoGamesExist_ShouldReturnNoContent()
-    {
-        // Arrange
-        _gameServiceMock.Setup(s => s.GetAllGamesAsync()).ReturnsAsync(new List<GameResponse>());
-
-        // Act
-        var result = await _gameController.GetAllGames() as NoContentResult;
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(204, result.StatusCode);
-    }
 }

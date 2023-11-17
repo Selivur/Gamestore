@@ -118,9 +118,7 @@ public class GameController : ControllerBase
     {
         var games = await _gameService.GetAllGamesAsync();
 
-        return games == null || !games.Any()
-            ? NoContent()
-            : Ok(games);
+        return Ok(games);
     }
 
     /// <summary>
