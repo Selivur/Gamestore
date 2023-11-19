@@ -20,7 +20,7 @@ public class GameController : ControllerBase
     /// Creates a new game in the database.
     /// </summary>
     /// <param name="game">The game object to be created.</param>
-    /// <returns>An IActionResult indicating whether the creation was successful and an error message if applicable.</returns>
+    /// <returns>An IActionResult indicating whether the creation was successful.</returns>
     [HttpPost("new")]
     public async Task<IActionResult> CreateGame([FromBody] GameRequest game)
     {
@@ -29,26 +29,22 @@ public class GameController : ControllerBase
             return BadRequest(GetErrorMessages());
         }
 
-        var (isSuccess, errorMessage) = await _gameService.CreateGameAsync(game);
+        await _gameService.CreateGameAsync(game);
 
-        return isSuccess
-            ? Ok(game)
-            : BadRequest(errorMessage);
+        return Ok();
     }
 
     /// <summary>
     /// Retrieves a game by its alias.
     /// </summary>
     /// <param name="gameAlias">The alias of the game to retrieve.</param>
-    /// <returns>An IActionResult containing the retrieved game if successful, or a BadRequest result with an error message if unsuccessful.</returns>
+    /// <returns>An IActionResult containing the retrieved game if successful.</returns>
     [HttpGet("{gameAlias}")]
     public async Task<IActionResult> GetGame(string gameAlias)
     {
-        var (isSuccess, errorMessage, game) = await _gameService.GetGameByAliasAsync(gameAlias);
+        await _gameService.GetGameByAliasAsync(gameAlias);
 
-        return !isSuccess
-            ? BadRequest(errorMessage)
-            : Ok(game);
+        return Ok();
     }
 
     /// <summary>
@@ -64,25 +60,21 @@ public class GameController : ControllerBase
             return BadRequest(GetErrorMessages());
         }
 
-        var (isSuccess, errorMessage) = await _gameService.UpdateGameAsync(game);
+        await _gameService.UpdateGameAsync(game);
 
-        return isSuccess
-            ? Ok(game)
-            : BadRequest(errorMessage);
+        return Ok();
     }
 
     /// <summary>
     /// Removes a game from the store by its alias.
     /// </summary>
     /// <param name="gameAlias">The alias of the game to remove.</param>
-    /// <returns>A 204 No Content response upon successful deletion, or a 404 Not Found response if the game doesn't exist.</returns>
+    /// <returns>A 204 No Content response upon successful deletion.</returns>
     [HttpDelete("{gameAlias}")]
     public async Task<IActionResult> RemoveGame(string gameAlias)
     {
-        var (isSuccess, errorMessage) = await _gameService.RemoveGameAsync(gameAlias);
-        return !isSuccess
-            ? NotFound(errorMessage)
-            : NoContent();
+        await _gameService.RemoveGameAsync(gameAlias);
+        return NoContent();
     }
 
     /// <summary>
@@ -93,12 +85,7 @@ public class GameController : ControllerBase
     [HttpGet("{gameAlias}/download")]
     public async Task<IActionResult> DownloadGame(string gameAlias)
     {
-        var (isSuccess, errorMessage, game) = await _gameService.GetGameByAliasAsync(gameAlias);
-
-        if (!isSuccess)
-        {
-            return NotFound(errorMessage);
-        }
+        var game = await _gameService.GetGameByAliasAsync(gameAlias);
 
         var content = GenerateGameFileContent(game);
         var fileName = $"{game.Name}_{DateTime.Now:yyyyMMddHHmmss}.txt";
@@ -111,7 +98,7 @@ public class GameController : ControllerBase
     /// Retrieves all games from the game store.
     /// </summary>
     /// <returns>
-    /// Returns an HTTP 204 No Content response if no games are found, or an HTTP 200 OK response with the list of games.
+    /// Returns an HTTP 200 OK response with the list of games.
     /// </returns>
     [HttpGet]
     public async Task<IActionResult> GetAllGames()
