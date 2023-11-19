@@ -1,3 +1,4 @@
+using Gamestore.Api.Filters;
 using Gamestore.Api.Services;
 using Gamestore.Api.Services.Interfaces;
 using Gamestore.Database.Dbcontext;
@@ -14,7 +15,10 @@ builder.Services.AddDbContext<GamestoreContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Gamestore.Api")));
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<GlobalExceptionHandler>();
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

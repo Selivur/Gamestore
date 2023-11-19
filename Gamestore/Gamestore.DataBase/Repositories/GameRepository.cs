@@ -33,19 +33,31 @@ public class GameRepository : IGameRepository
     public async Task AddAsync(Game game)
     {
         _context.Games.Add(game);
-        await _context.SaveChangesAsync();
+        var saved = await _context.SaveChangesAsync();
+        if (saved == 0)
+        {
+            throw new InvalidOperationException("Error when adding a game to the database.");
+        }
     }
 
     public async Task UpdateAsync(Game game)
     {
         _context.Entry(game).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
+        var saved = await _context.SaveChangesAsync();
+        if (saved == 0)
+        {
+            throw new InvalidOperationException("Error when updating a game in the database.");
+        }
     }
 
     public async Task RemoveAsync(string gameAlias)
     {
         var game = await _context.Games.SingleAsync(g => g.GameAlias == gameAlias);
         _context.Games.Remove(game);
-        await _context.SaveChangesAsync();
+        var saved = await _context.SaveChangesAsync();
+        if (saved == 0)
+        {
+            throw new InvalidOperationException("Error when deleting a game from the database.");
+        }
     }
 }

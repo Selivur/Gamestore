@@ -31,20 +31,20 @@ public interface IGameRepository
     /// Adds a new game to the repository asynchronously.
     /// </summary>
     /// <param name="game">The game to add to the repository.</param>
-    /// <returns>An asynchronous task representing the operation's completion.</returns>
+    /// <returns>An asynchronous task representing the operation's completion or throwing an error when failed to add the game.</returns>
     Task AddAsync(Game game);
 
     /// <summary>
     /// Updates an existing game in the repository asynchronously.
     /// </summary>
     /// <param name="game">The game to update in the repository.</param>
-    /// <returns>An asynchronous task representing the operation's completion.</returns>
+    /// <returns>An asynchronous task representing the operation's completion or throwing an error when failed to update the game.</returns>
     Task UpdateAsync(Game game);
 
     /// <summary>
     /// Removes a game from the repository by its unique identifier asynchronously.
     /// </summary>
     /// <param name="gameAlias">The unique alias of the game to remove.</param>
-    /// <returns>An asynchronous task representing the operation's completion.</returns>
+    /// <returns>An asynchronous task representing the operation's completion or throwing an error when failed to remove the game.</returns>
     Task RemoveAsync(string gameAlias);
 }
