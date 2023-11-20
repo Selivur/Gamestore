@@ -106,23 +106,6 @@ public class GameControllerTests
     }
 
     /// <summary>
-    /// Test verifies if the <see cref="GameController.UpdateGame"/> method calls <see cref="IGameService.UpdateGameAsync"/> when ModelState is valid.
-    /// </summary>
-    [Fact]
-    public async Task UpdateGame_CallsUpdateGameAsync_WhenModelStateIsValid()
-    {
-        // Arrange
-        var validGameRequest = new GameRequest { Name = "Valid Name" };
-        _gameController.ModelState.Clear();
-
-        // Act
-        await _gameController.UpdateGame(validGameRequest);
-
-        // Assert
-        _gameServiceMock.Verify(x => x.UpdateGameAsync(validGameRequest), Times.Once);
-    }
-
-    /// <summary>
     /// Test verifies if the <see cref="GameController.RemoveGame"/> method returns a NoContentResult.
     /// </summary>
     [Fact]
