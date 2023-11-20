@@ -8,5 +8,5 @@ public class Genre
 
     public int? ParentId { get; set; }
 
-    public ICollection<Genre> Genres { get; set; }
+    public Genre ParentGenre { get; set; }
 }
