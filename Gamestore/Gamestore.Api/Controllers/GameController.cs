@@ -122,7 +122,7 @@ public class GameController : ControllerBase
     /// <returns>A string containing the game alias, name, and description.</returns>
     private static string GenerateGameFileContent(GameResponse? game)
     {
-        string content = $"Game Alias: {game.GameAlias}\n" +
+        var content = $"Game Alias: {game.GameAlias}\n" +
                          $"Name: {game.Name}\n" +
                          $"Description: {game.Description}";
         return content;
