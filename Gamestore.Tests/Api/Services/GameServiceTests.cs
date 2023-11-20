@@ -207,7 +207,7 @@ public class GameServiceTests
         // Assert
         Assert.Equal(games.Count, result.Count());
 
-        for (int i = 0; i < games.Count; i++)
+        for (var i = 0; i < games.Count; i++)
         {
             Assert.Equal(games[i].GameAlias, result.ElementAt(i).GameAlias);
             Assert.Equal(games[i].Name, result.ElementAt(i).Name);

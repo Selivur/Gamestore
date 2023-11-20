@@ -75,7 +75,7 @@ public class GameService : IGameService
     public async Task<IEnumerable<GameResponse>> GetAllGamesAsync()
     {
         var games = await _repository.GetAllAsync();
-        List<GameResponse> gameResponses = games.Select(game => new GameResponse
+        var gameResponses = games.Select(game => new GameResponse
         {
             GameAlias = game.GameAlias,
             Name = game.Name,
