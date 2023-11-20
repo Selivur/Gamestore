@@ -131,9 +131,9 @@ public class GameRepositoryTests
 
         var games = new List<Game>
         {
-            new Game { Id = 1, GameAlias = "game-1", Name = "Game 1", Description = "Description 1" },
-            new Game { Id = 2, GameAlias = "game-2", Name = "Game 2", Description = "Description 2" },
-            new Game { Id = 3, GameAlias = "game-3", Name = "Game 3", Description = "Description 3" },
+            new() { Id = 1, GameAlias = "game-1", Name = "Game 1", Description = "Description 1" },
+            new() { Id = 2, GameAlias = "game-2", Name = "Game 2", Description = "Description 2" },
+            new() { Id = 3, GameAlias = "game-3", Name = "Game 3", Description = "Description 3" },
         };
 
         context.Games.AddRange(games);

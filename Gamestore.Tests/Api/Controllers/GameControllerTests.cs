@@ -61,7 +61,7 @@ public class GameControllerTests
     public async Task GetGame_ReturnsOkResult_WhenGameExists()
     {
         // Arrange
-        string gameAlias = "TestAlias";
+        var gameAlias = "TestAlias";
         _gameServiceMock.Setup(x => x.GetGameByAliasAsync(gameAlias)).ReturnsAsync(new GameResponse { GameAlias = gameAlias, Name = "Test Game" });
 
         // Act
@@ -112,7 +112,7 @@ public class GameControllerTests
     public async Task RemoveGame_ReturnsNoContentResult()
     {
         // Arrange
-        string gameAlias = "TestAlias";
+        var gameAlias = "TestAlias";
 
         // Act
         var result = await _gameController.RemoveGame(gameAlias);
@@ -129,7 +129,7 @@ public class GameControllerTests
     public async Task DownloadGame_ReturnsFileResult_WithCorrectContent()
     {
         // Arrange
-        string gameAlias = "TestAlias";
+        var gameAlias = "TestAlias";
         var game = new GameResponse
         {
             GameAlias = gameAlias,
@@ -165,8 +165,8 @@ public class GameControllerTests
         // Arrange
         var expectedGames = new List<GameResponse>
         {
-            new GameResponse { GameAlias = "Alias1", Name = "Game1" },
-            new GameResponse { GameAlias = "Alias2", Name = "Game2" },
+            new() { GameAlias = "Alias1", Name = "Game1" },
+            new() { GameAlias = "Alias2", Name = "Game2" },
         };
         _gameServiceMock.Setup(x => x.GetAllGamesAsync()).ReturnsAsync(expectedGames);
 

@@ -59,7 +59,7 @@ public class GameService : IGameService
     public async Task UpdateGameAsync(GameRequest game)
     {
         game.GameAlias ??= NormalizeGameAlias(game.Name);
-        Game existingGame = await _repository.GetByAliasAsync(game.GameAlias) ?? throw new InvalidOperationException("Can't find the Game with this Alias");
+        var existingGame = await _repository.GetByAliasAsync(game.GameAlias) ?? throw new InvalidOperationException("Can't find the Game with this Alias");
         existingGame.Name = game.Name;
         existingGame.Description = game.Description;
         await _repository.UpdateAsync(existingGame);

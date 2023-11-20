@@ -193,9 +193,9 @@ public class GameServiceTests
         // Arrange
         var games = new List<Game>
         {
-            new Game { GameAlias = "game1", Name = "Game 1", Description = "Description 1" },
-            new Game { GameAlias = "game2", Name = "Game 2", Description = "Description 2" },
-            new Game { GameAlias = "game3", Name = "Game 3", Description = "Description 3" },
+            new() { GameAlias = "game1", Name = "Game 1", Description = "Description 1" },
+            new() { GameAlias = "game2", Name = "Game 2", Description = "Description 2" },
+            new() { GameAlias = "game3", Name = "Game 3", Description = "Description 3" },
         };
 
         _mockRepository.Setup(repo => repo.GetAllAsync())
