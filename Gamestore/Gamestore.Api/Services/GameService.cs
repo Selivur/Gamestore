@@ -6,16 +6,24 @@ using Gamestore.Database.Repositories.Interfaces;
 
 namespace Gamestore.Api.Services;
 
-/// <inheritdoc/>
+/// <summary>
+/// Implementation of the <see cref="IGameService"/> interface.
+/// Provides functionality for managing game-related operations.
+/// </summary>
 public class GameService : IGameService
 {
     private readonly IGameRepository _repository;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GameService"/> class.
+    /// </summary>
+    /// <param name="repository">The game repository providing data access for the service.</param>
     public GameService(IGameRepository repository)
     {
         _repository = repository;
     }
 
+    /// <inheritdoc/>
     public async Task CreateGameAsync(GameRequest game)
     {
         game.GameAlias ??= NormalizeGameAlias(game.Name);
@@ -34,6 +42,7 @@ public class GameService : IGameService
         await _repository.AddAsync(newGame);
     }
 
+    /// <inheritdoc/>
     public async Task<GameResponse?> GetGameByAliasAsync(string gameAlias)
     {
         var game = await _repository.GetByAliasAsync(gameAlias) ?? throw new InvalidOperationException("Game not found");
@@ -46,6 +55,7 @@ public class GameService : IGameService
         return newGame;
     }
 
+    /// <inheritdoc/>
     public async Task UpdateGameAsync(GameRequest game)
     {
         game.GameAlias ??= NormalizeGameAlias(game.Name);
@@ -55,11 +65,13 @@ public class GameService : IGameService
         await _repository.UpdateAsync(existingGame);
     }
 
+    /// <inheritdoc/>
     public async Task RemoveGameAsync(string gameAlias)
     {
         await _repository.RemoveAsync(gameAlias);
     }
 
+    /// <inheritdoc/>
     public async Task<IEnumerable<GameResponse>> GetAllGamesAsync()
     {
         var games = await _repository.GetAllAsync();

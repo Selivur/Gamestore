@@ -5,12 +5,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Gamestore.Api.Controllers;
 
+/// <summary>
+/// API controller for managing game-related operations.
+/// </summary>
 [Route("api/games")]
 [ApiController]
 public class GameController : ControllerBase
 {
     private readonly IGameService _gameService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GameController"/> class.
+    /// </summary>
+    /// <param name="gameService">The game service used for handling game-related operations.</param>
     public GameController(IGameService gameService)
     {
         _gameService = gameService;
