@@ -6,34 +6,34 @@ using Moq;
 namespace Gamestore.Tests.Api.Services;
 public class GameServiceTests
 {
+    private readonly Mock<IGameRepository> _mockRepository;
+    private readonly GameService _gameService;
+
+    public GameServiceTests()
+    {
+        _mockRepository = new Mock<IGameRepository>();
+        _gameService = new GameService(_mockRepository.Object);
+    }
+
     /// <summary>
     /// Positive test that verifies whether the CreateGameAsync method of the GameService correctly
     /// creates a new game when the provided game alias is unique.
     /// </summary>
     [Fact]
-    public async Task CreateGameAsync_ShouldCreateGame()
+    public async Task CreateGameAsync_ShouldAddNewGame()
     {
         // Arrange
-        var repository = new Mock<IGameRepository>();
-        var service = new GameService(repository.Object);
+        var gameRequest = CreateGameRequest("test-game", "Test Game", "A test game description");
 
-        var gameRequest = new GameRequest
-        {
-            GameAlias = "new-game",
-            Name = "New Game",
-            Description = "A new game",
-        };
-
-        repository.Setup(r => r.GetByAliasAsync(It.IsAny<string>())).ReturnsAsync((Game)null);
+        _mockRepository.Setup(repo => repo.GetByAliasAsync(gameRequest.GameAlias!))
+            .ReturnsAsync((Game)null);
 
         // Act
-        var (isSuccess, errorMessage) = await service.CreateGameAsync(gameRequest);
+        await _gameService.CreateGameAsync(gameRequest);
 
         // Assert
-        Assert.True(isSuccess);
-        Assert.Null(errorMessage);
-
-        repository.Verify(r => r.AddAsync(It.IsAny<Game>()), Times.Once);
+        _mockRepository.Verify(repo => repo.GetByAliasAsync(gameRequest.GameAlias!), Times.Once);
+        _mockRepository.Verify(repo => repo.AddAsync(It.IsAny<Game>()), Times.Once);
     }
 
     /// <summary>
@@ -41,141 +41,61 @@ public class GameServiceTests
     /// correctly returns an error message when the provided game alias is not unique.
     /// </summary>
     [Fact]
-    public async Task CreateGameAsync_ShouldReturnErrorIfGameAliasNotUnique()
+    public async Task CreateGameAsync_ShouldThrowException_WhenGameAliasNotUnique()
     {
         // Arrange
-        var repository = new Mock<IGameRepository>();
-        var service = new GameService(repository.Object);
+        var gameRequest = CreateGameRequest("test-game", "Test Game", "A test game description");
 
-        var gameRequest = new GameRequest
+        var existingGame = new Game
         {
-            GameAlias = "existing-game",
-            Name = "Existing Game",
-            Description = "An existing game",
+            GameAlias = gameRequest.GameAlias!,
+            Name = "Test Game",
+            Description = "Existing game description",
         };
 
-        repository.Setup(r => r.GetByAliasAsync(It.IsAny<string>())).ReturnsAsync(new Game());
+        _mockRepository.Setup(repo => repo.GetByAliasAsync(gameRequest.GameAlias!))
+            .ReturnsAsync(existingGame);
 
-        // Act
-        var (isSuccess, errorMessage) = await service.CreateGameAsync(gameRequest);
-
-        // Assert
-        Assert.False(isSuccess);
-        Assert.Equal("Game alias must be unique", errorMessage);
-
-        repository.Verify(r => r.AddAsync(It.IsAny<Game>()), Times.Never);
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _gameService.CreateGameAsync(gameRequest));
     }
 
-    /// <summary>
-    /// Test that checks whether the CreateGameAsync method of the GameService correctly
-    /// handles an exception during execution and returns the appropriate error message.
-    /// </summary>
     [Fact]
-    public async Task CreateGameAsync_ShouldHandleException()
+    public async Task GetGameByAliasAsync_ShouldReturnGameResponse_WhenGameExists()
     {
         // Arrange
-        var repository = new Mock<IGameRepository>();
-        repository.Setup(r => r.GetByAliasAsync(It.IsAny<string>())).Throws(new Exception("Test exception"));
-        var service = new GameService(repository.Object);
-
-        var gameRequest = new GameRequest
-        {
-            GameAlias = "new-game",
-            Name = "New Game",
-            Description = "A new game",
-        };
-
-        // Act
-        var (isSuccess, errorMessage) = await service.CreateGameAsync(gameRequest);
-
-        // Assert
-        Assert.False(isSuccess);
-        Assert.Equal("An error occurred: Test exception", errorMessage);
-
-        repository.Verify(r => r.AddAsync(It.IsAny<Game>()), Times.Never);
-    }
-
-    /// <summary>
-    /// Positive test that verifies whether the GetGameByAliasAsync method of the GameService
-    /// correctly returns a game with the specified alias when such a game exists in the repository.
-    /// </summary>
-    [Fact]
-    public async Task GetGameByAliasAsync_ShouldReturnGame()
-    {
-        // Arrange
-        var repository = new Mock<IGameRepository>();
-        var service = new GameService(repository.Object);
-
-        var gameAlias = "existing-game";
+        var gameAlias = "test-game";
         var existingGame = new Game
         {
             GameAlias = gameAlias,
-            Name = "Existing Game",
-            Description = "An existing game",
+            Name = "Test Game",
+            Description = "A test game description",
         };
 
-        repository.Setup(r => r.GetByAliasAsync(gameAlias)).ReturnsAsync(existingGame);
+        _mockRepository.Setup(repo => repo.GetByAliasAsync(gameAlias))
+            .ReturnsAsync(existingGame);
 
         // Act
-        var result = await service.GetGameByAliasAsync(gameAlias);
+        var result = await _gameService.GetGameByAliasAsync(gameAlias);
 
         // Assert
-        Assert.True(result.IsSuccess);
-        Assert.Null(result.ErrorMessage);
-        Assert.NotNull(result.Game);
-        Assert.Equal(gameAlias, result.Game.GameAlias);
-        Assert.Equal(existingGame.Name, result.Game.Name);
-        Assert.Equal(existingGame.Description, result.Game.Description);
+        Assert.NotNull(result);
+        Assert.Equal(existingGame.GameAlias, result.GameAlias);
+        Assert.Equal(existingGame.Name, result.Name);
+        Assert.Equal(existingGame.Description, result.Description);
     }
 
-    /// <summary>
-    /// Positive test that verifies whether the GetGameByAliasAsync method of the GameService
-    /// correctly returns a response indicating that the game with the specified alias is not found
-    /// when such a game is absent in the repository.
-    /// </summary>
     [Fact]
-    public async Task GetGameByAliasAsync_ShouldReturnGameNotFound()
+    public async Task GetGameByAliasAsync_ShouldThrowException_WhenGameNotFound()
     {
         // Arrange
-        var repository = new Mock<IGameRepository>();
-        var service = new GameService(repository.Object);
+        var gameAlias = "non-existing-game";
 
-        var gameAlias = "non-existent-game";
+        _mockRepository.Setup(repo => repo.GetByAliasAsync(gameAlias))
+            .ReturnsAsync((Game)null);
 
-        repository.Setup(r => r.GetByAliasAsync(gameAlias)).ReturnsAsync((Game)null);
-
-        // Act
-        var result = await service.GetGameByAliasAsync(gameAlias);
-
-        // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Equal("Game not found", result.ErrorMessage);
-        Assert.Null(result.Game);
-    }
-
-    /// <summary>
-    /// Test that checks whether the GetGameByAliasAsync method of the GameService correctly handles
-    /// an exception that occurred during the execution of the repository method and returns the
-    /// appropriate error message.
-    /// </summary>
-    [Fact]
-    public async Task GetGameByAliasAsync_ShouldReturnErrorMessageOnException()
-    {
-        // Arrange
-        var repository = new Mock<IGameRepository>();
-        var service = new GameService(repository.Object);
-
-        var gameAlias = "existing-game";
-
-        repository.Setup(r => r.GetByAliasAsync(gameAlias)).ThrowsAsync(new Exception("An error occurred"));
-
-        // Act
-        var result = await service.GetGameByAliasAsync(gameAlias);
-
-        // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Equal("An error occurred", result.ErrorMessage);
-        Assert.Null(result.Game);
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _gameService.GetGameByAliasAsync(gameAlias));
     }
 
     /// <summary>
@@ -183,29 +103,29 @@ public class GameServiceTests
     /// GameService correctly updates an existing game with valid input data.
     /// </summary>
     [Fact]
-    public async Task UpdateGameAsync_ShouldUpdateGame()
+    public async Task UpdateGameAsync_ShouldUpdateExistingGame()
     {
         // Arrange
-        var repository = new Mock<IGameRepository>();
-        var service = new GameService(repository.Object);
+        var gameRequest = CreateGameRequest("test-game", "Updated Test Game", "Updated game description");
 
-        var gameRequest = new GameRequest
+        var existingGame = new Game
         {
-            GameAlias = "existing-game",
-            Name = "Updated Game",
-            Description = "An updated game",
+            GameAlias = gameRequest.GameAlias!,
+            Name = "Test Game",
+            Description = "A test game description",
         };
 
-        repository.Setup(r => r.GetByAliasAsync(It.IsAny<string>())).ReturnsAsync(new Game());
+        _mockRepository.Setup(repo => repo.GetByAliasAsync(gameRequest.GameAlias!))
+            .ReturnsAsync(existingGame);
 
         // Act
-        var (isSuccess, errorMessage) = await service.UpdateGameAsync(gameRequest);
+        await _gameService.UpdateGameAsync(gameRequest);
 
         // Assert
-        Assert.True(isSuccess);
-        Assert.Null(errorMessage);
-
-        repository.Verify(r => r.UpdateAsync(It.IsAny<Game>()), Times.Once);
+        _mockRepository.Verify(repo => repo.GetByAliasAsync(gameRequest.GameAlias!), Times.Once);
+        _mockRepository.Verify(repo => repo.UpdateAsync(It.IsAny<Game>()), Times.Once);
+        Assert.Equal(gameRequest.Name, existingGame.Name);
+        Assert.Equal(gameRequest.Description, existingGame.Description);
     }
 
     /// <summary>
@@ -213,58 +133,16 @@ public class GameServiceTests
     /// GameService correctly returns an error message when attempting to update a game with a non-existent alias.
     /// </summary>
     [Fact]
-    public async Task UpdateGameAsync_ShouldReturnErrorIfGameNotFound()
+    public async Task UpdateGameAsync_ShouldThrowException_WhenGameNotFound()
     {
         // Arrange
-        var repository = new Mock<IGameRepository>();
-        var service = new GameService(repository.Object);
+        var gameRequest = CreateGameRequest("non-existing-game", "Updated Test Game", "Updated game description");
 
-        var gameRequest = new GameRequest
-        {
-            GameAlias = "non-existing-game",
-            Name = "Updated Game",
-            Description = "An updated game",
-        };
+        _mockRepository.Setup(repo => repo.GetByAliasAsync(gameRequest.GameAlias!))
+                      .ReturnsAsync((Game)null);
 
-        repository.Setup(r => r.GetByAliasAsync(It.IsAny<string>())).ReturnsAsync((Game)null);
-
-        // Act
-        var (isSuccess, errorMessage) = await service.UpdateGameAsync(gameRequest);
-
-        // Assert
-        Assert.False(isSuccess);
-        Assert.Equal("Can't find the Game with this Alias", errorMessage);
-
-        repository.Verify(r => r.UpdateAsync(It.IsAny<Game>()), Times.Never);
-    }
-
-    /// <summary>
-    /// Test that checks whether the UpdateGameAsync method of the
-    /// GameService correctly handles an exception during execution and returns the appropriate error message.
-    /// </summary>
-    [Fact]
-    public async Task UpdateGameAsync_ShouldHandleException()
-    {
-        // Arrange
-        var repository = new Mock<IGameRepository>();
-        repository.Setup(r => r.GetByAliasAsync(It.IsAny<string>())).Throws(new Exception("Test exception"));
-        var service = new GameService(repository.Object);
-
-        var gameRequest = new GameRequest
-        {
-            GameAlias = "existing-game",
-            Name = "Updated Game",
-            Description = "An updated game",
-        };
-
-        // Act
-        var (isSuccess, errorMessage) = await service.UpdateGameAsync(gameRequest);
-
-        // Assert
-        Assert.False(isSuccess);
-        Assert.Equal("Test exception", errorMessage);
-
-        repository.Verify(r => r.UpdateAsync(It.IsAny<Game>()), Times.Never);
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _gameService.UpdateGameAsync(gameRequest));
     }
 
     /// <summary>
@@ -272,22 +150,19 @@ public class GameServiceTests
     /// of the GameService correctly removes an existing game by its alias.
     /// </summary>
     [Fact]
-    public async Task RemoveGameAsync_ShouldRemoveGame()
+    public async Task RemoveGameAsync_ShouldRemoveExistingGame()
     {
         // Arrange
-        var repository = new Mock<IGameRepository>();
-        var service = new GameService(repository.Object);
+        var gameAlias = "test-game";
 
-        var gameAlias = "existing-game";
+        _mockRepository.Setup(repo => repo.RemoveAsync(gameAlias))
+            .Returns(Task.CompletedTask);
 
         // Act
-        var (isSuccess, errorMessage) = await service.RemoveGameAsync(gameAlias);
+        await _gameService.RemoveGameAsync(gameAlias);
 
         // Assert
-        Assert.True(isSuccess);
-        Assert.Null(errorMessage);
-
-        repository.Verify(r => r.RemoveAsync(It.IsAny<string>()), Times.Once);
+        _mockRepository.Verify(repo => repo.RemoveAsync(gameAlias), Times.Once);
     }
 
     /// <summary>
@@ -295,23 +170,17 @@ public class GameServiceTests
     /// correctly handles an exception during execution and returns the appropriate error message.
     /// </summary>
     [Fact]
-    public async Task RemoveGameAsync_ShouldHandleException()
+    public async Task RemoveGameAsync_ShouldThrowException_WhenGameNotFound()
     {
         // Arrange
-        var repository = new Mock<IGameRepository>();
-        repository.Setup(r => r.RemoveAsync(It.IsAny<string>())).Throws(new Exception("Test exception"));
-        var service = new GameService(repository.Object);
+        var gameAlias = "non-existing-game";
 
-        var gameAlias = "existing-game";
+        _mockRepository.Setup(repo => repo.RemoveAsync(gameAlias))
+            .ThrowsAsync(new InvalidOperationException("Game not found"));
 
-        // Act
-        var (isSuccess, errorMessage) = await service.RemoveGameAsync(gameAlias);
-
-        // Assert
-        Assert.False(isSuccess);
-        Assert.Equal("Test exception", errorMessage);
-
-        repository.Verify(r => r.RemoveAsync(It.IsAny<string>()), Times.Once);
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _gameService.RemoveGameAsync(gameAlias));
+        Assert.Equal("Game not found", exception.Message);
     }
 
     /// <summary>
@@ -319,25 +188,54 @@ public class GameServiceTests
     /// retrieves and correctly maps games from the repository to GameResponse objects.
     /// </summary>
     [Fact]
-    public async Task GetAllGamesAsync_ShouldReturnGameResponses()
+    public async Task GetAllGamesAsync_ShouldReturnAllGames()
     {
         // Arrange
-        var repository = new Mock<IGameRepository>();
-        var service = new GameService(repository.Object);
         var games = new List<Game>
         {
             new Game { GameAlias = "game1", Name = "Game 1", Description = "Description 1" },
             new Game { GameAlias = "game2", Name = "Game 2", Description = "Description 2" },
+            new Game { GameAlias = "game3", Name = "Game 3", Description = "Description 3" },
         };
 
-        repository.Setup(r => r.GetAllAsync()).ReturnsAsync(games);
+        _mockRepository.Setup(repo => repo.GetAllAsync())
+            .ReturnsAsync(games);
 
         // Act
-        var result = await service.GetAllGamesAsync();
+        var result = await _gameService.GetAllGamesAsync();
 
         // Assert
-        Assert.NotNull(result);
-        Assert.NotEmpty(result);
         Assert.Equal(games.Count, result.Count());
+
+        for (int i = 0; i < games.Count; i++)
+        {
+            Assert.Equal(games[i].GameAlias, result.ElementAt(i).GameAlias);
+            Assert.Equal(games[i].Name, result.ElementAt(i).Name);
+            Assert.Equal(games[i].Description, result.ElementAt(i).Description);
+        }
+    }
+
+    [Fact]
+    public async Task GetAllGamesAsync_ShouldReturnEmptyList_WhenNoGamesFound()
+    {
+        // Arrange
+        _mockRepository.Setup(repo => repo.GetAllAsync())
+            .ReturnsAsync(new List<Game>());
+
+        // Act
+        var result = await _gameService.GetAllGamesAsync();
+
+        // Assert
+        Assert.Empty(result);
+    }
+
+    private static GameRequest CreateGameRequest(string gameAlias, string name, string description)
+    {
+        return new GameRequest
+        {
+            GameAlias = gameAlias,
+            Name = name,
+            Description = description,
+        };
     }
 }
