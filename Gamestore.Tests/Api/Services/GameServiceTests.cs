@@ -95,7 +95,7 @@ public class GameServiceTests
             .ReturnsAsync((Game)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _gameService.GetGameByAliasAsync(gameAlias));
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _gameService.GetGameByAliasAsync(gameAlias));
     }
 
     /// <summary>
@@ -142,7 +142,7 @@ public class GameServiceTests
                       .ReturnsAsync((Game)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _gameService.UpdateGameAsync(gameRequest));
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _gameService.UpdateGameAsync(gameRequest));
     }
 
     /// <summary>

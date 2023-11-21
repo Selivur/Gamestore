@@ -31,7 +31,7 @@ public class GameRepository : IGameRepository
     /// <inheritdoc />
     public async Task<Game?> GetByAliasAsync(string gameAlias)
     {
-        return await _context.Games.SingleOrDefaultAsync(g => g.GameAlias == gameAlias);
+        return await _context.Games.SingleOrDefaultAsync(g => g.GameAlias.Equals(gameAlias));
     }
 
     /// <inheritdoc />
@@ -44,33 +44,42 @@ public class GameRepository : IGameRepository
     public async Task AddAsync(Game game)
     {
         _context.Games.Add(game);
-        var saved = await _context.SaveChangesAsync();
-        if (saved == 0)
-        {
-            throw new InvalidOperationException("Error when adding a game to the database.");
-        }
+        await SaveChangesAsync("Error when adding the game to the database.");
     }
 
     /// <inheritdoc />
     public async Task UpdateAsync(Game game)
     {
         _context.Entry(game).State = EntityState.Modified;
-        var saved = await _context.SaveChangesAsync();
-        if (saved == 0)
-        {
-            throw new InvalidOperationException("Error when updating a game in the database.");
-        }
+
+        await SaveChangesAsync("Error when updating the game in the database.");
     }
 
     /// <inheritdoc />
     public async Task RemoveAsync(string gameAlias)
     {
-        var game = await _context.Games.SingleAsync(g => g.GameAlias == gameAlias);
-        _context.Games.Remove(game);
+        var game = await _context.Games.SingleOrDefaultAsync(g => g.GameAlias.Equals(gameAlias));
+
+        if (game != null)
+        {
+            _context.Games.Remove(game);
+            await SaveChangesAsync("Error when deleting the game from the database.");
+        }
+    }
+
+    /// <summary>
+    /// Asynchronously saves changes to the database context and throws a <see cref="DbUpdateException"/>
+    /// with the specified error message if no changes were saved.
+    /// </summary>
+    /// <param name="errorMessage">The error message to be included in the exception if no changes were saved.</param>
+    /// <returns>An asynchronous task representing the operation's completion or throwing a <see cref="DbUpdateException"/>.</returns>
+    private async Task SaveChangesAsync(string errorMessage)
+    {
         var saved = await _context.SaveChangesAsync();
+
         if (saved == 0)
         {
-            throw new InvalidOperationException("Error when deleting a game from the database.");
+            throw new DbUpdateException(errorMessage);
         }
     }
 }

@@ -81,6 +81,7 @@ public class GameController : ControllerBase
     public async Task<IActionResult> RemoveGame(string gameAlias)
     {
         await _gameService.RemoveGameAsync(gameAlias);
+
         return NoContent();
     }
 
@@ -98,6 +99,7 @@ public class GameController : ControllerBase
         var fileName = $"{game.Name}_{DateTime.Now:yyyyMMddHHmmss}.txt";
         var contentType = "text/plain";
         var bytes = Encoding.UTF8.GetBytes(content);
+
         return File(bytes, contentType, fileName);
     }
 
