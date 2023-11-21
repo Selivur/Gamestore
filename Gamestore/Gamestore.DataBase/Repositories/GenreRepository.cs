@@ -44,7 +44,7 @@ public class GenreRepository : IGenreRepository
     {
         _context.Genres.Add(genre);
 
-        await SaveChangesAsync("Error when adding the game from the database.");
+        await SaveChangesAsync("Error when adding the platform from the database.");
     }
 
     /// <inheritdoc />
@@ -52,7 +52,7 @@ public class GenreRepository : IGenreRepository
     {
         _context.Entry(genre).State = EntityState.Modified;
 
-        await SaveChangesAsync("Error when updating the game from the database.");
+        await SaveChangesAsync("Error when updating the platform from the database.");
     }
 
     /// <inheritdoc />
@@ -67,7 +67,7 @@ public class GenreRepository : IGenreRepository
 
         _context.Genres.Remove(genreToRemove);
 
-        await SaveChangesAsync("Error when deleting the game from the database.");
+        await SaveChangesAsync("Error when deleting the platform from the database.");
     }
 
     /// <summary>
