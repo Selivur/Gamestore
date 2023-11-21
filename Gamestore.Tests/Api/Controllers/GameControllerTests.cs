@@ -68,7 +68,7 @@ public class GameControllerTests
         var result = await _gameController.GetGame(gameAlias);
 
         // Assert
-        Assert.IsType<OkResult>(result);
+        Assert.IsType<OkObjectResult>(result);
     }
 
     /// <summary>
