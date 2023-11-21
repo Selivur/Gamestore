@@ -5,7 +5,7 @@ namespace Gamestore.Database.Repositories.Interfaces;
 /// <summary>
 /// Represents an interface for interacting with a genre repository.
 /// </summary>
-internal interface IGenreRepository
+public interface IGenreRepository
 {
     /// <summary>
     /// Retrieves a genre by its unique identifier asynchronously.
@@ -13,6 +13,13 @@ internal interface IGenreRepository
     /// <param name="id">The unique identifier of the game to retrieve.</param>
     /// <returns>An asynchronous task that returns the retrieved genre.</returns>
     Task<Genre?> GetByIdAsync(int id);
+
+    /// <summary>
+    /// Retrieves a genre by its name asynchronously.
+    /// </summary>
+    /// <param name="name">The name of the genre to retrieve.</param>
+    /// <returns>An asynchronous task that returns the retrieved genre.</returns>
+    Task<Game?> GetByNameAsync(string name);
 
     /// <summary>
     /// Retrieves all genres in the repository asynchronously.

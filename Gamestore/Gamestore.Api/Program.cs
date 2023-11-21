@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddScoped<IGameRepository, GameRepository>();
+builder.Services.AddScoped<IGenreRepository, GenreRepository>();
 
 builder.Services.AddDbContext<GamestoreContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Gamestore.Api")));

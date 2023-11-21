@@ -8,7 +8,7 @@ namespace Gamestore.Database.Repositories;
 /// <summary>
 /// Implementation of the <see cref="IGenreRepository"/> interface for interacting with genres in the database.
 /// </summary>
-internal class GenreRepository : IGenreRepository
+public class GenreRepository : IGenreRepository
 {
     private readonly GamestoreContext _context;
 
@@ -28,6 +28,12 @@ internal class GenreRepository : IGenreRepository
     }
 
     /// <inheritdoc />
+    public async Task<Game?> GetByNameAsync(string name)
+    {
+        return await _context.Games.SingleOrDefaultAsync(g => g.GameAlias.Equals(name));
+    }
+
+    /// <inheritdoc />
     public async Task<IEnumerable<Genre>> GetAllAsync()
     {
         return await _context.Genres.ToListAsync();
@@ -37,22 +43,16 @@ internal class GenreRepository : IGenreRepository
     public async Task AddAsync(Genre genre)
     {
         _context.Genres.Add(genre);
-        var saved = await _context.SaveChangesAsync();
-        if (saved == 0)
-        {
-            throw new InvalidOperationException("Error when adding a genre to the database.");
-        }
+
+        await SaveChangesAsync("Error when adding the game from the database.");
     }
 
     /// <inheritdoc />
     public async Task UpdateAsync(Genre genre)
     {
         _context.Entry(genre).State = EntityState.Modified;
-        var saved = await _context.SaveChangesAsync();
-        if (saved == 0)
-        {
-            throw new InvalidOperationException("Error when adding a genre to the database.");
-        }
+
+        await SaveChangesAsync("Error when updating the game from the database.");
     }
 
     /// <inheritdoc />
@@ -61,10 +61,22 @@ internal class GenreRepository : IGenreRepository
         var genreToRemove = await _context.Genres.FindAsync(id) ?? throw new InvalidOperationException("Genre not found");
 
         _context.Genres.Remove(genreToRemove);
+
+        await SaveChangesAsync("Error when deleting the game from the database.");
+    }
+
+    /// <summary>
+    /// Asynchronously saves changes to the database context and throws a <see cref="DbUpdateException"/>
+    /// with the specified error message if no changes were saved.
+    /// </summary>
+    /// <param name="errorMessage">The error message to be included in the exception if no changes were saved.</param>
+    /// <returns>An asynchronous task representing the operation's completion or throwing a <see cref="DbUpdateException"/>.</returns>
+    private async Task SaveChangesAsync(string errorMessage)
+    {
         var saved = await _context.SaveChangesAsync();
         if (saved == 0)
         {
-            throw new InvalidOperationException("Error when deleting a game from the database.");
+            throw new DbUpdateException(errorMessage);
         }
     }
 }
