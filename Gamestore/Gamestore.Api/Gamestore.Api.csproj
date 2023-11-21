@@ -25,4 +25,8 @@
     <ProjectReference Include="..\Gamestore.DataBase\Gamestore.Database.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

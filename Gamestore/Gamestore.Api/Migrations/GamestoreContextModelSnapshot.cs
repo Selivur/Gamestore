@@ -69,9 +69,17 @@ namespace Gamestore.Api.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("ParentId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("ParentId");
 
                     b.ToTable("Genres");
                 });
@@ -96,7 +104,7 @@ namespace Gamestore.Api.Migrations
             modelBuilder.Entity("Gamestore.Database.Entities.Game", b =>
                 {
                     b.HasOne("Gamestore.Database.Entities.Genre", "Genre")
-                        .WithMany()
+                        .WithMany("Games")
                         .HasForeignKey("GenreId");
 
                     b.HasOne("Gamestore.Database.Entities.Platform", "Platforms")
@@ -106,6 +114,20 @@ namespace Gamestore.Api.Migrations
                     b.Navigation("Genre");
 
                     b.Navigation("Platforms");
+                });
+
+            modelBuilder.Entity("Gamestore.Database.Entities.Genre", b =>
+                {
+                    b.HasOne("Gamestore.Database.Entities.Genre", "ParentGenre")
+                        .WithMany()
+                        .HasForeignKey("ParentId");
+
+                    b.Navigation("ParentGenre");
+                });
+
+            modelBuilder.Entity("Gamestore.Database.Entities.Genre", b =>
+                {
+                    b.Navigation("Games");
                 });
 #pragma warning restore 612, 618
         }

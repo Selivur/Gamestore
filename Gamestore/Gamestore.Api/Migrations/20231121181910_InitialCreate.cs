@@ -5,7 +5,7 @@
 namespace Gamestore.Api.Migrations;
 
 /// <inheritdoc />
-public partial class InitalMigrate : Migration
+public partial class InitialCreate : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,11 +16,17 @@ public partial class InitalMigrate : Migration
             {
                 Id = table.Column<int>(type: "int", nullable: false)
                     .Annotation("SqlServer:Identity", "1, 1"),
-                Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                ParentId = table.Column<int>(type: "int", nullable: true),
             },
             constraints: table =>
             {
                 table.PrimaryKey("PK_Genres", x => x.Id);
+                table.ForeignKey(
+                    name: "FK_Genres_Genres_ParentId",
+                    column: x => x.ParentId,
+                    principalTable: "Genres",
+                    principalColumn: "Id");
             });
 
         migrationBuilder.CreateTable(
@@ -78,6 +84,17 @@ public partial class InitalMigrate : Migration
             name: "IX_Games_PlatformsId",
             table: "Games",
             column: "PlatformsId");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_Genres_Name",
+            table: "Genres",
+            column: "Name",
+            unique: true);
+
+        migrationBuilder.CreateIndex(
+            name: "IX_Genres_ParentId",
+            table: "Genres",
+            column: "ParentId");
     }
 
     /// <inheritdoc />

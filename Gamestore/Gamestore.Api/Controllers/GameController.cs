@@ -49,9 +49,9 @@ public class GameController : ControllerBase
     [HttpGet("{gameAlias}")]
     public async Task<IActionResult> GetGame(string gameAlias)
     {
-        await _gameService.GetGameByAliasAsync(gameAlias);
+        var result = await _gameService.GetGameByAliasAsync(gameAlias);
 
-        return Ok();
+        return Ok(result);
     }
 
     /// <summary>
