@@ -60,6 +60,11 @@ public class GenreRepository : IGenreRepository
     {
         var genreToRemove = await _context.Genres.SingleOrDefaultAsync(g => g.Name.Equals(name)) ?? throw new InvalidOperationException("Genre not found");
 
+        if (genreToRemove.ParentId is null)
+        {
+            throw new DbUpdateException("Can't delete parent genre");
+        }
+
         _context.Genres.Remove(genreToRemove);
 
         await SaveChangesAsync("Error when deleting the game from the database.");
