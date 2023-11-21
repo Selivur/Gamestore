@@ -19,7 +19,7 @@ public interface IGenreRepository
     /// </summary>
     /// <param name="name">The name of the genre to retrieve.</param>
     /// <returns>An asynchronous task that returns the retrieved genre.</returns>
-    Task<Game?> GetByNameAsync(string name);
+    Task<Genre?> GetByNameAsync(string name);
 
     /// <summary>
     /// Retrieves all genres in the repository asynchronously.
@@ -44,7 +44,7 @@ public interface IGenreRepository
     /// <summary>
     /// Removes a game from the repository by its unique identifier asynchronously.
     /// </summary>
-    /// <param name="id">The unique alias of the game to remove.</param>
+    /// <param name="name">The unique alias of the game to remove.</param>
     /// <returns>An asynchronous task representing the operation's completion or throwing an error when failed to remove the genre.</returns>
-    Task RemoveAsync(int id);
+    Task RemoveAsync(string name);
 }

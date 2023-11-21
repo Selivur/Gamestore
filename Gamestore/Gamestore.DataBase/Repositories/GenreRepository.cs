@@ -28,9 +28,9 @@ public class GenreRepository : IGenreRepository
     }
 
     /// <inheritdoc />
-    public async Task<Game?> GetByNameAsync(string name)
+    public async Task<Genre?> GetByNameAsync(string name)
     {
-        return await _context.Games.SingleOrDefaultAsync(g => g.GameAlias.Equals(name));
+        return await _context.Genres.SingleOrDefaultAsync(g => g.Name.Equals(name));
     }
 
     /// <inheritdoc />
@@ -56,9 +56,9 @@ public class GenreRepository : IGenreRepository
     }
 
     /// <inheritdoc />
-    public async Task RemoveAsync(int id)
+    public async Task RemoveAsync(string name)
     {
-        var genreToRemove = await _context.Genres.FindAsync(id) ?? throw new InvalidOperationException("Genre not found");
+        var genreToRemove = await _context.Genres.SingleOrDefaultAsync(g => g.Name.Equals(name)) ?? throw new InvalidOperationException("Genre not found");
 
         _context.Genres.Remove(genreToRemove);
 
