@@ -30,9 +30,9 @@ public class GenreService : IGenreService
     /// <inheritdoc/>
     public async Task AddGenreAsync(GenreRequest genre)
     {
-        var existingGame = await _repository.GetByNameAsync(genre.Name);
+        var existingGenre = await _repository.GetByNameAsync(genre.Name);
 
-        if (existingGame != null)
+        if (existingGenre != null)
         {
             throw new InvalidOperationException("Genre name must be unique");
         }
@@ -63,12 +63,12 @@ public class GenreService : IGenreService
     }
 
     /// <inheritdoc/>
-    public async Task UpdateGenreAsync(int id, GenreRequest genre)
+    public async Task UpdateGenreAsync(GenreUpdateRequest request)
     {
-        var existingGenre = await _repository.GetByIdAsync(id) ?? throw new KeyNotFoundException("Can't find the Genre with this id");
+        var existingGenre = await _repository.GetByIdAsync(request.Id) ?? throw new KeyNotFoundException("Can't find the Genre with this id");
 
-        existingGenre.Name = genre.Name;
-        existingGenre.ParentId = genre.ParentId;
+        existingGenre.Name = request.Genre.Name;
+        existingGenre.ParentId = request.Genre.ParentId;
 
         await _repository.UpdateAsync(existingGenre);
     }

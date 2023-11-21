@@ -38,10 +38,9 @@ public interface IGenreService
     /// <summary>
     /// Updates a genre by its identifier.
     /// </summary>
-    /// <param name="id">The identifier of the genre to be updated.</param>
-    /// <param name="genre">The updated data for the genre.</param>
+    /// <param name="request">The request object containing the identifier and updated data for the genre.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task UpdateGenreAsync(int id, GenreRequest genre);
+    Task UpdateGenreAsync(GenreUpdateRequest request);
 
     /// <summary>
     /// Removes a genre by its name.
