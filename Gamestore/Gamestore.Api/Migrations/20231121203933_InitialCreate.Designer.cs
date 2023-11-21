@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gamestore.Api.Migrations
 {
     [DbContext(typeof(GamestoreContext))]
-    [Migration("20231121181910_InitialCreate")]
+    [Migration("20231121203933_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -97,9 +97,12 @@ namespace Gamestore.Api.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Type")
+                        .IsUnique();
 
                     b.ToTable("Platforms");
                 });

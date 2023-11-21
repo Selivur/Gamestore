@@ -35,7 +35,7 @@ public partial class InitialCreate : Migration
             {
                 Id = table.Column<int>(type: "int", nullable: false)
                     .Annotation("SqlServer:Identity", "1, 1"),
-                Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                Type = table.Column<string>(type: "nvarchar(450)", nullable: false),
             },
             constraints: table =>
             {
@@ -95,6 +95,12 @@ public partial class InitialCreate : Migration
             name: "IX_Genres_ParentId",
             table: "Genres",
             column: "ParentId");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_Platforms_Type",
+            table: "Platforms",
+            column: "Type",
+            unique: true);
     }
 
     /// <inheritdoc />

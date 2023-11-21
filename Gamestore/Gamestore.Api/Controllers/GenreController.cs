@@ -47,7 +47,7 @@ public class GenreController : ControllerBase
             return BadRequest(GetErrorMessages());
         }
 
-        await _genreService.UpdateGenreAsync(request.Id, request.Genre);
+        await _genreService.UpdateGenreAsync(request);
 
         return Ok($"Genre with ID {request.Id} updated successfully");
     }
