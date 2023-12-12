@@ -116,9 +116,9 @@ public class PlatformRepositoryTests
 
         var platforms = new List<Platform>
             {
-                new Platform { Id = 1, Type = "PC" },
-                new Platform { Id = 2, Type = "PlayStation" },
-                new Platform { Id = 3, Type = "Xbox" },
+                new() { Id = 1, Type = "PC" },
+                new() { Id = 2, Type = "PlayStation" },
+                new() { Id = 3, Type = "Xbox" },
             };
 
         context.Platforms.AddRange(platforms);

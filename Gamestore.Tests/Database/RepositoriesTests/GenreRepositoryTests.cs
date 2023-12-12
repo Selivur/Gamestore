@@ -110,9 +110,9 @@ public class GenreRepositoryTests
 
         var genres = new List<Genre>
         {
-            new Genre { Id = 1, Name = "Adventure" },
-            new Genre { Id = 2, Name = "Action" },
-            new Genre { Id = 3, Name = "RPG" },
+            new() { Id = 1, Name = "Adventure" },
+            new() { Id = 2, Name = "Action" },
+            new() { Id = 3, Name = "RPG" },
         };
 
         context.Genres.AddRange(genres);
