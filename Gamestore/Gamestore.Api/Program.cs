@@ -1,4 +1,5 @@
 using Gamestore.Api.Filters;
+using Gamestore.Api.Middleware;
 using Gamestore.Api.Services;
 using Gamestore.Api.Services.Interfaces;
 using Gamestore.Database.Dbcontext;
@@ -43,5 +44,9 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<IpAddressLoggingMiddleware>();
+
+app.UseMiddleware<PerformanceLoggingMiddleware>();
 
 app.Run();
