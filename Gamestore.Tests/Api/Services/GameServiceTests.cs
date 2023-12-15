@@ -80,7 +80,7 @@ public class GameServiceTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(existingGame.GameAlias, result.GameAlias);
+        Assert.Equal(existingGame.GameAlias, result.Key);
         Assert.Equal(existingGame.Name, result.Name);
         Assert.Equal(existingGame.Description, result.Description);
     }
@@ -209,7 +209,7 @@ public class GameServiceTests
 
         for (var i = 0; i < games.Count; i++)
         {
-            Assert.Equal(games[i].GameAlias, result.ElementAt(i).GameAlias);
+            Assert.Equal(games[i].GameAlias, result.ElementAt(i).Key);
             Assert.Equal(games[i].Name, result.ElementAt(i).Name);
             Assert.Equal(games[i].Description, result.ElementAt(i).Description);
         }

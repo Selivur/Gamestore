@@ -62,7 +62,7 @@ public class GameControllerTests
     {
         // Arrange
         var gameAlias = "TestAlias";
-        _gameServiceMock.Setup(x => x.GetGameByAliasAsync(gameAlias)).ReturnsAsync(new GameResponse { GameAlias = gameAlias, Name = "Test Game" });
+        _gameServiceMock.Setup(x => x.GetGameByAliasAsync(gameAlias)).ReturnsAsync(new GameResponse { Key = gameAlias, Name = "Test Game" });
 
         // Act
         var result = await _gameController.GetGame(gameAlias);
@@ -132,7 +132,7 @@ public class GameControllerTests
         var gameAlias = "TestAlias";
         var game = new GameResponse
         {
-            GameAlias = gameAlias,
+            Key = gameAlias,
             Name = "TestGame",
             Description = "TestDescription",
         };
@@ -146,7 +146,7 @@ public class GameControllerTests
         var fileResult = result as FileContentResult;
         Assert.NotNull(fileResult);
 
-        var expectedContent = $"Game Alias: {game.GameAlias}\n" +
+        var expectedContent = $"Game Alias: {game.Key}\n" +
                               $"Name: {game.Name}\n" +
                               $"Description: {game.Description}";
         var expectedFileName = $"{game.Name}_{DateTime.Now:yyyyMMddHHmmss}.txt";
@@ -165,8 +165,8 @@ public class GameControllerTests
         // Arrange
         var expectedGames = new List<GameResponse>
         {
-            new() { GameAlias = "Alias1", Name = "Game1" },
-            new() { GameAlias = "Alias2", Name = "Game2" },
+            new() { Key = "Alias1", Name = "Game1" },
+            new() { Key = "Alias2", Name = "Game2" },
         };
         _gameServiceMock.Setup(x => x.GetAllGamesAsync()).ReturnsAsync(expectedGames);
 

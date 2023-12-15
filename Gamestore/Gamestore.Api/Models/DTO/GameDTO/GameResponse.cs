@@ -8,7 +8,7 @@ public class GameResponse
     /// <summary>
     /// Gets or sets the alias of the game.
     /// </summary>
-    public string GameAlias { get; set; }
+    public string Key { get; set; }
 
     /// <summary>
     /// Gets or sets the name of the game.

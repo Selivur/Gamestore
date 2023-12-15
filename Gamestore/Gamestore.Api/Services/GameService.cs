@@ -52,7 +52,7 @@ public class GameService : IGameService
 
         GameResponse newGame = new()
         {
-            GameAlias = game.GameAlias,
+            Key = game.GameAlias,
             Name = game.Name,
             Description = game.Description,
         };
@@ -85,7 +85,7 @@ public class GameService : IGameService
 
         var gameResponses = games.Select(game => new GameResponse
         {
-            GameAlias = game.GameAlias,
+            Key = game.GameAlias,
             Name = game.Name,
             Description = game.Description,
         }).ToList();
