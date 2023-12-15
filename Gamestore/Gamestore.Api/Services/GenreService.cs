@@ -22,9 +22,13 @@ public class GenreService : IGenreService
     }
 
     /// <inheritdoc/>
-    public async Task<IEnumerable<Genre>> GetAllGenresAsync()
+    public async Task<IEnumerable<GenreResponse>> GetAllGenresAsync()
     {
-        return await _repository.GetAllAsync();
+        var genres = await _repository.GetAllAsync();
+
+        var genreResponses = genres.Select(GenreResponse.FromGenre).ToList();
+
+        return genreResponses;
     }
 
     /// <inheritdoc/>

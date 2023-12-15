@@ -1,5 +1,4 @@
 ﻿using Gamestore.Api.Models.DTO.GenreDTO;
-using Gamestore.Database.Entities;
 
 namespace Gamestore.Api.Services.Interfaces;
 
@@ -12,7 +11,7 @@ public interface IGenreService
     /// Gets all genres.
     /// </summary>
     /// <returns>The collection of all genres.</returns>
-    Task<IEnumerable<Genre>> GetAllGenresAsync();
+    Task<IEnumerable<GenreResponse>> GetAllGenresAsync();
 
     /// <summary>
     /// Adds a new genre.

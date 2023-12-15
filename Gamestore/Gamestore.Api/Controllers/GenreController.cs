@@ -97,6 +97,20 @@ public class GenreController : ControllerBase
     }
 
     /// <summary>
+    /// Retrieves all genre.
+    /// </summary>
+    /// <returns>
+    /// Returns an HTTP 200 OK response with the list of genres.
+    /// </returns>
+    [HttpGet]
+    public async Task<IActionResult> GetAllGenres()
+    {
+        var genres = await _genreService.GetAllGenresAsync();
+
+        return Ok(genres);
+    }
+
+    /// <summary>
     /// Returns a list of error messages from the ModelState object.
     /// </summary>
     /// <returns>A list of error messages.</returns>

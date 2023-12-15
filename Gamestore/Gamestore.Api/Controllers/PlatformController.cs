@@ -85,6 +85,20 @@ public class PlatformController : ControllerBase
     }
 
     /// <summary>
+    /// Retrieves all platforms.
+    /// </summary>
+    /// <returns>
+    /// Returns an HTTP 200 OK response with the list of platforms.
+    /// </returns>
+    [HttpGet]
+    public async Task<IActionResult> GetAllPlatforms()
+    {
+        var platforms = await _platformService.GetAllPlatformsAsync();
+
+        return Ok(platforms);
+    }
+
+    /// <summary>
     /// Returns a list of error messages from the ModelState object.
     /// </summary>
     /// <returns>A list of error messages.</returns>

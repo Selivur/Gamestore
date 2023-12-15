@@ -1,5 +1,4 @@
 ﻿using Gamestore.Api.Models.DTO.PlatformDTO;
-using Gamestore.Database.Entities;
 
 namespace Gamestore.Api.Services.Interfaces;
 
@@ -12,7 +11,7 @@ public interface IPlatformService
     /// Gets all platforms.
     /// </summary>
     /// <returns>The collection of all platforms.</returns>
-    Task<IEnumerable<Platform>> GetAllPlatformsAsync();
+    Task<IEnumerable<PlatformResponse>> GetAllPlatformsAsync();
 
     /// <summary>
     /// Adds a new platform.

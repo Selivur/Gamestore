@@ -22,9 +22,13 @@ public class PlatformService : IPlatformService
     }
 
     /// <inheritdoc/>
-    public async Task<IEnumerable<Platform>> GetAllPlatformsAsync()
+    public async Task<IEnumerable<PlatformResponse>> GetAllPlatformsAsync()
     {
-        return await _repository.GetAllAsync();
+        var platforms = await _repository.GetAllAsync();
+
+        var platformResponses = platforms.Select(PlatformResponse.FromPlatform).ToList();
+
+        return platformResponses;
     }
 
     /// <inheritdoc/>

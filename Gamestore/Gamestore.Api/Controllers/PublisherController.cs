@@ -7,7 +7,7 @@ namespace Gamestore.Api.Controllers;
 /// <summary>
 /// API controller for managing publisher-related operations.
 /// </summary>
-[Route("publisher")]
+[Route("publishers")]
 [ApiController]
 public class PublisherController : ControllerBase
 {
@@ -58,7 +58,7 @@ public class PublisherController : ControllerBase
     /// </summary>
     /// <param name="publisherName">The name of the publisher to retrieve.</param>
     /// <returns>An IActionResult containing the retrieved publisher if successful.</returns>
-    [HttpGet("{publisherName}")]
+    [HttpGet("getByPublisherName/{publisherName}")]
     public async Task<IActionResult> GetPublisher(string publisherName)
     {
         var result = await _publisherService.GetPublisherByNameAsync(publisherName);
@@ -98,7 +98,7 @@ public class PublisherController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves all publishers from the publisher store.
+    /// Retrieves all publishers.
     /// </summary>
     /// <returns>
     /// Returns an HTTP 200 OK response with the list of publishers.
