@@ -22,8 +22,8 @@ public class PlatformController : ControllerBase
     /// <summary>
     /// Retrieves a platform by its id.
     /// </summary>
-    /// <param name="id">The id of the game to retrieve.</param>
-    /// <returns>An IActionResult containing the retrieved game if successful.</returns>
+    /// <param name="id">The id of the platform to retrieve.</param>
+    /// <returns>An IActionResult containing the retrieved platform if successful.</returns>
     [HttpGet("{id}")]
     public async Task<IActionResult> GetPlatform(int id)
     {

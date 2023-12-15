@@ -21,8 +21,8 @@ public class GenreController : ControllerBase
     /// <summary>
     /// Retrieves a genre by its id.
     /// </summary>
-    /// <param name="id">The id of the game to retrieve.</param>
-    /// <returns>An IActionResult containing the retrieved game if successful.</returns>
+    /// <param name="id">The id of the genre to retrieve.</param>
+    /// <returns>An IActionResult containing the retrieved genre if successful.</returns>
     [HttpGet("{id}")]
     public async Task<IActionResult> GetGenre(int id)
     {
