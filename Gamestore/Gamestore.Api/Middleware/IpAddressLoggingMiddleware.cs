@@ -39,6 +39,8 @@ public class IpAddressLoggingMiddleware
     /// <param name="ipAddress">The IP address to log.</param>
     private static void LogIpAddress(string ipAddress)
     {
-        File.AppendAllText("ipAddressLog.txt", $"{DateTime.Now}: IP Address: {ipAddress}\n");
+        using var fileStream = new FileStream("ipAddressLog.txt", FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+        using var writer = new StreamWriter(fileStream);
+        writer.WriteLine($"{DateTime.UtcNow}: IP Address: {ipAddress}");
     }
 }

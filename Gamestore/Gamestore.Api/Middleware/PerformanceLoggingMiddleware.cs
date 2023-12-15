@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 
 namespace Gamestore.Api.Middleware;
 
@@ -43,6 +44,8 @@ public class PerformanceLoggingMiddleware
     /// <param name="elapsedMilliseconds">The elapsed time in milliseconds.</param>
     private static void LogPerformance(long elapsedMilliseconds)
     {
-        File.AppendAllText("performanceLog.txt", $"{DateTime.Now}: Request took {elapsedMilliseconds}ms\n");
+        using var fileStream = File.Open("performanceLog.txt", FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
+        using var writer = new StreamWriter(fileStream, Encoding.UTF8);
+        writer.WriteLine($"{DateTime.Now}: Request took {elapsedMilliseconds}ms");
     }
 }
