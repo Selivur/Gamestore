@@ -43,6 +43,6 @@ public class PerformanceLoggingMiddleware
     /// <param name="elapsedMilliseconds">The elapsed time in milliseconds.</param>
     private static void LogPerformance(long elapsedMilliseconds)
     {
-        File.AppendAllText("performanceLog.txt", $"{DateTime.UtcNow}: Request took {elapsedMilliseconds}ms\n");
+        File.AppendAllText("performanceLog.txt", $"{DateTime.Now}: Request took {elapsedMilliseconds}ms\n");
     }
 }

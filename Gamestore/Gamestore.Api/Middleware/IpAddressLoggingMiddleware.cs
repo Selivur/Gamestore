@@ -39,6 +39,6 @@ public class IpAddressLoggingMiddleware
     /// <param name="ipAddress">The IP address to log.</param>
     private static void LogIpAddress(string ipAddress)
     {
-        File.AppendAllText("ipAddressLog.txt", $"{DateTime.UtcNow}: IP Address: {ipAddress}\n");
+        File.AppendAllText("ipAddressLog.txt", $"{DateTime.Now}: IP Address: {ipAddress}\n");
     }
 }
