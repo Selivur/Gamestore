@@ -43,6 +43,21 @@ public partial class InitialCreate : Migration
             });
 
         migrationBuilder.CreateTable(
+            name: "Publishers",
+            columns: table => new
+            {
+                Id = table.Column<int>(type: "int", nullable: false)
+                    .Annotation("SqlServer:Identity", "1, 1"),
+                CompanyName = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                HomePage = table.Column<string>(type: "nvarchar(max)", nullable: false),
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("PK_Publishers", x => x.Id);
+            });
+
+        migrationBuilder.CreateTable(
             name: "Games",
             columns: table => new
             {
@@ -53,6 +68,7 @@ public partial class InitialCreate : Migration
                 Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                 GenreId = table.Column<int>(type: "int", nullable: true),
                 PlatformsId = table.Column<int>(type: "int", nullable: true),
+                PublishersId = table.Column<int>(type: "int", nullable: true),
             },
             constraints: table =>
             {
@@ -66,6 +82,11 @@ public partial class InitialCreate : Migration
                     name: "FK_Games_Platforms_PlatformsId",
                     column: x => x.PlatformsId,
                     principalTable: "Platforms",
+                    principalColumn: "Id");
+                table.ForeignKey(
+                    name: "FK_Games_Publishers_PublishersId",
+                    column: x => x.PublishersId,
+                    principalTable: "Publishers",
                     principalColumn: "Id");
             });
 
@@ -86,6 +107,11 @@ public partial class InitialCreate : Migration
             column: "PlatformsId");
 
         migrationBuilder.CreateIndex(
+            name: "IX_Games_PublishersId",
+            table: "Games",
+            column: "PublishersId");
+
+        migrationBuilder.CreateIndex(
             name: "IX_Genres_Name",
             table: "Genres",
             column: "Name",
@@ -101,6 +127,12 @@ public partial class InitialCreate : Migration
             table: "Platforms",
             column: "Type",
             unique: true);
+
+        migrationBuilder.CreateIndex(
+            name: "IX_Publishers_CompanyName",
+            table: "Publishers",
+            column: "CompanyName",
+            unique: true);
     }
 
     /// <inheritdoc />
@@ -114,5 +146,8 @@ public partial class InitialCreate : Migration
 
         migrationBuilder.DropTable(
             name: "Platforms");
+
+        migrationBuilder.DropTable(
+            name: "Publishers");
     }
 }

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gamestore.Api.Migrations
 {
     [DbContext(typeof(GamestoreContext))]
-    [Migration("20231121203933_InitialCreate")]
+    [Migration("20231215170541_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -50,6 +50,9 @@ namespace Gamestore.Api.Migrations
                     b.Property<int?>("PlatformsId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PublishersId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("GameAlias")
@@ -58,6 +61,8 @@ namespace Gamestore.Api.Migrations
                     b.HasIndex("GenreId");
 
                     b.HasIndex("PlatformsId");
+
+                    b.HasIndex("PublishersId");
 
                     b.ToTable("Games");
                 });
@@ -107,6 +112,34 @@ namespace Gamestore.Api.Migrations
                     b.ToTable("Platforms");
                 });
 
+            modelBuilder.Entity("Gamestore.Database.Entities.Publisher", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HomePage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyName")
+                        .IsUnique();
+
+                    b.ToTable("Publishers");
+                });
+
             modelBuilder.Entity("Gamestore.Database.Entities.Game", b =>
                 {
                     b.HasOne("Gamestore.Database.Entities.Genre", "Genre")
@@ -117,9 +150,15 @@ namespace Gamestore.Api.Migrations
                         .WithMany()
                         .HasForeignKey("PlatformsId");
 
+                    b.HasOne("Gamestore.Database.Entities.Publisher", "Publishers")
+                        .WithMany()
+                        .HasForeignKey("PublishersId");
+
                     b.Navigation("Genre");
 
                     b.Navigation("Platforms");
+
+                    b.Navigation("Publishers");
                 });
 
             modelBuilder.Entity("Gamestore.Database.Entities.Genre", b =>

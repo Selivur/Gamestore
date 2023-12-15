@@ -58,7 +58,8 @@ public class GenreRepository : IGenreRepository
     /// <inheritdoc />
     public async Task RemoveAsync(string name)
     {
-        var genreToRemove = await _context.Genres.SingleOrDefaultAsync(g => g.Name.Equals(name)) ?? throw new InvalidOperationException("Genre not found");
+        var genreToRemove = await _context.Genres.SingleOrDefaultAsync(g => g.Name.Equals(name))
+            ?? throw new InvalidOperationException("Genre not found");
 
         if (genreToRemove.ParentId is null)
         {

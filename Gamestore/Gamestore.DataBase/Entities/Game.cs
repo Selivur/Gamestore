@@ -19,4 +19,6 @@ public class Game
     public Genre? Genre { get; set; }
 
     public Platform? Platforms { get; set; }
+
+    public Publisher? Publishers { get; set; }
 }

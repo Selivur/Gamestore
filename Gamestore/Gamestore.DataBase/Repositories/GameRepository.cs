@@ -63,8 +63,9 @@ public class GameRepository : IGameRepository
         if (game != null)
         {
             _context.Games.Remove(game);
-            await SaveChangesAsync("Error when deleting the game from the database.");
         }
+
+        await SaveChangesAsync("Error when deleting the game from the database.");
     }
 
     /// <summary>
