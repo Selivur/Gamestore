@@ -30,19 +30,6 @@ public partial class InitialCreate : Migration
             });
 
         migrationBuilder.CreateTable(
-            name: "Platforms",
-            columns: table => new
-            {
-                Id = table.Column<int>(type: "int", nullable: false)
-                    .Annotation("SqlServer:Identity", "1, 1"),
-                Type = table.Column<string>(type: "nvarchar(450)", nullable: false),
-            },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_Platforms", x => x.Id);
-            });
-
-        migrationBuilder.CreateTable(
             name: "Publishers",
             columns: table => new
             {
@@ -65,24 +52,15 @@ public partial class InitialCreate : Migration
                     .Annotation("SqlServer:Identity", "1, 1"),
                 GameAlias = table.Column<string>(type: "nvarchar(450)", nullable: false),
                 Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                Price = table.Column<int>(type: "int", nullable: false),
+                UnitInStock = table.Column<int>(type: "int", nullable: false),
+                Discount = table.Column<int>(type: "int", nullable: false),
                 Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                GenreId = table.Column<int>(type: "int", nullable: true),
-                PlatformsId = table.Column<int>(type: "int", nullable: true),
                 PublishersId = table.Column<int>(type: "int", nullable: true),
             },
             constraints: table =>
             {
                 table.PrimaryKey("PK_Games", x => x.Id);
-                table.ForeignKey(
-                    name: "FK_Games_Genres_GenreId",
-                    column: x => x.GenreId,
-                    principalTable: "Genres",
-                    principalColumn: "Id");
-                table.ForeignKey(
-                    name: "FK_Games_Platforms_PlatformsId",
-                    column: x => x.PlatformsId,
-                    principalTable: "Platforms",
-                    principalColumn: "Id");
                 table.ForeignKey(
                     name: "FK_Games_Publishers_PublishersId",
                     column: x => x.PublishersId,
@@ -90,21 +68,59 @@ public partial class InitialCreate : Migration
                     principalColumn: "Id");
             });
 
+        migrationBuilder.CreateTable(
+            name: "GameGenre",
+            columns: table => new
+            {
+                GamesId = table.Column<int>(type: "int", nullable: false),
+                GenreId = table.Column<int>(type: "int", nullable: false),
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("PK_GameGenre", x => new { x.GamesId, x.GenreId });
+                table.ForeignKey(
+                    name: "FK_GameGenre_Games_GamesId",
+                    column: x => x.GamesId,
+                    principalTable: "Games",
+                    principalColumn: "Id",
+                    onDelete: ReferentialAction.Cascade);
+                table.ForeignKey(
+                    name: "FK_GameGenre_Genres_GenreId",
+                    column: x => x.GenreId,
+                    principalTable: "Genres",
+                    principalColumn: "Id",
+                    onDelete: ReferentialAction.Cascade);
+            });
+
+        migrationBuilder.CreateTable(
+            name: "Platforms",
+            columns: table => new
+            {
+                Id = table.Column<int>(type: "int", nullable: false)
+                    .Annotation("SqlServer:Identity", "1, 1"),
+                Type = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                GameId = table.Column<int>(type: "int", nullable: true),
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("PK_Platforms", x => x.Id);
+                table.ForeignKey(
+                    name: "FK_Platforms_Games_GameId",
+                    column: x => x.GameId,
+                    principalTable: "Games",
+                    principalColumn: "Id");
+            });
+
+        migrationBuilder.CreateIndex(
+            name: "IX_GameGenre_GenreId",
+            table: "GameGenre",
+            column: "GenreId");
+
         migrationBuilder.CreateIndex(
             name: "IX_Games_GameAlias",
             table: "Games",
             column: "GameAlias",
             unique: true);
-
-        migrationBuilder.CreateIndex(
-            name: "IX_Games_GenreId",
-            table: "Games",
-            column: "GenreId");
-
-        migrationBuilder.CreateIndex(
-            name: "IX_Games_PlatformsId",
-            table: "Games",
-            column: "PlatformsId");
 
         migrationBuilder.CreateIndex(
             name: "IX_Games_PublishersId",
@@ -123,6 +139,11 @@ public partial class InitialCreate : Migration
             column: "ParentId");
 
         migrationBuilder.CreateIndex(
+            name: "IX_Platforms_GameId",
+            table: "Platforms",
+            column: "GameId");
+
+        migrationBuilder.CreateIndex(
             name: "IX_Platforms_Type",
             table: "Platforms",
             column: "Type",
@@ -139,13 +160,16 @@ public partial class InitialCreate : Migration
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropTable(
-            name: "Games");
+            name: "GameGenre");
+
+        migrationBuilder.DropTable(
+            name: "Platforms");
 
         migrationBuilder.DropTable(
             name: "Genres");
 
         migrationBuilder.DropTable(
-            name: "Platforms");
+            name: "Games");
 
         migrationBuilder.DropTable(
             name: "Publishers");

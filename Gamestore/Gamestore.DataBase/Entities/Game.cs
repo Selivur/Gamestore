@@ -14,11 +14,17 @@ public class Game
 
     public string Name { get; set; }
 
+    public int Price { get; set; }
+
+    public int UnitInStock { get; set; }
+
+    public int Discount { get; set; }
+
     public string? Description { get; set; }
 
-    public Genre? Genre { get; set; }
+    public ICollection<Genre>? Genre { get; set; }
 
-    public Platform? Platforms { get; set; }
+    public ICollection<Platform>? Platforms { get; set; }
 
     public Publisher? Publishers { get; set; }
 }
