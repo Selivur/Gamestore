@@ -1,4 +1,4 @@
-﻿using Gamestore.Api.Models.DTO.GenreDTO;
+﻿using Gamestore.Api.Models.Wrappers.Genre;
 using Gamestore.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,6 +32,21 @@ public class GenreController : ControllerBase
     }
 
     /// <summary>
+    /// Retrieves genres by their parent ID.
+    /// </summary>
+    /// <param name="id">The ID of the parent genre.</param>
+    /// <returns>
+    /// Returns an HTTP 200 OK response with the list of genres.
+    /// </returns>
+    [HttpGet("getByParentGenre/{Id}")]
+    public async Task<IActionResult> GetGenresByParentId(int id)
+    {
+        var genres = await _genreService.GetGenresByParentIdAsync(id);
+
+        return Ok(genres);
+    }
+
+    /// <summary>
     /// Updates the description of a genre through the API.
     /// </summary>
     /// <param name="request">The request object containing the identifier and updated data for the genre.</param>
@@ -40,16 +55,16 @@ public class GenreController : ControllerBase
     /// 400 Bad Request if the model state is invalid.
     /// </returns>
     [HttpPut("update")]
-    public async Task<IActionResult> UpdateGenre([FromBody] GenreUpdateRequest request)
+    public async Task<IActionResult> UpdateGenre([FromBody] GenreUpdateWrapper request)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(GetErrorMessages());
         }
 
-        await _genreService.UpdateGenreAsync(request);
+        await _genreService.UpdateGenreAsync(request.GenreRequsert);
 
-        return Ok($"Genre with ID {request.Id} updated successfully");
+        return Ok();
     }
 
     /// <summary>
@@ -71,14 +86,14 @@ public class GenreController : ControllerBase
     /// <param name="genre">The genre object to be created.</param>
     /// <returns>An IActionResult indicating whether the creation was successful.</returns>
     [HttpPost("new")]
-    public async Task<IActionResult> AddGenre([FromBody] GenreRequest genre)
+    public async Task<IActionResult> AddGenre([FromBody] GenreAddWrapper genre)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(GetErrorMessages());
         }
 
-        await _genreService.AddGenreAsync(genre);
+        await _genreService.AddGenreAsync(genre.GenreRequsert);
 
         return Ok();
     }

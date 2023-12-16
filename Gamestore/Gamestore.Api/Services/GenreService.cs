@@ -69,10 +69,15 @@ public class GenreService : IGenreService
     /// <inheritdoc/>
     public async Task UpdateGenreAsync(GenreUpdateRequest request)
     {
+        if (request.Id == request.ParentId)
+        {
+            throw new ArgumentException("Can't be parent genre for itself");
+        }
+
         var existingGenre = await _repository.GetByIdAsync(request.Id) ?? throw new KeyNotFoundException("Can't find the Genre with this id");
 
-        existingGenre.Name = request.Genre.Name;
-        existingGenre.ParentId = request.Genre.ParentId;
+        existingGenre.Name = request.Name;
+        existingGenre.ParentId = request.ParentId;
 
         await _repository.UpdateAsync(existingGenre);
     }
@@ -120,5 +125,11 @@ public class GenreService : IGenreService
         var genreResponses = genres.Select(GenreResponse.FromGenre).ToList();
 
         return genreResponses;
+    }
+
+    /// <inheritdoc/>
+    public async Task<IEnumerable<Genre>> GetGenresByParentIdAsync(int parentId)
+    {
+        return await _repository.GetByParentIdAsync(parentId);
     }
 }

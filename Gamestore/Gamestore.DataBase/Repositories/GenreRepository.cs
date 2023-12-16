@@ -89,6 +89,14 @@ public class GenreRepository : IGenreRepository
         return genreList;
     }
 
+    /// <inheritdoc />
+    public async Task<IEnumerable<Genre>> GetByParentIdAsync(int id)
+    {
+        return await _context.Genres
+            .Where(g => g.ParentId == id)
+            .ToListAsync();
+    }
+
     /// <summary>
     /// Asynchronously saves changes to the database context and throws a <see cref="DbUpdateException"/>
     /// with the specified error message if no changes were saved.

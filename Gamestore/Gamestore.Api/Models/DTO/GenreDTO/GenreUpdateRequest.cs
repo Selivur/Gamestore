@@ -7,6 +7,8 @@ public class GenreUpdateRequest
     [Required(ErrorMessage = "Id is required")]
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "Genre is required")]
-    public GenreRequest Genre { get; set; }
+    [Required(ErrorMessage = "Name is required")]
+    public string Name { get; set; }
+
+    public int? ParentId { get; set; }
 }

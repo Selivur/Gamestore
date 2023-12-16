@@ -1,4 +1,5 @@
 ﻿using Gamestore.Api.Models.DTO.GenreDTO;
+using Gamestore.Database.Entities;
 
 namespace Gamestore.Api.Services.Interfaces;
 
@@ -60,4 +61,13 @@ public interface IGenreService
     /// <param name="gameAlias">The alias of the game to filter genres.</param>
     /// <returns>An asynchronous task representing the operation, returning a list of <see cref="GenreResponse"/>.</returns>
     Task<IEnumerable<GenreResponse>> GetGenresByGameAliasAsync(string gameAlias);
+
+    /// <summary>
+    /// Retrieves a list of genres with the specified parent ID.
+    /// </summary>
+    /// <param name="parentId">The ID of the parent genre.</param>
+    /// <returns>
+    /// An asynchronous enumerable collection of genres with the specified parent ID.
+    /// </returns>
+    Task<IEnumerable<Genre>> GetGenresByParentIdAsync(int parentId);
 }

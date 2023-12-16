@@ -56,4 +56,13 @@ public interface IGenreRepository
     /// <returns>An asynchronous task that represents the operation, returning a collection of genres.</returns>
     /// <exception cref="ArgumentException">Thrown if no game is found with the specified alias.</exception>
     Task<IEnumerable<Genre>> GetByGameAliasAsync(string gameAlias);
+
+    /// <summary>
+    /// Retrieves a list of genres with the specified parent ID.
+    /// </summary>
+    /// <param name="id">The ID of the parent genre.</param>
+    /// <returns>
+    /// An asynchronous enumerable collection of genres with the specified parent ID.
+    /// </returns>
+    Task<IEnumerable<Genre>> GetByParentIdAsync(int id);
 }
