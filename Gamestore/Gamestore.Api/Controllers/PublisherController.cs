@@ -1,4 +1,4 @@
-﻿using Gamestore.Api.Models.DTO.PublisherDTO;
+﻿using Gamestore.Api.Models.Wrappers.Publisher;
 using Gamestore.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,14 +41,14 @@ public class PublisherController : ControllerBase
     /// <param name="publisher">The publisher object to be created.</param>
     /// <returns>An IActionResult indicating whether the creation was successful.</returns>
     [HttpPost("new")]
-    public async Task<IActionResult> CreatePublisher([FromBody] PublisherRequest publisher)
+    public async Task<IActionResult> CreatePublisher([FromBody] PublisherWrapper publisher)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(GetErrorMessages());
         }
 
-        await _publisherService.CreatePublisherAsync(publisher);
+        await _publisherService.CreatePublisherAsync(publisher.PublisherRequest);
 
         return Ok();
     }
@@ -72,14 +72,14 @@ public class PublisherController : ControllerBase
     /// <param name="publisher">The publisher object to update.</param>
     /// <returns>An IActionResult object representing the result of the update operation.</returns>
     [HttpPut("update")]
-    public async Task<IActionResult> UpdatePublisher([FromBody] PublisherRequest publisher)
+    public async Task<IActionResult> UpdatePublisher([FromBody] PublisherWrapper publisher)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(GetErrorMessages());
         }
 
-        await _publisherService.UpdatePublisherAsync(publisher);
+        await _publisherService.UpdatePublisherAsync(publisher.PublisherRequest);
 
         return Ok();
     }
