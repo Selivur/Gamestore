@@ -1,4 +1,4 @@
-﻿using Gamestore.Api.Models.DTO.PlatformDTO;
+﻿using Gamestore.Api.Models.Wrappers.Platform;
 using Gamestore.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -64,22 +64,22 @@ public class PlatformController : ControllerBase
     /// <summary>
     /// Updates the description of a platform through the API.
     /// </summary>
-    /// <param name="request">The request object containing the identifier and updated data for the platform.</param>
+    /// <param name="platform">The request object containing the identifier and updated data for the platform.</param>
     /// <returns>
     /// 200 OK if the update is successful.
     /// 400 Bad Request if the model state is invalid.
     /// </returns>
     [HttpPut("update")]
-    public async Task<IActionResult> UpdatePlatform([FromBody] PlatformRequest request)
+    public async Task<IActionResult> UpdatePlatform([FromBody] PlatformUpdateWrapper platform)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(GetErrorMessages());
         }
 
-        await _platformService.UpdatePlatformAsync(request);
+        await _platformService.UpdatePlatformAsync(platform.PlatformRequest);
 
-        return Ok($"Platform with ID {request.Id} updated successfully");
+        return Ok();
     }
 
     /// <summary>
@@ -98,17 +98,12 @@ public class PlatformController : ControllerBase
     /// <summary>
     /// Creates a new platform in the database.
     /// </summary>
-    /// <param name="name">The platform name to be created.</param>
+    /// <param name="platform">The platform wrapper to be created.</param>
     /// <returns>An IActionResult indicating whether the creation was successful.</returns>
     [HttpPost("new")]
-    public async Task<IActionResult> AddPlatform([FromBody] string name)
+    public async Task<IActionResult> AddPlatform([FromBody] PlatformAddWrapper platform)
     {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
-
-        await _platformService.AddPlatformAsync(name);
+        await _platformService.AddPlatformAsync(platform.PlatformTypeRequest.Type);
 
         return Ok();
     }
