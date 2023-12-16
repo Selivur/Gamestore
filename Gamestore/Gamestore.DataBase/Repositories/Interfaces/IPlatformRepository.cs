@@ -44,8 +44,16 @@ public interface IPlatformRepository
     /// <summary>
     /// Removes a platform from the repository by its unique identifier asynchronously.
     /// </summary>
-    /// <param name="name">The unique alias of the platform to remove.</param>
-    /// <returns>An asynchronous task representing the operation's completion or throwing an error when failed to remove the genre.</returns>
-    /// <exception cref="ArgumentException">Thrown if no platform is found with the specified name.</exception>
-    Task RemoveAsync(string name);
+    /// <param name="id">The unique id of the platform to remove.</param>
+    /// <returns>An asynchronous task representing the operation's completion or throwing an error when failed to remove the platform.</returns>
+    /// <exception cref="ArgumentException">Thrown if no platform is found with the specified id.</exception>
+    Task RemoveAsync(int id);
+
+    /// <summary>
+    /// Retrieves a collection of platforms associated with a specified game alias.
+    /// </summary>
+    /// <param name="gameAlias">The alias of the game.</param>
+    /// <returns>An asynchronous task that represents the operation, returning a collection of platforms.</returns>
+    /// <exception cref="ArgumentException">Thrown if no game is found with the specified alias.</exception>
+    Task<IEnumerable<Platform>> GetByGameAliasAsync(string gameAlias);
 }

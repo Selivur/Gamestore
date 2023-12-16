@@ -56,10 +56,10 @@ public class GenreRepository : IGenreRepository
     }
 
     /// <inheritdoc />
-    public async Task RemoveAsync(string name)
+    public async Task RemoveAsync(int id)
     {
-        var genreToRemove = await _context.Genres.SingleOrDefaultAsync(g => g.Name.Equals(name))
-            ?? throw new ArgumentException($"No genre found with name '{name}'.", nameof(name));
+        var genreToRemove = await _context.Genres.SingleOrDefaultAsync(g => g.Id.Equals(id))
+            ?? throw new ArgumentException($"No genre found with id '{id}'.", nameof(id));
 
         if (genreToRemove.ParentId is null)
         {
@@ -69,6 +69,24 @@ public class GenreRepository : IGenreRepository
         _context.Genres.Remove(genreToRemove);
 
         await SaveChangesAsync("Error when deleting the platform from the database.");
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<Genre>> GetByGameAliasAsync(string gameAlias)
+    {
+        var gameExists = await _context.Games.AnyAsync(g => g.GameAlias == gameAlias);
+
+        if (!gameExists)
+        {
+            throw new ArgumentException($"No game found with the alias '{gameAlias}'.", nameof(gameAlias));
+        }
+
+        var genreList = await _context.Games
+            .Where(g => g.GameAlias == gameAlias)
+            .SelectMany(g => g.Genre)
+            .ToListAsync();
+
+        return genreList;
     }
 
     /// <summary>

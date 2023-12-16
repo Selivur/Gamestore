@@ -52,14 +52,32 @@ public class PlatformRepository : IPlatformRepository
     }
 
     /// <inheritdoc />
-    public async Task RemoveAsync(string name)
+    public async Task RemoveAsync(int id)
     {
-        var platformToRemove = await _context.Platforms.SingleOrDefaultAsync(g => g.Type.Equals(name))
-                            ?? throw new ArgumentException($"No paltform found with name '{name}'.", nameof(name));
+        var platformToRemove = await _context.Platforms.SingleOrDefaultAsync(g => g.Id.Equals(id))
+                            ?? throw new ArgumentException($"No paltform found with id '{id}'.", nameof(id));
 
         _context.Platforms.Remove(platformToRemove);
 
         await SaveChangesAsync("Error when deleting the platform from the database.");
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<Platform>> GetByGameAliasAsync(string gameAlias)
+    {
+        var gameExists = await _context.Games.AnyAsync(g => g.GameAlias == gameAlias);
+
+        if (!gameExists)
+        {
+            throw new ArgumentException($"No game found with the alias '{gameAlias}'.", nameof(gameAlias));
+        }
+
+        var platformList = await _context.Games
+            .Where(g => g.GameAlias == gameAlias)
+            .SelectMany(p => p.Platforms)
+            .ToListAsync();
+
+        return platformList;
     }
 
     /// <summary>

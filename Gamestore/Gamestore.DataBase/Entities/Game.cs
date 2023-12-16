@@ -22,9 +22,9 @@ public class Game
 
     public string? Description { get; set; }
 
-    public ICollection<Genre>? Genre { get; set; }
+    public ICollection<Genre> Genre { get; set; }
 
-    public ICollection<Platform>? Platforms { get; set; }
+    public ICollection<Platform> Platforms { get; set; }
 
     public Publisher? Publishers { get; set; }
 }

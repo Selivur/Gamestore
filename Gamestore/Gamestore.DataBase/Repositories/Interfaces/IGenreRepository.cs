@@ -42,10 +42,18 @@ public interface IGenreRepository
     Task UpdateAsync(Genre genre);
 
     /// <summary>
-    /// Removes a platform from the repository by its unique identifier asynchronously.
+    /// Removes a genre from the repository by its unique id asynchronously.
     /// </summary>
-    /// <param name="name">The unique alias of the platform to remove.</param>
+    /// <param name="id">The unique id of the genre to remove.</param>
     /// <returns>An asynchronous task representing the operation's completion or throwing an error when failed to remove the genre.</returns>
-    /// <exception cref="ArgumentException">Thrown if no genre is found with the specified name.</exception>
-    Task RemoveAsync(string name);
+    /// <exception cref="ArgumentException">Thrown if no genre is found with the specified id.</exception>
+    Task RemoveAsync(int id);
+
+    /// <summary>
+    /// Retrieves a collection of genres associated with a specified game alias.
+    /// </summary>
+    /// <param name="gameAlias">The alias of the game.</param>
+    /// <returns>An asynchronous task that represents the operation, returning a collection of genres.</returns>
+    /// <exception cref="ArgumentException">Thrown if no game is found with the specified alias.</exception>
+    Task<IEnumerable<Genre>> GetByGameAliasAsync(string gameAlias);
 }

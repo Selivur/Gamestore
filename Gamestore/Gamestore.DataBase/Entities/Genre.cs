@@ -17,5 +17,5 @@ public class Genre
     [ForeignKey("ParentId")]
     public Genre ParentGenre { get; set; }
 
-    public ICollection<Game> Games { get; set; } = new List<Game>();
+    public ICollection<Game> Games { get; set; }
 }

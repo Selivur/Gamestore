@@ -56,10 +56,10 @@ public class PublisherRepository : IPublisherRepository
     }
 
     /// <inheritdoc />
-    public async Task RemoveAsync(string name)
+    public async Task RemoveAsync(int id)
     {
-        var publisher = await _context.Publishers.SingleOrDefaultAsync(g => g.CompanyName.Equals(name))
-            ?? throw new ArgumentException($"No publisher found with the company name '{name}'.", nameof(name));
+        var publisher = await _context.Publishers.SingleOrDefaultAsync(g => g.Id.Equals(id))
+            ?? throw new ArgumentException($"No publisher found with the id '{id}'.", nameof(id));
 
         _context.Publishers.Remove(publisher);
 
@@ -67,7 +67,7 @@ public class PublisherRepository : IPublisherRepository
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<Publisher>> GetPublishersByGameAliasAsync(string gameAlias)
+    public async Task<IEnumerable<Publisher>> GetByGameAliasAsync(string gameAlias)
     {
         var gameExists = await _context.Games.AnyAsync(g => g.GameAlias == gameAlias);
 
@@ -77,7 +77,7 @@ public class PublisherRepository : IPublisherRepository
         }
 
         var publisherList = await _context.Publishers
-            .Where(p => p.Games != null && p.Games.Any(g => g.GameAlias == gameAlias))
+            .Where(p => p.Games.Any(g => g.GameAlias == gameAlias))
             .ToListAsync();
 
         return publisherList;

@@ -15,4 +15,6 @@ public class Publisher
     public string Description { get; set; }
 
     public string HomePage { get; set; }
+
+    public ICollection<Game> Games { get; set; }
 }
