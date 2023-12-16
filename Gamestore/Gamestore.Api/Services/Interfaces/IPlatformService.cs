@@ -28,9 +28,9 @@ public interface IPlatformService
     Task<PlatformResponse?> GetPlatformByNameAsync(string name);
 
     /// <summary>
-    /// Gets a platform by its name.
+    /// Gets a platform by its id.
     /// </summary>
-    /// <param name="id">The name of the platform.</param>
+    /// <param name="id">The id of the platform.</param>
     /// <returns>The detailed information about the platform.</returns>
     Task<PlatformResponse?> GetPlatformByIdAsync(int id);
 
@@ -42,9 +42,16 @@ public interface IPlatformService
     Task UpdatePlatformAsync(PlatformRequest platform);
 
     /// <summary>
-    /// Removes a platform by its name.
+    /// Removes a platform by its id.
     /// </summary>
-    /// <param name="name">The name of the platform to be removed.</param>
+    /// <param name="id">The id of the platform to be removed.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task RemovePlatformAsync(string name);
+    Task RemovePlatformAsync(int id);
+
+    /// <summary>
+    /// Gets a list of platforms in the form of <see cref="PlatformResponse"/>.
+    /// </summary>
+    /// <param name="gameAlias">The alias of the game to filter platforms.</param>
+    /// <returns>An asynchronous task representing the operation, returning a list of <see cref="PlatformResponse"/>.</returns>
+    Task<IEnumerable<PlatformResponse>> GetPlatformsByGameAliasAsync(string gameAlias);
 }

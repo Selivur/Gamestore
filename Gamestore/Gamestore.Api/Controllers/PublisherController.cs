@@ -87,12 +87,12 @@ public class PublisherController : ControllerBase
     /// <summary>
     /// Removes a publisher from the store by its name.
     /// </summary>
-    /// <param name="publisherName">The name of the publisher to remove.</param>
+    /// <param name="id">The id of the publisher to remove.</param>
     /// <returns>A 204 No Content response upon successful deletion.</returns>
-    [HttpDelete("{publisherName}")]
-    public async Task<IActionResult> RemovePublisher(string publisherName)
+    [HttpDelete("remove/{id}")]
+    public async Task<IActionResult> RemovePublisher(int id)
     {
-        await _publisherService.RemovePublisherAsync(publisherName);
+        await _publisherService.RemovePublisherAsync(id);
 
         return NoContent();
     }
@@ -107,6 +107,21 @@ public class PublisherController : ControllerBase
     public async Task<IActionResult> GetAllPublishers()
     {
         var publishers = await _publisherService.GetAllPublishersAsync();
+
+        return Ok(publishers);
+    }
+
+    /// <summary>
+    /// Retrieves a list of publishers associated with a specific game.
+    /// </summary>
+    /// <param name="gameAlias">The alias of the game to filter publishers.</param>
+    /// <returns>
+    /// Returns an HTTP 200 OK response with the list of publishers.
+    /// </returns>
+    [HttpGet("getPublisherByGameKey/{gameAlias}")]
+    public async Task<IActionResult> GetAllPublishersByGameAlias(string gameAlias)
+    {
+        var publishers = await _publisherService.GetPublishersByGameAliasAsync(gameAlias);
 
         return Ok(publishers);
     }

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gamestore.Api.Migrations
 {
     [DbContext(typeof(GamestoreContext))]
-    [Migration("20231215195803_InitialCreate")]
+    [Migration("20231216161638_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -38,6 +38,21 @@ namespace Gamestore.Api.Migrations
                     b.HasIndex("GenreId");
 
                     b.ToTable("GameGenre");
+                });
+
+            modelBuilder.Entity("GamePlatform", b =>
+                {
+                    b.Property<int>("GamesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlatformsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("GamesId", "PlatformsId");
+
+                    b.HasIndex("PlatformsId");
+
+                    b.ToTable("GamePlatform");
                 });
 
             modelBuilder.Entity("Gamestore.Database.Entities.Game", b =>
@@ -114,16 +129,11 @@ namespace Gamestore.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("GameId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("GameId");
 
                     b.HasIndex("Type")
                         .IsUnique();
@@ -174,10 +184,25 @@ namespace Gamestore.Api.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("GamePlatform", b =>
+                {
+                    b.HasOne("Gamestore.Database.Entities.Game", null)
+                        .WithMany()
+                        .HasForeignKey("GamesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Gamestore.Database.Entities.Platform", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Gamestore.Database.Entities.Game", b =>
                 {
                     b.HasOne("Gamestore.Database.Entities.Publisher", "Publishers")
-                        .WithMany()
+                        .WithMany("Games")
                         .HasForeignKey("PublishersId");
 
                     b.Navigation("Publishers");
@@ -192,16 +217,9 @@ namespace Gamestore.Api.Migrations
                     b.Navigation("ParentGenre");
                 });
 
-            modelBuilder.Entity("Gamestore.Database.Entities.Platform", b =>
+            modelBuilder.Entity("Gamestore.Database.Entities.Publisher", b =>
                 {
-                    b.HasOne("Gamestore.Database.Entities.Game", null)
-                        .WithMany("Platforms")
-                        .HasForeignKey("GameId");
-                });
-
-            modelBuilder.Entity("Gamestore.Database.Entities.Game", b =>
-                {
-                    b.Navigation("Platforms");
+                    b.Navigation("Games");
                 });
 #pragma warning restore 612, 618
         }

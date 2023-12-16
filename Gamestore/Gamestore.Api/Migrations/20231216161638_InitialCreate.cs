@@ -30,6 +30,19 @@ public partial class InitialCreate : Migration
             });
 
         migrationBuilder.CreateTable(
+            name: "Platforms",
+            columns: table => new
+            {
+                Id = table.Column<int>(type: "int", nullable: false)
+                    .Annotation("SqlServer:Identity", "1, 1"),
+                Type = table.Column<string>(type: "nvarchar(450)", nullable: false),
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("PK_Platforms", x => x.Id);
+            });
+
+        migrationBuilder.CreateTable(
             name: "Publishers",
             columns: table => new
             {
@@ -93,28 +106,38 @@ public partial class InitialCreate : Migration
             });
 
         migrationBuilder.CreateTable(
-            name: "Platforms",
+            name: "GamePlatform",
             columns: table => new
             {
-                Id = table.Column<int>(type: "int", nullable: false)
-                    .Annotation("SqlServer:Identity", "1, 1"),
-                Type = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                GameId = table.Column<int>(type: "int", nullable: true),
+                GamesId = table.Column<int>(type: "int", nullable: false),
+                PlatformsId = table.Column<int>(type: "int", nullable: false),
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_Platforms", x => x.Id);
+                table.PrimaryKey("PK_GamePlatform", x => new { x.GamesId, x.PlatformsId });
                 table.ForeignKey(
-                    name: "FK_Platforms_Games_GameId",
-                    column: x => x.GameId,
+                    name: "FK_GamePlatform_Games_GamesId",
+                    column: x => x.GamesId,
                     principalTable: "Games",
-                    principalColumn: "Id");
+                    principalColumn: "Id",
+                    onDelete: ReferentialAction.Cascade);
+                table.ForeignKey(
+                    name: "FK_GamePlatform_Platforms_PlatformsId",
+                    column: x => x.PlatformsId,
+                    principalTable: "Platforms",
+                    principalColumn: "Id",
+                    onDelete: ReferentialAction.Cascade);
             });
 
         migrationBuilder.CreateIndex(
             name: "IX_GameGenre_GenreId",
             table: "GameGenre",
             column: "GenreId");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_GamePlatform_PlatformsId",
+            table: "GamePlatform",
+            column: "PlatformsId");
 
         migrationBuilder.CreateIndex(
             name: "IX_Games_GameAlias",
@@ -139,11 +162,6 @@ public partial class InitialCreate : Migration
             column: "ParentId");
 
         migrationBuilder.CreateIndex(
-            name: "IX_Platforms_GameId",
-            table: "Platforms",
-            column: "GameId");
-
-        migrationBuilder.CreateIndex(
             name: "IX_Platforms_Type",
             table: "Platforms",
             column: "Type",
@@ -163,13 +181,16 @@ public partial class InitialCreate : Migration
             name: "GameGenre");
 
         migrationBuilder.DropTable(
-            name: "Platforms");
+            name: "GamePlatform");
 
         migrationBuilder.DropTable(
             name: "Genres");
 
         migrationBuilder.DropTable(
             name: "Games");
+
+        migrationBuilder.DropTable(
+            name: "Platforms");
 
         migrationBuilder.DropTable(
             name: "Publishers");

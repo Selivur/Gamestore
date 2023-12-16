@@ -33,6 +33,35 @@ public class PlatformController : ControllerBase
     }
 
     /// <summary>
+    /// Retrieves all platforms.
+    /// </summary>
+    /// <returns>
+    /// Returns an HTTP 200 OK response with the list of platforms.
+    /// </returns>
+    [HttpGet]
+    public async Task<IActionResult> GetAllPlatforms()
+    {
+        var platforms = await _platformService.GetAllPlatformsAsync();
+
+        return Ok(platforms);
+    }
+
+    /// <summary>
+    /// Retrieves a list of platforms associated with a specific game.
+    /// </summary>
+    /// <param name="gameAlias">The alias of the game to filter platforms.</param>
+    /// <returns>
+    /// Returns an HTTP 200 OK response with the list of platforms.
+    /// </returns>
+    [HttpGet("getPlatformsByGameKey/{gameAlias}")]
+    public async Task<IActionResult> GetAllPlatformsByGameAlias(string gameAlias)
+    {
+        var platforms = await _platformService.GetPlatformsByGameAliasAsync(gameAlias);
+
+        return Ok(platforms);
+    }
+
+    /// <summary>
     /// Updates the description of a platform through the API.
     /// </summary>
     /// <param name="request">The request object containing the identifier and updated data for the platform.</param>
@@ -54,14 +83,14 @@ public class PlatformController : ControllerBase
     }
 
     /// <summary>
-    /// Deletes a platform through the API.
+    /// Deletes a platform through by id.
     /// </summary>
-    /// <param name="name">The name of the platform to be removed.</param>
+    /// <param name="id">The id of the platform to be removed.</param>
     /// <returns>A 204 No Content response upon successful deletion.</returns>
-    [HttpDelete("remove")]
-    public async Task<IActionResult> RemovePlatform(string name)
+    [HttpDelete("remove/{id}")]
+    public async Task<IActionResult> RemovePlatform(int id)
     {
-        await _platformService.RemovePlatformAsync(name);
+        await _platformService.RemovePlatformAsync(id);
 
         return NoContent();
     }
@@ -82,20 +111,6 @@ public class PlatformController : ControllerBase
         await _platformService.AddPlatformAsync(name);
 
         return Ok();
-    }
-
-    /// <summary>
-    /// Retrieves all platforms.
-    /// </summary>
-    /// <returns>
-    /// Returns an HTTP 200 OK response with the list of platforms.
-    /// </returns>
-    [HttpGet]
-    public async Task<IActionResult> GetAllPlatforms()
-    {
-        var platforms = await _platformService.GetAllPlatformsAsync();
-
-        return Ok(platforms);
     }
 
     /// <summary>

@@ -1,4 +1,6 @@
-﻿namespace Gamestore.Api.Models.DTO.GameDTO;
+﻿using Gamestore.Database.Entities;
+
+namespace Gamestore.Api.Models.DTO.GameDTO;
 
 /// <summary>
 /// Represents a response containing game information.
@@ -39,4 +41,18 @@ public class GameResponse
     /// Gets or sets the discount applied to the game.
     /// </summary>
     public int Discount { get; set; }
+
+    public static GameResponse FromGame(Game game)
+    {
+        return new GameResponse
+        {
+            Key = game.GameAlias,
+            Id = game.Id.ToString(),
+            Name = game.Name,
+            Description = game.Description,
+            Price = game.Price,
+            UnitInStock = game.UnitInStock,
+            Discount = game.Discount,
+        };
+    }
 }

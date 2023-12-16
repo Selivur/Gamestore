@@ -70,15 +70,24 @@ public class PublisherService : IPublisherService
     }
 
     /// <inheritdoc/>
-    public async Task RemovePublisherAsync(string name)
+    public async Task RemovePublisherAsync(int id)
     {
-        await _repository.RemoveAsync(name);
+        await _repository.RemoveAsync(id);
     }
 
     /// <inheritdoc/>
     public async Task<IEnumerable<PublisherResponse>> GetAllPublishersAsync()
     {
         var publishers = await _repository.GetAllAsync();
+
+        var publisherResponses = publishers.Select(PublisherResponse.FromPublisher).ToList();
+
+        return publisherResponses;
+    }
+
+    public async Task<IEnumerable<PublisherResponse>> GetPublishersByGameAliasAsync(string gameAlias)
+    {
+        var publishers = await _repository.GetByGameAliasAsync(gameAlias);
 
         var publisherResponses = publishers.Select(PublisherResponse.FromPublisher).ToList();
 

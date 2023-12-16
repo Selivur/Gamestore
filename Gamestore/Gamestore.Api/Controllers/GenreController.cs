@@ -55,12 +55,12 @@ public class GenreController : ControllerBase
     /// <summary>
     /// Deletes a genre through the API.
     /// </summary>
-    /// <param name="name">The name of the genre to be removed.</param>
+    /// <param name="id">The id of the genre to be removed.</param>
     /// <returns>A 204 No Content response upon successful deletion.</returns>
-    [HttpDelete("remove")]
-    public async Task<IActionResult> RemoveGenre(string name)
+    [HttpDelete("remove/{id}")]
+    public async Task<IActionResult> RemoveGenre(int id)
     {
-        await _genreService.RemoveGenreAsync(name);
+        await _genreService.RemoveGenreAsync(id);
 
         return NoContent();
     }
@@ -106,6 +106,21 @@ public class GenreController : ControllerBase
     public async Task<IActionResult> GetAllGenres()
     {
         var genres = await _genreService.GetAllGenresAsync();
+
+        return Ok(genres);
+    }
+
+    /// <summary>
+    /// Retrieves a list of genres associated with a specific game.
+    /// </summary>
+    /// <param name="gameAlias">The alias of the game to filter genres.</param>
+    /// <returns>
+    /// Returns an HTTP 200 OK response with the list of genres.
+    /// </returns>
+    [HttpGet("getGenresByGameKey/{gameAlias}")]
+    public async Task<IActionResult> GetAllGenresByGameAlias(string gameAlias)
+    {
+        var genres = await _genreService.GetGenresByGameAliasAsync(gameAlias);
 
         return Ok(genres);
     }

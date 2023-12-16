@@ -28,9 +28,9 @@ public interface IGenreService
     Task<GenreResponse?> GetGenreByNameAsync(string name);
 
     /// <summary>
-    /// Gets a genre by its name.
+    /// Gets a genre by its id.
     /// </summary>
-    /// <param name="id">The name of the genre.</param>
+    /// <param name="id">The id of the genre.</param>
     /// <returns>The detailed information about the genre.</returns>
     Task<GenreResponse?> GetGenreByIdAsync(int id);
 
@@ -42,15 +42,22 @@ public interface IGenreService
     Task UpdateGenreAsync(GenreUpdateRequest request);
 
     /// <summary>
-    /// Removes a genre by its name.
+    /// Removes a genre by its id.
     /// </summary>
-    /// <param name="name">The name of the genre to be removed.</param>
+    /// <param name="id">The id of the genre to be removed.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task RemoveGenreAsync(string name);
+    Task RemoveGenreAsync(int id);
 
     /// <summary>
     /// Initializes predefined genres in the database.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task InitializePredefinedGenresAsync();
+
+    /// <summary>
+    /// Gets a list of genres in the form of <see cref="GenreResponse"/>.
+    /// </summary>
+    /// <param name="gameAlias">The alias of the game to filter genres.</param>
+    /// <returns>An asynchronous task representing the operation, returning a list of <see cref="GenreResponse"/>.</returns>
+    Task<IEnumerable<GenreResponse>> GetGenresByGameAliasAsync(string gameAlias);
 }

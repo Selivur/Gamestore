@@ -24,6 +24,19 @@ public class GameController : ControllerBase
     }
 
     /// <summary>
+    /// Retrieves a game by its id.
+    /// </summary>
+    /// <param name="id">The id of the game to retrieve.</param>
+    /// <returns>An IActionResult containing the retrieved game if successful.</returns>
+    [HttpGet("getById/{id}")]
+    public async Task<IActionResult> GetGenre(int id)
+    {
+        var result = await _gameService.GetGameByIdAsync(id);
+
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Creates a new game in the database.
     /// </summary>
     /// <param name="game">The game object to be created.</param>
@@ -46,7 +59,7 @@ public class GameController : ControllerBase
     /// </summary>
     /// <param name="gameAlias">The alias of the game to retrieve.</param>
     /// <returns>An IActionResult containing the retrieved game if successful.</returns>
-    [HttpGet("{gameAlias}")]
+    [HttpGet("getByAlias/{gameAlias}")]
     public async Task<IActionResult> GetGame(string gameAlias)
     {
         var result = await _gameService.GetGameByAliasAsync(gameAlias);
@@ -77,7 +90,7 @@ public class GameController : ControllerBase
     /// </summary>
     /// <param name="gameAlias">The alias of the game to remove.</param>
     /// <returns>A 204 No Content response upon successful deletion.</returns>
-    [HttpDelete("{gameAlias}")]
+    [HttpDelete("remove/{gameAlias}")]
     public async Task<IActionResult> RemoveGame(string gameAlias)
     {
         await _gameService.RemoveGameAsync(gameAlias);

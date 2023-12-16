@@ -76,8 +76,18 @@ public class PlatformService : IPlatformService
     }
 
     /// <inheritdoc/>
-    public async Task RemovePlatformAsync(string name)
+    public async Task RemovePlatformAsync(int id)
     {
-        await _repository.RemoveAsync(name);
+        await _repository.RemoveAsync(id);
+    }
+
+    /// <inheritdoc/>
+    public async Task<IEnumerable<PlatformResponse>> GetPlatformsByGameAliasAsync(string gameAlias)
+    {
+        var platforms = await _repository.GetByGameAliasAsync(gameAlias);
+
+        var platformResponses = platforms.Select(PlatformResponse.FromPlatform).ToList();
+
+        return platformResponses;
     }
 }

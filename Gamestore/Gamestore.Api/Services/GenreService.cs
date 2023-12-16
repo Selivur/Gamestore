@@ -78,9 +78,9 @@ public class GenreService : IGenreService
     }
 
     /// <inheritdoc/>
-    public async Task RemoveGenreAsync(string name)
+    public async Task RemoveGenreAsync(int id)
     {
-        await _repository.RemoveAsync(name);
+        await _repository.RemoveAsync(id);
     }
 
     /// <inheritdoc/>
@@ -110,5 +110,15 @@ public class GenreService : IGenreService
         {
             await _repository.AddAsync(genre);
         }
+    }
+
+    /// <inheritdoc/>
+    public async Task<IEnumerable<GenreResponse>> GetGenresByGameAliasAsync(string gameAlias)
+    {
+        var genres = await _repository.GetByGameAliasAsync(gameAlias);
+
+        var genreResponses = genres.Select(GenreResponse.FromGenre).ToList();
+
+        return genreResponses;
     }
 }

@@ -46,6 +46,14 @@ public class GameService : IGameService
     }
 
     /// <inheritdoc/>
+    public async Task<GameResponse?> GetGameByIdAsync(int id)
+    {
+        var game = await _repository.GetByIdAsync(id) ?? throw new KeyNotFoundException("Game not found");
+
+        return GameResponse.FromGame(game);
+    }
+
+    /// <inheritdoc/>
     public async Task<GameResponse?> GetGameByAliasAsync(string gameAlias)
     {
         var game = await _repository.GetByAliasAsync(gameAlias) ?? throw new KeyNotFoundException("Game not found");

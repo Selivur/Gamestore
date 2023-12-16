@@ -19,6 +19,13 @@ public interface IGameService
     Task<GameResponse?> GetGameByAliasAsync(string gameAlias);
 
     /// <summary>
+    /// Gets a game by its id.
+    /// </summary>
+    /// <param name="id">The id of the game.</param>
+    /// <returns>The detailed information about the game.</returns>
+    Task<GameResponse?> GetGameByIdAsync(int id);
+
+    /// <summary>
     /// Updates an existing game in the database.
     /// </summary>
     /// <param name="game">The game object containing the updated properties.</param>

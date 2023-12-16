@@ -34,13 +34,20 @@ public interface IPublisherService
     /// <summary>
     /// Removes a Publisher from the database based on its name.
     /// </summary>
-    /// <param name="name">The name of the Publisher to be removed.</param>
+    /// <param name="id">The id of the Publisher to be removed.</param>
     /// <returns>A tuple indicating whether the removal was successful and an error message if applicable.</returns>
-    Task RemovePublisherAsync(string name);
+    Task RemovePublisherAsync(int id);
 
     /// <summary>
     /// Retrieves all publishers from the database.
     /// </summary>
     /// <returns>An IEnumerable of Publisher objects.</returns>
     Task<IEnumerable<PublisherResponse>> GetAllPublishersAsync();
+
+    /// <summary>
+    /// Gets a list of publishers in the form of <see cref="PublisherResponse"/>.
+    /// </summary>
+    /// <param name="gameAlias">The alias of the game to filter publishers.</param>
+    /// <returns>An asynchronous task representing the operation, returning a list of <see cref="PublisherResponse"/>.</returns>
+    Task<IEnumerable<PublisherResponse>> GetPublishersByGameAliasAsync(string gameAlias);
 }
