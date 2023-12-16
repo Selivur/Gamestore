@@ -46,5 +46,6 @@ public interface IPlatformRepository
     /// </summary>
     /// <param name="name">The unique alias of the platform to remove.</param>
     /// <returns>An asynchronous task representing the operation's completion or throwing an error when failed to remove the genre.</returns>
+    /// <exception cref="ArgumentException">Thrown if no platform is found with the specified name.</exception>
     Task RemoveAsync(string name);
 }

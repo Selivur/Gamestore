@@ -46,5 +46,6 @@ public interface IGameRepository
     /// </summary>
     /// <param name="gameAlias">The unique alias of the game to remove.</param>
     /// <returns>An asynchronous task representing the operation's completion or throwing an error when failed to remove the game.</returns>
+    /// <exception cref="ArgumentException">Thrown if no game is found with the specified game alias.</exception>
     Task RemoveAsync(string gameAlias);
 }

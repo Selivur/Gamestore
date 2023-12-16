@@ -42,9 +42,18 @@ public interface IPublisherRepository
     Task UpdateAsync(Publisher publisher);
 
     /// <summary>
+    /// Retrieves a collection of publishers associated with a specified game alias.
+    /// </summary>
+    /// <param name="gameAlias">The alias of the game.</param>
+    /// <returns>An asynchronous task that represents the operation, returning a collection of publishers.</returns>
+    /// <exception cref="ArgumentException">Thrown if no game is found with the specified alias.</exception>
+    Task<IEnumerable<Publisher>> GetPublishersByGameAliasAsync(string gameAlias);
+
+    /// <summary>
     /// Removes a publisher from the repository by its unique identifier asynchronously.
     /// </summary>
     /// <param name="name">The unique alias of the publisher to remove.</param>
     /// <returns>An asynchronous task representing the operation's completion or throwing an error when failed to remove the publisher.</returns>
+    /// <exception cref="ArgumentException">Thrown if no publisher is found with the specified company name.</exception>
     Task RemoveAsync(string name);
 }

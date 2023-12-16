@@ -55,7 +55,7 @@ public class PlatformRepository : IPlatformRepository
     public async Task RemoveAsync(string name)
     {
         var platformToRemove = await _context.Platforms.SingleOrDefaultAsync(g => g.Type.Equals(name))
-                            ?? throw new InvalidOperationException("Platform not found");
+                            ?? throw new ArgumentException($"No paltform found with name '{name}'.", nameof(name));
 
         _context.Platforms.Remove(platformToRemove);
 

@@ -59,7 +59,7 @@ public class GameRepository : IGameRepository
     public async Task RemoveAsync(string gameAlias)
     {
         var game = await _context.Games.SingleOrDefaultAsync(g => g.GameAlias.Equals(gameAlias))
-            ?? throw new InvalidOperationException("Game not found");
+            ?? throw new ArgumentException($"No game found with the Game Alias '{gameAlias}'.", nameof(gameAlias));
 
         _context.Games.Remove(game);
 
