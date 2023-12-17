@@ -104,6 +104,60 @@ public class GameRepository : IGameRepository
         await SaveChangesAsync("Error when updating the game in the database.");
     }
 
+    /// <inheritdoc />
+    public async Task<IEnumerable<Game>> GetByPublisherNameAsync(string name)
+    {
+        var publusherExists = await _context.Publishers.AnyAsync(g => g.CompanyName == name);
+
+        if (!publusherExists)
+        {
+            throw new ArgumentException($"No publisher found with the name '{name}'.", nameof(name));
+        }
+
+        var gameList = await _context.Publishers
+            .Where(g => g.CompanyName == name)
+            .SelectMany(g => g.Games)
+            .ToListAsync();
+
+        return gameList;
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<Game>> GetByGenreIdAsync(int id)
+    {
+        var publusherExists = await _context.Genres.AnyAsync(g => g.Id == id);
+
+        if (!publusherExists)
+        {
+            throw new ArgumentException($"No genre found with the name '{id}'.", nameof(id));
+        }
+
+        var gameList = await _context.Genres
+            .Where(g => g.Id == id)
+            .SelectMany(g => g.Games)
+            .ToListAsync();
+
+        return gameList;
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<Game>> GetByPlatformTypeAsync(string type)
+    {
+        var publusherExists = await _context.Platforms.AnyAsync(g => g.Type == type);
+
+        if (!publusherExists)
+        {
+            throw new ArgumentException($"No publusher found with the name '{type}'.", nameof(type));
+        }
+
+        var gameList = await _context.Platforms
+            .Where(g => g.Type == type)
+            .SelectMany(g => g.Games)
+            .ToListAsync();
+
+        return gameList;
+    }
+
     /// <summary>
     /// Asynchronously saves changes to the database context and throws a <see cref="DbUpdateException"/>
     /// with the specified error message if no changes were saved.

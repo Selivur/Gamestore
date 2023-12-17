@@ -66,4 +66,25 @@ public interface IGameRepository
     /// <param name="platformsId">Array of platform IDs for the game.</param>
     /// <param name="publisherId">Publisher ID for the game.</param>
     Task UpdateGameWithDependencies(Game game, int[] genresId, int[] platformsId, int publisherId);
+
+    /// <summary>
+    /// Asynchronously gets a list of games by publisher name.
+    /// </summary>
+    /// <param name="name">The name of the publisher.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an IEnumerable of games.</returns>
+    Task<IEnumerable<Game>> GetByPublisherNameAsync(string name);
+
+    /// <summary>
+    /// Asynchronously gets a list of games by genre ID.
+    /// </summary>
+    /// <param name="id">The ID of the genre.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an IEnumerable of games.</returns>
+    Task<IEnumerable<Game>> GetByGenreIdAsync(int id);
+
+    /// <summary>
+    /// Asynchronously gets a list of games by platform type.
+    /// </summary>
+    /// <param name="type">The type of the platform.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an IEnumerable of games.</returns>
+    Task<IEnumerable<Game>> GetByPlatformTypeAsync(string type);
 }

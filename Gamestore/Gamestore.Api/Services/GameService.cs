@@ -108,6 +108,36 @@ public class GameService : IGameService
         return gameResponses;
     }
 
+    /// <inheritdoc/>
+    public async Task<IEnumerable<GameResponse>> GetAllGamesByPublisherNameAsync(string name)
+    {
+        var games = await _gameRepository.GetByPublisherNameAsync(name);
+
+        var gameResponses = games.Select(GameResponse.FromGame).ToList();
+
+        return gameResponses;
+    }
+
+    /// <inheritdoc/>
+    public async Task<IEnumerable<GameResponse>> GetAllGamesByPlatformTypeAsync(int id)
+    {
+        var games = await _gameRepository.GetByGenreIdAsync(id);
+
+        var gameResponses = games.Select(GameResponse.FromGame).ToList();
+
+        return gameResponses;
+    }
+
+    /// <inheritdoc/>
+    public async Task<IEnumerable<GameResponse>> GetAllGamesByPlatformTypeAsync(string type)
+    {
+        var games = await _gameRepository.GetByPlatformTypeAsync(type);
+
+        var gameResponses = games.Select(GameResponse.FromGame).ToList();
+
+        return gameResponses;
+    }
+
     private static string NormalizeGameAlias(string name)
     {
         return name.Replace(" ", "-").ToLower(CultureInfo.InvariantCulture);

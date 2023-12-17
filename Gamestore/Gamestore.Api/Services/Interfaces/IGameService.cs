@@ -44,4 +44,25 @@ public interface IGameService
     /// </summary>
     /// <returns>An IEnumerable of Game objects.</returns>
     Task<IEnumerable<GameResponse>> GetAllGamesAsync();
+
+    /// <summary>
+    /// Asynchronously gets a list of game responses by publisher name.
+    /// </summary>
+    /// <param name="name">The name of the publisher.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an IEnumerable of game responses.</returns>
+    Task<IEnumerable<GameResponse>> GetAllGamesByPublisherNameAsync(string name);
+
+    /// <summary>
+    /// Asynchronously gets a list of game responses by platform type ID.
+    /// </summary>
+    /// <param name="id">The ID of the platform type.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an IEnumerable of game responses.</returns>
+    Task<IEnumerable<GameResponse>> GetAllGamesByPlatformTypeAsync(int id);
+
+    /// <summary>
+    /// Asynchronously gets a list of game responses by platform type.
+    /// </summary>
+    /// <param name="type">The type of the platform.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an IEnumerable of game responses.</returns>
+    Task<IEnumerable<GameResponse>> GetAllGamesByPlatformTypeAsync(string type);
 }

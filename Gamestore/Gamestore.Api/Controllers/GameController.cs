@@ -132,6 +132,45 @@ public class GameController : ControllerBase
     }
 
     /// <summary>
+    /// Asynchronously gets all games by publisher name.
+    /// </summary>
+    /// <param name="name">The name of the publisher.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an IActionResult that encapsulates the result of the action method.</returns>
+    [HttpGet("publisher/{name}")]
+    public async Task<IActionResult> GetAllGamesByPublisherName(string name)
+    {
+        var games = await _gameService.GetAllGamesByPublisherNameAsync(name);
+
+        return Ok(games);
+    }
+
+    /// <summary>
+    /// Asynchronously gets all games by platform type ID.
+    /// </summary>
+    /// <param name="id">The ID of the platform type.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an IActionResult that encapsulates the result of the action method.</returns>
+    [HttpGet("genre/{id}")]
+    public async Task<IActionResult> GetAllGamesByPlatformType(int id)
+    {
+        var games = await _gameService.GetAllGamesByPlatformTypeAsync(id);
+
+        return Ok(games);
+    }
+
+    /// <summary>
+    /// Asynchronously gets all games by platform type.
+    /// </summary>
+    /// <param name="type">The type of the platform.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an IActionResult that encapsulates the result of the action method.</returns>
+    [HttpGet("/platform/{type}")]
+    public async Task<IActionResult> GetAllGamesByPlatformType(string type)
+    {
+        var games = await _gameService.GetAllGamesByPlatformTypeAsync(type);
+
+        return Ok(games);
+    }
+
+    /// <summary>
     /// Generates the content for a game file.
     /// </summary>
     /// <param name="game">The game object to generate the content for.</param>
