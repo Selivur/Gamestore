@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Gamestore.Api.Models.DTO.GameDTO;
+using Gamestore.Api.Models.Wrappers.Game;
 using Gamestore.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,7 +43,7 @@ public class GameController : ControllerBase
     /// <param name="game">The game object to be created.</param>
     /// <returns>An IActionResult indicating whether the creation was successful.</returns>
     [HttpPost("new")]
-    public async Task<IActionResult> CreateGame([FromBody] GameRequest game)
+    public async Task<IActionResult> CreateGame([FromBody] GameWrapper game)
     {
         if (!ModelState.IsValid)
         {
@@ -73,7 +74,7 @@ public class GameController : ControllerBase
     /// <param name="game">The game object to update.</param>
     /// <returns>An IActionResult object representing the result of the update operation.</returns>
     [HttpPut("update")]
-    public async Task<IActionResult> UpdateGame([FromBody] GameRequest game)
+    public async Task<IActionResult> UpdateGame([FromBody] GameWrapper game)
     {
         if (!ModelState.IsValid)
         {

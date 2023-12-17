@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using Gamestore.Api.Models.DTO.GameDTO;
+using Gamestore.Api.Models.Wrappers.Game;
 using Gamestore.Api.Services.Interfaces;
 using Gamestore.Database.Entities;
 using Gamestore.Database.Repositories.Interfaces;
@@ -12,7 +13,7 @@ namespace Gamestore.Api.Services;
 /// </summary>
 public class GameService : IGameService
 {
-    private readonly IGameRepository _repository;
+    private readonly IGameRepository _gameRepository;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GameService"/> class.
@@ -20,15 +21,19 @@ public class GameService : IGameService
     /// <param name="repository">The game repository providing data access for the service.</param>
     public GameService(IGameRepository repository)
     {
-        _repository = repository;
+        _gameRepository = repository;
     }
 
     /// <inheritdoc/>
-    public async Task CreateGameAsync(GameRequest game)
+    public async Task CreateGameAsync(GameWrapper fullGame)
     {
-        game.GameAlias ??= NormalizeGameAlias(game.Name);
+        var game = fullGame.GameRequest;
 
-        var existingGame = await _repository.GetByAliasAsync(game.GameAlias);
+        game.GameAlias = string.IsNullOrEmpty(game.GameAlias)
+            ? NormalizeGameAlias(game.Name)
+            : game.GameAlias;
+
+        var existingGame = await _gameRepository.GetByAliasAsync(game.GameAlias);
 
         if (existingGame != null)
         {
@@ -39,16 +44,20 @@ public class GameService : IGameService
         {
             GameAlias = game.GameAlias,
             Name = game.Name,
+            Price = game.Price,
+            UnitInStock = game.UnitInStock,
+            Discount = game.Discount,
             Description = game.Description,
         };
 
-        await _repository.AddAsync(newGame);
+        await _gameRepository.AddGameWithDependencies(newGame, fullGame.GenresId, fullGame.PlatformsId, fullGame.PublisherId);
     }
 
     /// <inheritdoc/>
     public async Task<GameResponse?> GetGameByIdAsync(int id)
     {
-        var game = await _repository.GetByIdAsync(id) ?? throw new KeyNotFoundException("Game not found");
+        var game = await _gameRepository.GetByIdAsync(id)
+            ?? throw new KeyNotFoundException("Game not found");
 
         return GameResponse.FromGame(game);
     }
@@ -56,47 +65,45 @@ public class GameService : IGameService
     /// <inheritdoc/>
     public async Task<GameResponse?> GetGameByAliasAsync(string gameAlias)
     {
-        var game = await _repository.GetByAliasAsync(gameAlias) ?? throw new KeyNotFoundException("Game not found");
+        var game = await _gameRepository.GetByAliasAsync(gameAlias)
+            ?? throw new KeyNotFoundException("Game not found");
 
-        GameResponse newGame = new()
-        {
-            Key = game.GameAlias,
-            Name = game.Name,
-            Description = game.Description,
-        };
-
-        return newGame;
+        return GameResponse.FromGame(game);
     }
 
     /// <inheritdoc/>
-    public async Task UpdateGameAsync(GameRequest game)
+    public async Task UpdateGameAsync(GameWrapper fullGame)
     {
-        game.GameAlias ??= NormalizeGameAlias(game.Name);
+        var game = fullGame.GameRequest;
+        game.GameAlias = string.IsNullOrEmpty(game.GameAlias)
+            ? NormalizeGameAlias(game.Name)
+            : game.GameAlias;
 
-        var existingGame = await _repository.GetByAliasAsync(game.GameAlias) ?? throw new KeyNotFoundException("Can't find the Game with this Alias");
+        var existingGame = await _gameRepository.GetByIdAsync(Convert.ToInt32(game.Id))
+            ?? throw new KeyNotFoundException("Can't find the Game with this Alias");
+
+        existingGame.GameAlias = game.GameAlias;
         existingGame.Name = game.Name;
+        existingGame.Price = game.Price;
+        existingGame.UnitInStock = game.UnitInStock;
+        existingGame.Discount = game.Discount;
         existingGame.Description = game.Description;
 
-        await _repository.UpdateAsync(existingGame);
+        await _gameRepository.UpdateGameWithDependencies(existingGame, fullGame.GenresId, fullGame.PlatformsId, fullGame.PublisherId);
     }
 
     /// <inheritdoc/>
     public async Task RemoveGameAsync(string gameAlias)
     {
-        await _repository.RemoveAsync(gameAlias);
+        await _gameRepository.RemoveAsync(gameAlias);
     }
 
     /// <inheritdoc/>
     public async Task<IEnumerable<GameResponse>> GetAllGamesAsync()
     {
-        var games = await _repository.GetAllAsync();
+        var games = await _gameRepository.GetAllAsync();
 
-        var gameResponses = games.Select(game => new GameResponse
-        {
-            Key = game.GameAlias,
-            Name = game.Name,
-            Description = game.Description,
-        }).ToList();
+        var gameResponses = games.Select(GameResponse.FromGame).ToList();
 
         return gameResponses;
     }

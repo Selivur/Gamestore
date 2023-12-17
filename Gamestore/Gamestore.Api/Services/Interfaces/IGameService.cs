@@ -1,14 +1,15 @@
 ﻿using Gamestore.Api.Models.DTO.GameDTO;
+using Gamestore.Api.Models.Wrappers.Game;
 
 namespace Gamestore.Api.Services.Interfaces;
 
 public interface IGameService
 {
     /// <summary>
-    /// Creates a new game in the database.
+    /// Adds a new game to the database.
     /// </summary>
-    /// <param name="game">The game object to be created.</param>
-    Task CreateGameAsync(GameRequest game);
+    /// <param name="fullGame">The GameWrapper object containing the game data and its relationships.</param>
+    Task CreateGameAsync(GameWrapper fullGame);
 
     /// <summary>
     /// Retrieves a game from the database by its alias.
@@ -28,8 +29,8 @@ public interface IGameService
     /// <summary>
     /// Updates an existing game in the database.
     /// </summary>
-    /// <param name="game">The game object containing the updated properties.</param>
-    Task UpdateGameAsync(GameRequest game);
+    /// <param name="fullGame">The GameWrapper object containing the updated game data and its relationships.</param>
+    Task UpdateGameAsync(GameWrapper fullGame);
 
     /// <summary>
     /// Removes a game from the database based on its alias.

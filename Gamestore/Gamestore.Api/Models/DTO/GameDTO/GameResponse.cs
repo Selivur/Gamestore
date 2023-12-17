@@ -1,4 +1,5 @@
-﻿using Gamestore.Database.Entities;
+﻿using System.Text.Json.Serialization;
+using Gamestore.Database.Entities;
 
 namespace Gamestore.Api.Models.DTO.GameDTO;
 
@@ -38,8 +39,9 @@ public class GameResponse
     public int UnitInStock { get; set; }
 
     /// <summary>
-    /// Gets or sets the discount applied to the game.
+    /// Gets or sets the Discontinued applied to the game.
     /// </summary>
+    [JsonPropertyName("discontinued")]
     public int Discount { get; set; }
 
     public static GameResponse FromGame(Game game)

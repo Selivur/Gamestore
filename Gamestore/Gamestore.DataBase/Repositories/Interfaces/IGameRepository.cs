@@ -48,4 +48,22 @@ public interface IGameRepository
     /// <returns>An asynchronous task representing the operation's completion or throwing an error when failed to remove the game.</returns>
     /// <exception cref="ArgumentException">Thrown if no game is found with the specified game alias.</exception>
     Task RemoveAsync(string gameAlias);
+
+    /// <summary>
+    /// Adds a new game to the database.
+    /// </summary>
+    /// <param name="game">The Game object containing the game data.</param>
+    /// <param name="genresId">Array of genre IDs for the game.</param>
+    /// <param name="platformsId">Array of platform IDs for the game.</param>
+    /// <param name="publisherId">Publisher ID for the game.</param>
+    Task AddGameWithDependencies(Game game, int[] genresId, int[] platformsId, int publisherId);
+
+    /// <summary>
+    /// Updates an existing game in the database.
+    /// </summary>
+    /// <param name="game">The Game object containing the updated game data.</param>
+    /// <param name="genresId">Array of genre IDs for the game.</param>
+    /// <param name="platformsId">Array of platform IDs for the game.</param>
+    /// <param name="publisherId">Publisher ID for the game.</param>
+    Task UpdateGameWithDependencies(Game game, int[] genresId, int[] platformsId, int publisherId);
 }

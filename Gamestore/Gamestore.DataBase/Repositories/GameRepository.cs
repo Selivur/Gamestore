@@ -66,6 +66,44 @@ public class GameRepository : IGameRepository
         await SaveChangesAsync("Error when deleting the game from the database.");
     }
 
+    /// <inheritdoc />
+    public async Task AddGameWithDependencies(Game game, int[] genresId, int[] platformsId, int publisherId)
+    {
+        game.Genre = _context.Genres.Where(g => genresId.Contains(g.Id)).ToList();
+        game.Platforms = _context.Platforms.Where(p => platformsId.Contains(p.Id)).ToList();
+        game.Publishers = _context.Publishers.Find(publisherId);
+
+        _context.Games.Add(game);
+        await SaveChangesAsync("Error when adding the game to the database.");
+    }
+
+    public async Task UpdateGameWithDependencies(Game game, int[] genresId, int[] platformsId, int publisherId)
+    {
+        game = _context.Games.Include(g => g.Genre).Include(g => g.Platforms)
+        .FirstOrDefault(g => g.Id == game.Id);
+
+        game.Genre.Clear();
+        var selectedGenres = _context.Genres.Where(g => genresId.Contains(g.Id)).ToList();
+        foreach (var genre in selectedGenres)
+        {
+            game.Genre.Add(genre);
+        }
+
+        // Handle the Platforms relationship
+        game.Platforms.Clear();
+        var selectedPlatforms = _context.Platforms.Where(p => platformsId.Contains(p.Id)).ToList();
+        foreach (var platform in selectedPlatforms)
+        {
+            game.Platforms.Add(platform);
+        }
+
+        game.Publishers = _context.Publishers.Find(publisherId);
+
+        _context.Games.Update(game);
+
+        await SaveChangesAsync("Error when updating the game in the database.");
+    }
+
     /// <summary>
     /// Asynchronously saves changes to the database context and throws a <see cref="DbUpdateException"/>
     /// with the specified error message if no changes were saved.
