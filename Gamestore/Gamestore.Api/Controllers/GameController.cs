@@ -9,7 +9,7 @@ namespace Gamestore.Api.Controllers;
 /// <summary>
 /// API controller for managing game-related operations.
 /// </summary>
-[Route("api/games")]
+[Route("games")]
 [ApiController]
 public class GameController : ControllerBase
 {
