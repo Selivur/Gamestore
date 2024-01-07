@@ -84,27 +84,37 @@ public class OrderRepository : IOrderRepository
     /// <inheritdoc />
     public async Task UpdateGameWithDependencies(Order order, string gameAlias)
     {
-        var orderDetails = order.OrderDetails.First();
+        // Знайдіть існуючий об'єкт Order з OrderDetails за допомогою gameAlias
+        var existingOrder = await _context.Orders
+            .Include(o => o.OrderDetails)
+                .ThenInclude(od => od.Game)
+            .FirstOrDefaultAsync(o => o.Id == order.Id);
 
-        var orderDetailsFromDb = _context.Orders.Include(g => g.OrderDetails).FirstOrDefault(g => g.Id == order.Id).OrderDetails;
-
-        orderDetails.Game = _context.Games.SingleOrDefault(g => g.GameAlias.Equals(gameAlias))
-            ?? throw new KeyNotFoundException("Game not found with specified alias");
-
-        var orderDetailsToRemove = orderDetailsFromDb.FirstOrDefault(orderDetails => orderDetails.Game.GameAlias == gameAlias);
-
-        if (orderDetailsToRemove != null)
+        if (existingOrder != null)
         {
-            orderDetailsFromDb.Remove(orderDetailsToRemove);
-        }
-        else
-        {
-            _context.OrderDetails.Add(orderDetails);
-        }
+            // Знайдіть існуючий об'єкт OrderDetails за допомогою gameAlias
+            var existingOrderDetails = existingOrder.OrderDetails
+                .FirstOrDefault(od => od.Game.GameAlias == gameAlias);
 
-        orderDetailsFromDb.Add(orderDetails);
-        order.OrderDetails = orderDetailsFromDb;
-        _context.Orders.Update(order);
+            if (existingOrderDetails != null)
+            {
+                // Оновіть дані про гру чи інші поля за необхідності
+                existingOrderDetails.Quantity = order.OrderDetails.First().Quantity;
+                existingOrderDetails.Price = order.OrderDetails.First().Price;
+            }
+            else
+            {
+                // Якщо не знайдено існуючих деталей замовлення для гри, можливо, потрібно додати нову деталь.
+                order.OrderDetails.First().Game = await _context.Games
+                    .FirstOrDefaultAsync(g => g.GameAlias == gameAlias)
+                    ?? throw new KeyNotFoundException("Game not found with specified alias");
+
+                existingOrder.OrderDetails.Add(order.OrderDetails.First());
+            }
+
+            // Оновіть існуючий об'єкт Order в контексті
+            _context.Orders.Update(existingOrder);
+        }
 
         await SaveChangesAsync("Error when updating the order in the database.");
     }

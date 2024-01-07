@@ -34,10 +34,10 @@
   "deletePublisherApiUrl": "/publishers/remove/{id}",
   "updatePublisherApiUrl": "/publishers/update",
 
-  "orderApiUrl": "/order/{id}",
+  "orderApiUrl": "/order/{key}",
   "ordersApiUrl": "/orders",
   "orderDetailsApiUrl": "/orderDetails/{id}",
-  "buyGameApiUrl": "/{id}",
+  "buyGameApiUrl": "/game/{key}/buy",
   "cancelGameBuyApiUrl": "/{id}",
   "basketApiUrl": "/{id}",
   "makeOrderInfoApiUrl": "/{id}",

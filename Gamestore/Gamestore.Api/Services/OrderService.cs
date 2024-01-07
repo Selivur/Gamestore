@@ -80,6 +80,7 @@ public class OrderService : IOrderService
 
         if (existingOrder != null)
         {
+            newOrder.Id = existingOrder.Id;
             await _repository.UpdateGameWithDependencies(newOrder, gameAlias);
         }
 
