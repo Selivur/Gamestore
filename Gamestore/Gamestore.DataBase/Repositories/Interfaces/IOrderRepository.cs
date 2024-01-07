@@ -41,4 +41,22 @@ public interface IOrderRepository
     /// <returns>An asynchronous task representing the operation's completion or throwing an error when failed to remove the order.</returns>
     /// <exception cref="ArgumentException">Thrown if no order is found with the specified company name.</exception>
     Task RemoveAsync(int id);
+
+    /// <summary>
+    /// Updates an existing order in the database with the specified game dependency.
+    /// </summary>
+    /// <param name="order">The order to be updated.</param>
+    /// <param name="gameAlias">The alias of the game to be associated with the order.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown if the game is not found.</exception>
+    Task UpdateGameWithDependencies(Order order, string gameAlias);
+
+    /// <summary>
+    /// Adds a new order to the database with the specified game dependency.
+    /// </summary>
+    /// <param name="order">The order to be added.</param>
+    /// <param name="gameAlias">The alias of the game to be associated with the order.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown if the game or customer is not found.</exception>
+    Task AddOrderWithDependencies(Order order, string gameAlias);
 }

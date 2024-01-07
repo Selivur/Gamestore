@@ -25,13 +25,15 @@ public class OrderRepository : IOrderRepository
     /// <inheritdoc />
     public async Task<Order?> GetByIdAsync(int id)
     {
-        return await _context.Orders.FindAsync(id);
+        return await _context.Orders
+            .Include(o => o.Customer)
+            .FirstOrDefaultAsync(o => o.Id == id);
     }
 
     /// <inheritdoc />
     public async Task<IEnumerable<Order>> GetAllAsync()
     {
-        return await _context.Orders.ToListAsync();
+        return await _context.Orders.Include(o => o.Customer).ToListAsync();
     }
 
     /// <inheritdoc />
@@ -58,6 +60,53 @@ public class OrderRepository : IOrderRepository
         _context.Orders.Remove(order);
 
         await SaveChangesAsync("Error when deleting the order from the database.");
+    }
+
+    /// <inheritdoc />
+    public async Task AddOrderWithDependencies(Order order, string gameAlias)
+    {
+        var orderDetails = order.OrderDetails.First();
+
+        orderDetails.Game = _context.Games.SingleOrDefault(g => g.GameAlias.Equals(gameAlias))
+            ?? throw new KeyNotFoundException("Game not found with specified alias");
+
+        order.Customer = _context.Customers.Find(order.Customer.Id)
+            ?? throw new KeyNotFoundException("Customer not found");
+
+        order.OrderDetails.Clear();
+        order.OrderDetails.Add(orderDetails);
+
+        _context.OrderDetails.Add(orderDetails);
+        _context.Orders.Add(order);
+        await SaveChangesAsync("Error when adding the order to the database.");
+    }
+
+    /// <inheritdoc />
+    public async Task UpdateGameWithDependencies(Order order, string gameAlias)
+    {
+        var orderDetails = order.OrderDetails.First();
+
+        var orderDetailsFromDb = _context.Orders.Include(g => g.OrderDetails).FirstOrDefault(g => g.Id == order.Id).OrderDetails;
+
+        orderDetails.Game = _context.Games.SingleOrDefault(g => g.GameAlias.Equals(gameAlias))
+            ?? throw new KeyNotFoundException("Game not found with specified alias");
+
+        var orderDetailsToRemove = orderDetailsFromDb.FirstOrDefault(orderDetails => orderDetails.Game.GameAlias == gameAlias);
+
+        if (orderDetailsToRemove != null)
+        {
+            orderDetailsFromDb.Remove(orderDetailsToRemove);
+        }
+        else
+        {
+            _context.OrderDetails.Add(orderDetails);
+        }
+
+        orderDetailsFromDb.Add(orderDetails);
+        order.OrderDetails = orderDetailsFromDb;
+        _context.Orders.Update(order);
+
+        await SaveChangesAsync("Error when updating the order in the database.");
     }
 
     /// <summary>

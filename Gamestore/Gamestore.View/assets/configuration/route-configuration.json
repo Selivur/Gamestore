@@ -23,8 +23,8 @@
   "DeletePublisher": "publisher/remove",
   "AddPublisher": "publisher/add",
 
-  "Order": "",
-  "Orders": "",
-  "Basket": "",
-  "MakeOrder": ""
+  "Order": "order",
+  "Orders": "orders",
+  "Basket": "order/details",
+  "MakeOrder": "order/make"
 }

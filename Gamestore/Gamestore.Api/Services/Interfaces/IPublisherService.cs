@@ -11,7 +11,7 @@ public interface IPublisherService
     Task CreatePublisherAsync(PublisherRequest publisher);
 
     /// <summary>
-    /// Gets a Publisher by its name.
+    /// Gets a Publisher by its id.
     /// </summary>
     /// <param name="id">The name of the Publisher.</param>
     /// <returns>The detailed information about the Publisher.</returns>

@@ -77,6 +77,7 @@ public class GameRepository : IGameRepository
         await SaveChangesAsync("Error when adding the game to the database.");
     }
 
+    /// <inheritdoc />
     public async Task UpdateGameWithDependencies(Game game, int[] genresId, int[] platformsId, int publisherId)
     {
         game = _context.Games.Include(g => g.Genre).Include(g => g.Platforms)
