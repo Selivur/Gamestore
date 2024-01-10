@@ -37,4 +37,13 @@ public interface IOrderService
     /// <param name="gameAlias">The alias of the game to be associated with the order.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task AddOrderWithDetails(OrderRequest order, string gameAlias);
+
+    /// <summary>
+    /// Retrieves the cart details for a given order ID.
+    /// </summary>
+    /// <param name="orderId">The unique identifier of the order.</param>
+    /// <returns>
+    /// A collection of <see cref="CartDetailsDTO"/> representing the cart details for the specified order.
+    /// </returns>
+    Task<IEnumerable<CartDetailsDTO>> GetCartDetailsAsync(int orderId);
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gamestore.Api.Migrations
 {
     [DbContext(typeof(GamestoreContext))]
-    [Migration("20231217001624_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240110220353_UpdateOrderAndOrderDetails")]
+    partial class UpdateOrderAndOrderDetails
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,6 +53,23 @@ namespace Gamestore.Api.Migrations
                     b.HasIndex("PlatformsId");
 
                     b.ToTable("GamePlatform");
+                });
+
+            modelBuilder.Entity("Gamestore.Database.Entities.Customer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("Gamestore.Database.Entities.Game", b =>
@@ -119,6 +136,62 @@ namespace Gamestore.Api.Migrations
                     b.HasIndex("ParentId");
 
                     b.ToTable("Genres");
+                });
+
+            modelBuilder.Entity("Gamestore.Database.Entities.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("OrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("Gamestore.Database.Entities.OrderDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Discount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GameId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderDetails");
                 });
 
             modelBuilder.Entity("Gamestore.Database.Entities.Platform", b =>
@@ -215,6 +288,37 @@ namespace Gamestore.Api.Migrations
                         .HasForeignKey("ParentId");
 
                     b.Navigation("ParentGenre");
+                });
+
+            modelBuilder.Entity("Gamestore.Database.Entities.Order", b =>
+                {
+                    b.HasOne("Gamestore.Database.Entities.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("Gamestore.Database.Entities.OrderDetails", b =>
+                {
+                    b.HasOne("Gamestore.Database.Entities.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Gamestore.Database.Entities.Order", null)
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("OrderId");
+
+                    b.Navigation("Game");
+                });
+
+            modelBuilder.Entity("Gamestore.Database.Entities.Order", b =>
+                {
+                    b.Navigation("OrderDetails");
                 });
 
             modelBuilder.Entity("Gamestore.Database.Entities.Publisher", b =>

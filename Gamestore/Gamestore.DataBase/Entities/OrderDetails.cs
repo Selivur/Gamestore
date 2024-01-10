@@ -7,5 +7,7 @@ public class OrderDetails
 
     public int Price { get; set; }
 
+    public int Discount { get; set; }
+
     public Game Game { get; set; }
 }

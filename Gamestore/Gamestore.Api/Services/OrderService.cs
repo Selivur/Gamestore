@@ -63,7 +63,6 @@ public class OrderService : IOrderService
         {
             OrderDate = order.OrderDate,
             Price = order.Sum,
-            Discount = order.Discount,
             Customer = new Customer()
             {
                 Id = Convert.ToInt32(order.CustomerId),
@@ -74,6 +73,7 @@ public class OrderService : IOrderService
                 {
                     Quantity = order.Quantity,
                     Price = order.Price,
+                    Discount = order.Discount,
                 },
             },
         };
@@ -87,5 +87,15 @@ public class OrderService : IOrderService
         {
             await _repository.AddOrderWithDependencies(newOrder, gameAlias);
         }
+    }
+
+    /// <inheritdoc/>
+    public async Task<IEnumerable<CartDetailsDTO>> GetCartDetailsAsync(int orderId)
+    {
+        var orders = await _repository.GetAllOrderDetails(orderId);
+
+        var orderResponses = orders.Select(CartDetailsDTO.FromOrderDetails).ToList();
+
+        return orderResponses;
     }
 }

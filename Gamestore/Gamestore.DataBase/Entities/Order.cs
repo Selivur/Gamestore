@@ -7,8 +7,6 @@ public class Order
 
     public int Price { get; set; }
 
-    public int Discount { get; set; }
-
     public ICollection<OrderDetails> OrderDetails { get; set; }
 
     public Customer Customer { get; set; }

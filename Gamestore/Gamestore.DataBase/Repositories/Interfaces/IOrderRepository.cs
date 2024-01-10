@@ -59,4 +59,13 @@ public interface IOrderRepository
     /// <returns>A task representing the asynchronous operation.</returns>
     /// <exception cref="KeyNotFoundException">Thrown if the game or customer is not found.</exception>
     Task AddOrderWithDependencies(Order order, string gameAlias);
+
+    /// <summary>
+    /// Retrieves all order details for a given order ID.
+    /// </summary>
+    /// <param name="orderId">The unique identifier of the order.</param>
+    /// <returns>
+    /// A collection of <see cref="OrderDetails"/> representing the details of the specified order.
+    /// </returns>
+    Task<IEnumerable<OrderDetails>> GetAllOrderDetails(int orderId);
 }

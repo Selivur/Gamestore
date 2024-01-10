@@ -69,6 +69,19 @@ public class OrderController : ControllerBase
     }
 
     /// <summary>
+    /// Retrieves the details of the cart for a given order ID.
+    /// </summary>
+    /// <param name="orderId">The ID of the order.</param>
+    /// <returns>Returns the cart details for the specified order.</returns>
+    [HttpGet("/cart")]
+    public async Task<IActionResult> GetCartDetails(int orderId)
+    {
+        var cartDetails = await _orderService.GetCartDetailsAsync(orderId);
+
+        return Ok(cartDetails);
+    }
+
+    /// <summary>
     /// Returns a list of error messages from the ModelState object.
     /// </summary>
     /// <returns>A list of error messages.</returns>

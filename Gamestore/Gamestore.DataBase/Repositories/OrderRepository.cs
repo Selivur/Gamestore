@@ -113,6 +113,17 @@ public class OrderRepository : IOrderRepository
         await SaveChangesAsync("Error when updating the order in the database.");
     }
 
+    /// <inheritdoc />
+    public async Task<IEnumerable<OrderDetails>> GetAllOrderDetails(int orderId)
+    {
+        return await _context.Orders
+            .Where(o => o.Id == orderId)
+            .Include(o => o.OrderDetails)
+                .ThenInclude(od => od.Game)
+            .SelectMany(o => o.OrderDetails)
+            .ToListAsync();
+    }
+
     /// <summary>
     /// Asynchronously saves changes to the database context and throws a <see cref="DbUpdateException"/>
     /// with the specified error message if no changes were saved.

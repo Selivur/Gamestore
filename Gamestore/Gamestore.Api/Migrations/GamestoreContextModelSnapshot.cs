@@ -146,9 +146,6 @@ namespace Gamestore.Api.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Discount")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("OrderDate")
                         .HasColumnType("datetime2");
 
@@ -169,6 +166,9 @@ namespace Gamestore.Api.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Discount")
+                        .HasColumnType("int");
 
                     b.Property<int>("GameId")
                         .HasColumnType("int");

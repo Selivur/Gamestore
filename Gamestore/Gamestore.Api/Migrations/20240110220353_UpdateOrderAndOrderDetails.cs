@@ -5,11 +5,24 @@
 namespace Gamestore.Api.Migrations;
 
 /// <inheritdoc />
-public partial class InitialCreate : Migration
+public partial class UpdateOrderAndOrderDetails : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
+        migrationBuilder.CreateTable(
+            name: "Customers",
+            columns: table => new
+            {
+                Id = table.Column<int>(type: "int", nullable: false)
+                    .Annotation("SqlServer:Identity", "1, 1"),
+                Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("PK_Customers", x => x.Id);
+            });
+
         migrationBuilder.CreateTable(
             name: "Genres",
             columns: table => new
@@ -55,6 +68,27 @@ public partial class InitialCreate : Migration
             constraints: table =>
             {
                 table.PrimaryKey("PK_Publishers", x => x.Id);
+            });
+
+        migrationBuilder.CreateTable(
+            name: "Orders",
+            columns: table => new
+            {
+                Id = table.Column<int>(type: "int", nullable: false)
+                    .Annotation("SqlServer:Identity", "1, 1"),
+                OrderDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                Price = table.Column<int>(type: "int", nullable: false),
+                CustomerId = table.Column<int>(type: "int", nullable: false),
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("PK_Orders", x => x.Id);
+                table.ForeignKey(
+                    name: "FK_Orders_Customers_CustomerId",
+                    column: x => x.CustomerId,
+                    principalTable: "Customers",
+                    principalColumn: "Id",
+                    onDelete: ReferentialAction.Cascade);
             });
 
         migrationBuilder.CreateTable(
@@ -129,6 +163,34 @@ public partial class InitialCreate : Migration
                     onDelete: ReferentialAction.Cascade);
             });
 
+        migrationBuilder.CreateTable(
+            name: "OrderDetails",
+            columns: table => new
+            {
+                Id = table.Column<int>(type: "int", nullable: false)
+                    .Annotation("SqlServer:Identity", "1, 1"),
+                Quantity = table.Column<int>(type: "int", nullable: false),
+                Price = table.Column<int>(type: "int", nullable: false),
+                Discount = table.Column<int>(type: "int", nullable: false),
+                GameId = table.Column<int>(type: "int", nullable: false),
+                OrderId = table.Column<int>(type: "int", nullable: true),
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("PK_OrderDetails", x => x.Id);
+                table.ForeignKey(
+                    name: "FK_OrderDetails_Games_GameId",
+                    column: x => x.GameId,
+                    principalTable: "Games",
+                    principalColumn: "Id",
+                    onDelete: ReferentialAction.Cascade);
+                table.ForeignKey(
+                    name: "FK_OrderDetails_Orders_OrderId",
+                    column: x => x.OrderId,
+                    principalTable: "Orders",
+                    principalColumn: "Id");
+            });
+
         migrationBuilder.CreateIndex(
             name: "IX_GameGenre_GenreId",
             table: "GameGenre",
@@ -162,6 +224,21 @@ public partial class InitialCreate : Migration
             column: "ParentId");
 
         migrationBuilder.CreateIndex(
+            name: "IX_OrderDetails_GameId",
+            table: "OrderDetails",
+            column: "GameId");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_OrderDetails_OrderId",
+            table: "OrderDetails",
+            column: "OrderId");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_Orders_CustomerId",
+            table: "Orders",
+            column: "CustomerId");
+
+        migrationBuilder.CreateIndex(
             name: "IX_Platforms_Type",
             table: "Platforms",
             column: "Type",
@@ -184,15 +261,24 @@ public partial class InitialCreate : Migration
             name: "GamePlatform");
 
         migrationBuilder.DropTable(
-            name: "Genres");
+            name: "OrderDetails");
 
         migrationBuilder.DropTable(
-            name: "Games");
+            name: "Genres");
 
         migrationBuilder.DropTable(
             name: "Platforms");
 
         migrationBuilder.DropTable(
+            name: "Games");
+
+        migrationBuilder.DropTable(
+            name: "Orders");
+
+        migrationBuilder.DropTable(
             name: "Publishers");
+
+        migrationBuilder.DropTable(
+            name: "Customers");
     }
 }
