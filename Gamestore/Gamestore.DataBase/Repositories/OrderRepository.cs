@@ -73,6 +73,13 @@ public class OrderRepository : IOrderRepository
         order.Customer = _context.Customers.Find(order.Customer.Id)
             ?? throw new KeyNotFoundException("Customer not found");
 
+        if (orderDetails.Game.UnitInStock < orderDetails.Quantity)
+        {
+            throw new InvalidOperationException("Not enough units in stock for the requested quantity");
+        }
+
+        orderDetails.Game.UnitInStock -= orderDetails.Quantity;
+
         order.OrderDetails.Clear();
         order.OrderDetails.Add(orderDetails);
 
@@ -93,6 +100,14 @@ public class OrderRepository : IOrderRepository
         {
             var existingOrderDetails = existingOrder.OrderDetails
                 .FirstOrDefault(od => od.Game.GameAlias == gameAlias);
+
+            var orderDetails = order.OrderDetails.First();
+            if (existingOrderDetails.Game.UnitInStock < orderDetails.Quantity)
+            {
+                throw new InvalidOperationException("Not enough units in stock for the requested quantity");
+            }
+
+            orderDetails.Game.UnitInStock -= orderDetails.Quantity;
 
             if (existingOrderDetails != null)
             {
