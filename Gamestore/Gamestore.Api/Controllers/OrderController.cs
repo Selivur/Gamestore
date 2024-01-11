@@ -81,6 +81,14 @@ public class OrderController : ControllerBase
         return Ok(cartDetails);
     }
 
+    [HttpGet("/payment")]
+    public async Task<IActionResult> GetPaymentMethodInfo(string name)
+    {
+        var cartDetails = await _orderService.GetPaymentDetails(name);
+
+        return Ok(cartDetails);
+    }
+
     /// <summary>
     /// Returns a list of error messages from the ModelState object.
     /// </summary>

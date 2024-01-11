@@ -46,4 +46,11 @@ public interface IOrderService
     /// A collection of <see cref="CartDetailsDTO"/> representing the cart details for the specified order.
     /// </returns>
     Task<IEnumerable<CartDetailsDTO>> GetCartDetailsAsync(int orderId);
+
+    /// <summary>
+    /// Retrieves payment details based on the specified payment method name.
+    /// </summary>
+    /// <param name="name">The name of the payment method.</param>
+    /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation. The result is a <see cref="PaymentDetails"/> object.</returns>
+    Task<PaymentDetails> GetPaymentDetails(string name);
 }
