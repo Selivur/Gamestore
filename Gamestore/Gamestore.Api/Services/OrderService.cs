@@ -3,6 +3,9 @@ using Gamestore.Api.Models.DTO.OrderDTO;
 using Gamestore.Api.Services.Interfaces;
 using Gamestore.Database.Entities;
 using Gamestore.Database.Repositories.Interfaces;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
 
 namespace Gamestore.Api.Services;
 
@@ -125,6 +128,27 @@ public class OrderService : IOrderService
         }
 
         return Task.FromResult(paymentDetails);
+    }
+
+    /// <inheritdoc/>
+    public async Task<byte[]> GetBankPDFAsync(int orderId, int validityDays)
+    {
+        Order order = await _repository.GetByIdWithOrderDetailsAsync(orderId);
+        using MemoryStream ms = new();
+        using (var writer = new PdfWriter(ms).SetSmartMode(true))
+        using (var pdf = new PdfDocument(writer))
+        {
+            using var document = new Document(pdf);
+
+            document.Add(new Paragraph($"User ID: {order.Customer.Id}"));
+            document.Add(new Paragraph($"Order ID: {order.Id}"));
+            document.Add(new Paragraph($"Validity Date: {DateTime.Now.AddDays(validityDays)}"));
+            document.Add(new Paragraph($"Sum: {order.Price}"));
+
+            document.Close();
+        }
+
+        return ms.ToArray();
     }
 
     /// <inheritdoc/>

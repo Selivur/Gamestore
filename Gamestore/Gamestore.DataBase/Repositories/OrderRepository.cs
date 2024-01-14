@@ -31,6 +31,15 @@ public class OrderRepository : IOrderRepository
     }
 
     /// <inheritdoc />
+    public async Task<Order?> GetByIdWithOrderDetailsAsync(int id)
+    {
+        return await _context.Orders
+            .Include(o => o.Customer)
+            .Include(od => od.OrderDetails)
+            .FirstOrDefaultAsync(o => o.Id == id);
+    }
+
+    /// <inheritdoc />
     public async Task<IEnumerable<Order>> GetAllAsync()
     {
         return await _context.Orders.Include(o => o.Customer).ToListAsync();
@@ -102,8 +111,12 @@ public class OrderRepository : IOrderRepository
                 .FirstOrDefault(od => od.Game.GameAlias == gameAlias);
 
             var orderDetails = order.OrderDetails.First();
+
+            orderDetails.Game.UnitInStock += existingOrderDetails.Quantity;
+
             if (existingOrderDetails.Game.UnitInStock < orderDetails.Quantity)
             {
+                orderDetails.Game.UnitInStock -= existingOrderDetails.Quantity;
                 throw new InvalidOperationException("Not enough units in stock for the requested quantity");
             }
 

@@ -90,6 +90,20 @@ public class OrderController : ControllerBase
     }
 
     /// <summary>
+    /// Retrieves a bank invoice PDF for the specified order.
+    /// </summary>
+    /// <param name="orderId">The ID of the order for which the PDF is requested.</param>
+    /// <param name="validityDays">The number of days the invoice is valid (default is 3 days).</param>
+    /// <returns>A FileResult containing the bank invoice PDF.</returns>
+    [HttpGet("{orderId}/invoice-pdf")]
+    public async Task<IActionResult> GetBankInvoicePdf(int orderId, int validityDays = 3)
+    {
+        byte[] pdfBytes = await _orderService.GetBankPDFAsync(orderId, validityDays);
+
+        return File(pdfBytes, "application/pdf", $"invoice_{orderId}.pdf");
+    }
+
+    /// <summary>
     /// Returns a list of error messages from the ModelState object.
     /// </summary>
     /// <returns>A list of error messages.</returns>

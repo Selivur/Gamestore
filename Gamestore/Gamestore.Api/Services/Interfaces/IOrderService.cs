@@ -51,6 +51,22 @@ public interface IOrderService
     /// Retrieves payment details based on the specified payment method name.
     /// </summary>
     /// <param name="name">The name of the payment method.</param>
-    /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation. The result is a <see cref="PaymentDetails"/> object.</returns>
+    /// <returns>A <see cref="Task{TResult}"/> representing the operation. The result is a <see cref="PaymentDetails"/> object.</returns>
     Task<PaymentDetails> GetPaymentDetails(string name);
+
+    /// <summary>
+    /// Generates a PDF document for a bank invoice based on the provided order information.
+    /// </summary>
+    /// <param name="orderId">The ID of the order for which the PDF is generated.</param>
+    /// <param name="validityDays">The number of days the invoice is valid (default is 3 days).</param>
+    /// <returns>A byte array representing the generated PDF document.</returns>
+    /// <remarks>
+    /// The generated PDF contains the following information:
+    /// - User ID
+    /// - Order ID
+    /// - Validity Date (default validity period is 3 days, configurable)
+    /// - Sum.
+    /// </remarks>
+    /// <returns>A byte array containing the generated PDF document.</returns>
+    Task<byte[]> GetBankPDFAsync(int orderId, int validityDays);
 }

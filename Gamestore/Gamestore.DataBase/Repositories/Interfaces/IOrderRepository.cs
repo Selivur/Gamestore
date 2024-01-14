@@ -68,4 +68,11 @@ public interface IOrderRepository
     /// A collection of <see cref="OrderDetails"/> representing the details of the specified order.
     /// </returns>
     Task<IEnumerable<OrderDetails>> GetAllOrderDetails(int orderId);
+
+    /// <summary>
+    /// Retrieves an order with its associated order details by the specified order ID.
+    /// </summary>
+    /// <param name="id">The ID of the order to retrieve.</param>
+    /// <returns>Returns the order with associated order details if found; otherwise, returns null.</returns>
+    Task<Order?> GetByIdWithOrderDetailsAsync(int id);
 }
