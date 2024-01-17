@@ -45,11 +45,6 @@ public class GameController : ControllerBase
     [HttpPost("new")]
     public async Task<IActionResult> CreateGame([FromBody] GameWrapper game)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(GetErrorMessages());
-        }
-
         await _gameService.CreateGameAsync(game);
 
         return Ok();
@@ -76,11 +71,6 @@ public class GameController : ControllerBase
     [HttpPut("update")]
     public async Task<IActionResult> UpdateGame([FromBody] GameWrapper game)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(GetErrorMessages());
-        }
-
         await _gameService.UpdateGameAsync(game);
 
         return Ok();
@@ -181,17 +171,5 @@ public class GameController : ControllerBase
                          $"Name: {game.Name}\n" +
                          $"Description: {game.Description}";
         return content;
-    }
-
-    /// <summary>
-    /// Returns a list of error messages from the ModelState object.
-    /// </summary>
-    /// <returns>A list of error messages.</returns>
-    private List<string> GetErrorMessages()
-    {
-        return ModelState.Values
-            .SelectMany(v => v.Errors)
-            .Select(v => v.ErrorMessage)
-            .ToList();
     }
 }

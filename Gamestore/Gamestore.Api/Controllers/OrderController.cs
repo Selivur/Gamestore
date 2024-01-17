@@ -58,11 +58,6 @@ public class OrderController : ControllerBase
     [HttpPut("/game/{gameAlias}/buy")]
     public async Task<IActionResult> CreateGame([FromBody] OrderRequest order, string gameAlias)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(GetErrorMessages());
-        }
-
         await _orderService.AddOrderWithDetails(order, gameAlias);
 
         return Ok();
@@ -86,7 +81,7 @@ public class OrderController : ControllerBase
     /// </summary>
     /// <param name="name">The name of the payment method.</param>
     /// <returns>An IActionResult containing the payment method information.</returns>
-    [HttpGet("/payment")]
+    [HttpGet("payment")]
     public async Task<IActionResult> GetPaymentMethodInfo(string name)
     {
         var cartDetails = await _orderService.GetPaymentDetails(name);
@@ -106,17 +101,5 @@ public class OrderController : ControllerBase
         byte[] pdfBytes = await _orderService.GetBankPDFAsync(orderId, validityDays);
 
         return File(pdfBytes, "application/pdf", $"invoice_{orderId}.pdf");
-    }
-
-    /// <summary>
-    /// Returns a list of error messages from the ModelState object.
-    /// </summary>
-    /// <returns>A list of error messages.</returns>
-    private List<string> GetErrorMessages()
-    {
-        return ModelState.Values
-            .SelectMany(v => v.Errors)
-            .Select(v => v.ErrorMessage)
-            .ToList();
     }
 }
