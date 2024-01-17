@@ -62,7 +62,7 @@ public class GenreController : ControllerBase
             return BadRequest(GetErrorMessages());
         }
 
-        await _genreService.UpdateGenreAsync(request.GenreRequsert);
+        await _genreService.UpdateGenreAsync(request.GenreRequest);
 
         return Ok();
     }
@@ -93,7 +93,7 @@ public class GenreController : ControllerBase
             return BadRequest(GetErrorMessages());
         }
 
-        await _genreService.AddGenreAsync(genre.GenreRequsert);
+        await _genreService.AddGenreAsync(genre.GenreRequest);
 
         return Ok();
     }

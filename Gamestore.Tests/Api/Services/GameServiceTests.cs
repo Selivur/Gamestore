@@ -10,6 +10,9 @@ public class GameServiceTests
     private readonly Mock<IGameRepository> _mockRepository;
     private readonly GameService _gameService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GameServiceTests"/> class.
+    /// </summary>
     public GameServiceTests()
     {
         _mockRepository = new Mock<IGameRepository>();
@@ -82,6 +85,9 @@ public class GameServiceTests
         await Assert.ThrowsAsync<InvalidOperationException>(() => _gameService.CreateGameAsync(validGameRequest));
     }
 
+    /// <summary>
+    /// Tests the <see cref="GameService.GetGameByAliasAsync"/> method to ensure it returns the expected <see cref="GameResponse"/> when the game exists.
+    /// </summary>
     [Fact]
     public async Task GetGameByAliasAsync_ShouldReturnGameResponse_WhenGameExists()
     {
@@ -107,6 +113,9 @@ public class GameServiceTests
         Assert.Equal(existingGame.Description, result.Description);
     }
 
+    /// <summary>
+    /// Tests the <see cref="GameService.GetGameByAliasAsync"/> method to ensure it throws a <see cref="KeyNotFoundException"/> when the game is not found.
+    /// </summary>
     [Fact]
     public async Task GetGameByAliasAsync_ShouldThrowException_WhenGameNotFound()
     {
@@ -252,6 +261,9 @@ public class GameServiceTests
         }
     }
 
+    /// <summary>
+    /// Tests the <see cref="GameService.GetAllGamesAsync"/> method to ensure it returns an empty list when no games are found.
+    /// </summary>
     [Fact]
     public async Task GetAllGamesAsync_ShouldReturnEmptyList_WhenNoGamesFound()
     {

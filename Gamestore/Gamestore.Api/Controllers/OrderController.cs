@@ -55,7 +55,7 @@ public class OrderController : ControllerBase
     /// <param name="order">The order details provided in the request body.</param>
     /// <param name="gameAlias">The alias of the game being purchased.</param>
     /// <returns>An ActionResult indicating the success of the operation.</returns>
-    [HttpPost("/game/{gameAlias}/buy")]
+    [HttpPut("/game/{gameAlias}/buy")]
     public async Task<IActionResult> CreateGame([FromBody] OrderRequest order, string gameAlias)
     {
         if (!ModelState.IsValid)
@@ -81,6 +81,11 @@ public class OrderController : ControllerBase
         return Ok(cartDetails);
     }
 
+    /// <summary>
+    /// Retrieves payment method information based on the specified name.
+    /// </summary>
+    /// <param name="name">The name of the payment method.</param>
+    /// <returns>An IActionResult containing the payment method information.</returns>
     [HttpGet("/payment")]
     public async Task<IActionResult> GetPaymentMethodInfo(string name)
     {

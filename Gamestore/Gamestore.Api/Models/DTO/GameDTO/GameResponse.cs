@@ -44,6 +44,11 @@ public class GameResponse
     [JsonPropertyName("discontinued")]
     public int Discount { get; set; }
 
+    /// <summary>
+    /// Converts a Game object to a GameResponse object.
+    /// </summary>
+    /// <param name="game">The Game object to convert.</param>
+    /// <returns>The converted GameResponse object.</returns>
     public static GameResponse FromGame(Game game)
     {
         return new GameResponse

@@ -27,10 +27,19 @@ public class GameRequest
     /// </summary>
     public string Description { get; set; }
 
+    /// <summary>
+    /// Gets or sets the discount of the game.
+    /// </summary>
     [JsonPropertyName("discontinued")]
     public int Discount { get; set; }
 
+    /// <summary>
+    /// Gets or sets the price of the game.
+    /// </summary>
     public int Price { get; set; }
 
+    /// <summary>
+    /// Gets or sets the available quantity of the game.
+    /// </summary>
     public int UnitInStock { get; set; }
 }

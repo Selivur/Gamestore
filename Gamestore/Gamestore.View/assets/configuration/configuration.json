@@ -34,7 +34,7 @@
   "deletePublisherApiUrl": "/publishers/remove/{id}",
   "updatePublisherApiUrl": "/publishers/update",
 
-  "orderApiUrl": "/order/{key}",
+  "orderApiUrl": "/orders/{key}",
   "ordersApiUrl": "/orders",
   "orderDetailsApiUrl": "/orderDetails/{id}",
   "buyGameApiUrl": "/game/{key}/buy",

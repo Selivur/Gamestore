@@ -3,6 +3,9 @@ public class GameRepositoryTests
 {
     private readonly DbContextOptions<GamestoreContext> _options;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GameRepositoryTests"/> class.
+    /// </summary>
     public GameRepositoryTests()
     {
         _options = new DbContextOptionsBuilder<GamestoreContext>()
