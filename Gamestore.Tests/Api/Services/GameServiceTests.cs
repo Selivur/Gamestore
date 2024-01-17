@@ -1,4 +1,5 @@
 ﻿using Gamestore.Api.Models.DTO.GameDTO;
+using Gamestore.Api.Models.Wrappers.Game;
 using Gamestore.Api.Services;
 using Gamestore.Database.Repositories.Interfaces;
 using Moq;
@@ -23,17 +24,32 @@ public class GameServiceTests
     public async Task CreateGameAsync_ShouldAddNewGame()
     {
         // Arrange
-        var gameRequest = CreateGameRequest("test-game", "Test Game", "A test game description");
+        var validGameRequest = new GameWrapper
+        {
+            GameRequest = new GameRequest { Name = "Valid Name", Description = "Desc", GameAlias = "valid_name" },
+            GenresId = new int[] { 1, 2 },
+            PlatformsId = new int[] { 3, 4 },
+            PublisherId = 5,
+        };
 
-        _mockRepository.Setup(repo => repo.GetByAliasAsync(gameRequest.GameAlias!))
+        _mockRepository.Setup(repo => repo.GetByAliasAsync(validGameRequest.GameRequest.GameAlias!))
             .ReturnsAsync((Game)null);
 
+        // Use a flag to indicate whether AddAsync was called
+        bool addAsyncCalled = false;
+
+        _mockRepository.Setup(repo => repo.AddGameWithDependencies(It.IsAny<Game>(), It.IsAny<int[]>(), It.IsAny<int[]>(), It.IsAny<int>()))
+            .Callback((Game game, int[] genresId, int[] platformsId, int publisherId) =>
+            {
+                addAsyncCalled = true;
+            });
+
         // Act
-        await _gameService.CreateGameAsync(gameRequest);
+        await _gameService.CreateGameAsync(validGameRequest);
 
         // Assert
-        _mockRepository.Verify(repo => repo.GetByAliasAsync(gameRequest.GameAlias!), Times.Once);
-        _mockRepository.Verify(repo => repo.AddAsync(It.IsAny<Game>()), Times.Once);
+        _mockRepository.Verify(repo => repo.GetByAliasAsync(validGameRequest.GameRequest.GameAlias!), Times.Once);
+        Assert.True(addAsyncCalled, "AddAsync should have been called within AddGameWithDependencies");
     }
 
     /// <summary>
@@ -44,20 +60,26 @@ public class GameServiceTests
     public async Task CreateGameAsync_ShouldThrowException_WhenGameAliasNotUnique()
     {
         // Arrange
-        var gameRequest = CreateGameRequest("test-game", "Test Game", "A test game description");
+        var validGameRequest = new GameWrapper
+        {
+            GameRequest = new GameRequest { Name = "Valid Name", Description = "Desc", GameAlias = "valid_name" },
+            GenresId = new int[] { 1, 2 },
+            PlatformsId = new int[] { 3, 4 },
+            PublisherId = 5,
+        };
 
         var existingGame = new Game
         {
-            GameAlias = gameRequest.GameAlias!,
+            GameAlias = validGameRequest.GameRequest.GameAlias!,
             Name = "Test Game",
             Description = "Existing game description",
         };
 
-        _mockRepository.Setup(repo => repo.GetByAliasAsync(gameRequest.GameAlias!))
+        _mockRepository.Setup(repo => repo.GetByAliasAsync(validGameRequest.GameRequest.GameAlias!))
             .ReturnsAsync(existingGame);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _gameService.CreateGameAsync(gameRequest));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _gameService.CreateGameAsync(validGameRequest));
     }
 
     [Fact]
@@ -106,26 +128,35 @@ public class GameServiceTests
     public async Task UpdateGameAsync_ShouldUpdateExistingGame()
     {
         // Arrange
-        var gameRequest = CreateGameRequest("test-game", "Updated Test Game", "Updated game description");
+        var validGameRequest = new GameWrapper
+        {
+            GameRequest = new GameRequest { Id = "1", Name = "new Name", Description = "Upd Desc", GameAlias = "valid_name" },
+            GenresId = new int[] { 1, 2 },
+            PlatformsId = new int[] { 3, 4 },
+            PublisherId = 5,
+        };
 
         var existingGame = new Game
         {
-            GameAlias = gameRequest.GameAlias!,
+            Id = 1, // Ensure this matches the Id in GameWrapper
+            GameAlias = validGameRequest.GameRequest.GameAlias!,
             Name = "Test Game",
             Description = "A test game description",
         };
 
-        _mockRepository.Setup(repo => repo.GetByAliasAsync(gameRequest.GameAlias!))
+        _mockRepository.Setup(repo => repo.GetByIdAsync(It.IsAny<int>()))
             .ReturnsAsync(existingGame);
 
         // Act
-        await _gameService.UpdateGameAsync(gameRequest);
+        await _gameService.UpdateGameAsync(validGameRequest);
 
         // Assert
-        _mockRepository.Verify(repo => repo.GetByAliasAsync(gameRequest.GameAlias!), Times.Once);
-        _mockRepository.Verify(repo => repo.UpdateAsync(It.IsAny<Game>()), Times.Once);
-        Assert.Equal(gameRequest.Name, existingGame.Name);
-        Assert.Equal(gameRequest.Description, existingGame.Description);
+        _mockRepository.Verify(repo => repo.GetByIdAsync(It.IsAny<int>()), Times.Once);
+        _mockRepository.Verify(repo => repo.UpdateGameWithDependencies(It.IsAny<Game>(), It.IsAny<int[]>(), It.IsAny<int[]>(), It.IsAny<int>()), Times.Once);
+
+        // Additional assertions
+        Assert.Equal(validGameRequest.GameRequest.Name, existingGame.Name);
+        Assert.Equal(validGameRequest.GameRequest.Description, existingGame.Description);
     }
 
     /// <summary>
@@ -136,13 +167,19 @@ public class GameServiceTests
     public async Task UpdateGameAsync_ShouldThrowException_WhenGameNotFound()
     {
         // Arrange
-        var gameRequest = CreateGameRequest("non-existing-game", "Updated Test Game", "Updated game description");
+        var validGameRequest = new GameWrapper
+        {
+            GameRequest = new GameRequest { Name = "Name", Description = "Desc", GameAlias = "non_ex_game" },
+            GenresId = new int[] { 1, 2 },
+            PlatformsId = new int[] { 3, 4 },
+            PublisherId = 5,
+        };
 
-        _mockRepository.Setup(repo => repo.GetByAliasAsync(gameRequest.GameAlias!))
+        _mockRepository.Setup(repo => repo.GetByAliasAsync(validGameRequest.GameRequest.GameAlias!))
                       .ReturnsAsync((Game)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<KeyNotFoundException>(() => _gameService.UpdateGameAsync(gameRequest));
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _gameService.UpdateGameAsync(validGameRequest));
     }
 
     /// <summary>
@@ -227,15 +264,5 @@ public class GameServiceTests
 
         // Assert
         Assert.Empty(result);
-    }
-
-    private static GameRequest CreateGameRequest(string gameAlias, string name, string description)
-    {
-        return new GameRequest
-        {
-            GameAlias = gameAlias,
-            Name = name,
-            Description = description,
-        };
     }
 }

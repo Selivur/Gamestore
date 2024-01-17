@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Gamestore.Api.Controllers;
 using Gamestore.Api.Models.DTO.GameDTO;
+using Gamestore.Api.Models.Wrappers.Game;
 using Gamestore.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -27,7 +28,13 @@ public class GameControllerTests
     public async Task CreateGame_ReturnsOkResult_WhenModelStateIsValid()
     {
         // Arrange
-        var validGameRequest = new GameRequest { Name = "Valid Name" };
+        var validGameRequest = new GameWrapper
+        {
+            GameRequest = new GameRequest { Name = "Valid Name" },
+            GenresId = new int[] { 1, 2 },
+            PlatformsId = new int[] { 3, 4 },
+            PublisherId = 5,
+        };
         _gameController.ModelState.Clear();
 
         // Act
@@ -44,7 +51,7 @@ public class GameControllerTests
     public async Task CreateGame_ReturnsBadRequestResult_WhenNameIsMissing()
     {
         // Arrange
-        var invalidGameRequest = new GameRequest { /* Name is missing */ };
+        var invalidGameRequest = new GameWrapper { /* Name is missing */ };
         _gameController.ModelState.AddModelError("Name", "Name is required");
 
         // Act
@@ -78,7 +85,13 @@ public class GameControllerTests
     public async Task UpdateGame_ReturnsOkResult_WhenModelStateIsValid()
     {
         // Arrange
-        var validGameRequest = new GameRequest { Name = "Valid Name" };
+        var validGameRequest = new GameWrapper
+        {
+            GameRequest = new GameRequest { Name = "Valid Name" },
+            GenresId = new int[] { 1, 2 },
+            PlatformsId = new int[] { 3, 4 },
+            PublisherId = 5,
+        };
         _gameController.ModelState.Clear();
 
         // Act
@@ -95,7 +108,7 @@ public class GameControllerTests
     public async Task UpdateGame_ReturnsBadRequestResult_WhenModelStateIsInvalid()
     {
         // Arrange
-        var invalidGameRequest = new GameRequest { /* Name is missing */ };
+        var invalidGameRequest = new GameWrapper { /* Name is missing */ };
         _gameController.ModelState.AddModelError("Name", "Name is required");
 
         // Act

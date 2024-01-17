@@ -193,7 +193,7 @@ public class GenreRepositoryTests
         context.SaveChanges();
 
         // Act
-        await repository.RemoveAsync("Adventure");
+        await repository.RemoveAsync(1);
 
         // Assert
         var removedGenre = await context.Genres.FirstOrDefaultAsync(g => g.Id == 1);
@@ -211,7 +211,7 @@ public class GenreRepositoryTests
         var repository = new GenreRepository(context);
 
         // Act and Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(async () => await repository.RemoveAsync("nonexistent-genre"));
+        await Assert.ThrowsAsync<ArgumentException>(async () => await repository.RemoveAsync(0));
     }
 
     /// <summary>
@@ -229,7 +229,7 @@ public class GenreRepositoryTests
         context.SaveChanges();
 
         // Act & Assert
-        await Assert.ThrowsAsync<DbUpdateException>(() => repository.RemoveAsync("Adventure"));
+        await Assert.ThrowsAsync<DbUpdateException>(() => repository.RemoveAsync(1));
     }
 
     /// <summary>

@@ -202,7 +202,7 @@ public class PlatformRepositoryTests
         context.SaveChanges();
 
         // Act
-        await repository.RemoveAsync("PC");
+        await repository.RemoveAsync(1);
 
         // Assert
         var removedPlatform = await context.Platforms.FirstOrDefaultAsync(p => p.Id == 1);
@@ -221,7 +221,7 @@ public class PlatformRepositoryTests
         var repository = new PlatformRepository(context);
 
         // Act and Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(async () => await repository.RemoveAsync("nonexistent-platform"));
+        await Assert.ThrowsAsync<ArgumentException>(async () => await repository.RemoveAsync(1));
     }
 
     /// <summary>
