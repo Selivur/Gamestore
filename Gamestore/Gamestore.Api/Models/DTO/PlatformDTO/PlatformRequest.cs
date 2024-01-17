@@ -10,6 +10,7 @@ public class PlatformRequest
     /// <summary>
     /// Gets or sets the unique identifier of the platform.
     /// </summary>
+    [RegularExpression(@"^[0-9]+$", ErrorMessage = "Only numbers allowed in the id field.")]
     public int Id { get; set; }
 
     /// <summary>

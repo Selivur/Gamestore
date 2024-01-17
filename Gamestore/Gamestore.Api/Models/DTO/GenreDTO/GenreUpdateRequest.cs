@@ -11,6 +11,7 @@ public class GenreUpdateRequest
     /// Gets or sets the unique identifier of the genre. Required.
     /// </summary>
     [Required(ErrorMessage = "Id is required")]
+    [RegularExpression(@"^[0-9]+$", ErrorMessage = "Only numbers allowed in the id field.")]
     public int Id { get; set; }
 
     /// <summary>

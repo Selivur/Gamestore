@@ -1,4 +1,6 @@
-﻿namespace Gamestore.Api.Models.DTO.OrderDTO;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Gamestore.Api.Models.DTO.OrderDTO;
 
 /// <summary>
 /// Represents a data transfer object (DTO) for creating or updating an order.
@@ -8,6 +10,7 @@ public class OrderRequest
     /// <summary>
     /// Gets or sets the unique identifier of the order.
     /// </summary>
+    [RegularExpression(@"^[0-9]+$", ErrorMessage = "Only numbers allowed in the id field.")]
     public string Id { get; set; }
 
     /// <summary>

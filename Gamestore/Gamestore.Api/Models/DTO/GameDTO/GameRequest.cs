@@ -8,6 +8,7 @@ namespace Gamestore.Api.Models.DTO.GameDTO;
 /// </summary>
 public class GameRequest
 {
+    [RegularExpression(@"^[0-9]+$", ErrorMessage = "Only numbers allowed in the id field.")]
     public string? Id { get; set; }
 
     /// <summary>
