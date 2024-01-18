@@ -48,11 +48,13 @@ public interface IOrderService
     Task<IEnumerable<CartDetailsDTO>> GetCartDetailsAsync(int orderId);
 
     /// <summary>
-    /// Retrieves payment details based on the specified payment method name.
+    /// Retrieves a list of all available payment methods.
     /// </summary>
-    /// <param name="name">The name of the payment method.</param>
-    /// <returns>A <see cref="Task{TResult}"/> representing the operation. The result is a <see cref="PaymentDetails"/> object.</returns>
-    Task<PaymentDetails> GetPaymentDetails(string name);
+    /// <returns>A task representing the asynchronous operation that returns a list of payment methods.</returns>
+    /// <remarks>
+    /// The returned list contains <see cref="PaymentDetails"/> objects, each representing the details of a specific payment method.
+    /// </remarks>
+    Task<List<PaymentDetails>> GetAllPaymentMethods();
 
     /// <summary>
     /// Generates a PDF document for a bank invoice based on the provided order information.

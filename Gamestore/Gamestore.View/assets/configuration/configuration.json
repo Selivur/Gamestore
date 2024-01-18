@@ -34,12 +34,12 @@
   "deletePublisherApiUrl": "/publishers/remove/{id}",
   "updatePublisherApiUrl": "/publishers/update",
 
-  "orderApiUrl": "/orders/{key}",
+  "orderApiUrl": "/orders/{id}",
   "ordersApiUrl": "/orders",
-  "orderDetailsApiUrl": "/orderDetails/{id}",
+  "orderDetailsApiUrl": "/cart/{id}",
   "buyGameApiUrl": "/game/{key}/buy",
-  "cancelGameBuyApiUrl": "/{id}",
-  "basketApiUrl": "/orders",
-  "makeOrderInfoApiUrl": "/{id}",
-  "payApiUrl": "/{id}"
+  "cancelGameBuyApiUrl": "/cancelGameBuyApiUrl/{id}",
+  "basketApiUrl": "/orders/{id}/invoice-pdf",
+  "makeOrderInfoApiUrl": "makeOrderInfoApiUrl/{id}",
+  "payApiUrl": "payApiUrl/{id}"
 }

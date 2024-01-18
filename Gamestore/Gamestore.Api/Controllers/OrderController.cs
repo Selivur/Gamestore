@@ -60,7 +60,7 @@ public class OrderController : ControllerBase
     {
         await _orderService.AddOrderWithDetails(order, gameAlias);
 
-        return Ok();
+        return Ok(order);
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public class OrderController : ControllerBase
     /// </summary>
     /// <param name="orderId">The ID of the order.</param>
     /// <returns>Returns the cart details for the specified order.</returns>
-    [HttpGet("/cart")]
+    [HttpGet("/cart/{orderId}")]
     public async Task<IActionResult> GetCartDetails(int orderId)
     {
         var cartDetails = await _orderService.GetCartDetailsAsync(orderId);
@@ -79,12 +79,11 @@ public class OrderController : ControllerBase
     /// <summary>
     /// Retrieves payment method information based on the specified name.
     /// </summary>
-    /// <param name="name">The name of the payment method.</param>
-    /// <returns>An IActionResult containing the payment method information.</returns>
+    /// <returns>An IActionResult containing a list of payment method information.</returns>
     [HttpGet("payment")]
-    public async Task<IActionResult> GetPaymentMethodInfo(string name)
+    public async Task<IActionResult> GetPaymentMethodInfo()
     {
-        var cartDetails = await _orderService.GetPaymentDetails(name);
+        var cartDetails = await _orderService.GetAllPaymentMethods();
 
         return Ok(cartDetails);
     }
@@ -92,14 +91,13 @@ public class OrderController : ControllerBase
     /// <summary>
     /// Retrieves a bank invoice PDF for the specified order.
     /// </summary>
-    /// <param name="orderId">The ID of the order for which the PDF is requested.</param>
-    /// <param name="validityDays">The number of days the invoice is valid (default is 3 days).</param>
+    /// <param name="id">The ID of the order for which the PDF is requested.</param>
     /// <returns>A FileResult containing the bank invoice PDF.</returns>
-    [HttpGet("{orderId}/invoice-pdf")]
-    public async Task<IActionResult> GetBankInvoicePdf(int orderId, int validityDays = 3)
+    [HttpGet("{id}/invoice-pdf")]
+    public async Task<IActionResult> GetBankInvoicePdf(int id)
     {
-        byte[] pdfBytes = await _orderService.GetBankPDFAsync(orderId, validityDays);
+        byte[] pdfBytes = await _orderService.GetBankPDFAsync(id, 3);
 
-        return File(pdfBytes, "application/pdf", $"invoice_{orderId}.pdf");
+        return File(pdfBytes, "application/pdf", $"invoice_{id}.pdf");
     }
 }

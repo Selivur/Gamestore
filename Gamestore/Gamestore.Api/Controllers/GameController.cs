@@ -30,9 +30,9 @@ public class GameController : ControllerBase
     /// <param name="id">The id of the game to retrieve.</param>
     /// <returns>An IActionResult containing the retrieved game if successful.</returns>
     [HttpGet("getById/{id}")]
-    public async Task<IActionResult> GetGenre(int id)
+    public async Task<IActionResult> GetGenre(string id)
     {
-        var result = await _gameService.GetGameByIdAsync(id);
+        var result = await _gameService.GetGameByIdAsync(Convert.ToInt32(id));
 
         return Ok(result);
     }

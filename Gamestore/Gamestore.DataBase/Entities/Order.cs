@@ -13,12 +13,12 @@ public class Order
     /// <summary>
     /// Gets or sets the date when the order was placed.
     /// </summary>
-    public DateTime? OrderDate { get; set; }
+    public DateTime? OrderDate { get; set; } = DateTime.Now;
 
     /// <summary>
     /// Gets or sets the total price of the order.
     /// </summary>
-    public int Price { get; set; }
+    public int Price { get; set; } = 10;
 
     /// <summary>
     /// Gets or sets the collection of order details associated with the order.

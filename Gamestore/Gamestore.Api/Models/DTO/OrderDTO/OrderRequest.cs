@@ -16,11 +16,13 @@ public class OrderRequest
     /// <summary>
     /// Gets or sets the customer's unique identifier for the order.
     /// </summary>
+    [RegularExpression(@"^[0-9]+$", ErrorMessage = "Only numbers allowed in the id field.")]
     public string CustomerId { get; set; }
 
     /// <summary>
     /// Gets or sets the unique identifier of the product in the order.
     /// </summary>
+    [RegularExpression(@"^[0-9]+$", ErrorMessage = "Only numbers allowed in the id field.")]
     public int ProductId { get; set; }
 
     /// <summary>

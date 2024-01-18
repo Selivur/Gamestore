@@ -112,15 +112,15 @@ public class OrderRepository : IOrderRepository
 
             var orderDetails = order.OrderDetails.First();
 
-            orderDetails.Game.UnitInStock += existingOrderDetails.Quantity;
+            existingOrderDetails.Game.UnitInStock += existingOrderDetails.Quantity;
 
             if (existingOrderDetails.Game.UnitInStock < orderDetails.Quantity)
             {
-                orderDetails.Game.UnitInStock -= existingOrderDetails.Quantity;
+                existingOrderDetails.Game.UnitInStock -= existingOrderDetails.Quantity;
                 throw new InvalidOperationException("Not enough units in stock for the requested quantity");
             }
 
-            orderDetails.Game.UnitInStock -= orderDetails.Quantity;
+            existingOrderDetails.Game.UnitInStock -= orderDetails.Quantity;
 
             if (existingOrderDetails != null)
             {

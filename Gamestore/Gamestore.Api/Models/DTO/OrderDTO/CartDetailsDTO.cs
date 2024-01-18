@@ -1,4 +1,5 @@
-﻿using Gamestore.Database.Entities;
+﻿using System.Text.Json.Serialization;
+using Gamestore.Database.Entities;
 
 namespace Gamestore.Api.Models.DTO.OrderDTO;
 
@@ -25,6 +26,7 @@ public class CartDetailsDTO
     /// <summary>
     /// Gets or sets the unique identifier of the associated game.
     /// </summary>
+    [JsonPropertyName("productId")]
     public string GameId { get; set; }
 
     /// <summary>
