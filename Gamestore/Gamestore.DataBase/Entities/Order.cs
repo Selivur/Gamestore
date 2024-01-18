@@ -1,4 +1,6 @@
-﻿namespace Gamestore.Database.Entities;
+﻿using Gamestore.Database.Entities.Enums;
+
+namespace Gamestore.Database.Entities;
 
 /// <summary>
 /// Represents an order entity in the Gamestore database.
@@ -29,4 +31,14 @@ public class Order
     /// Gets or sets the customer associated with the order.
     /// </summary>
     public Customer Customer { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Status of the order.
+    /// </summary>
+    public OrderStatus Status { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Payment Date of the order.
+    /// </summary>
+    public DateTime? PaymentDate { get; set; }
 }
