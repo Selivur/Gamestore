@@ -93,6 +93,26 @@ public class GameService : IGameService
     }
 
     /// <inheritdoc/>
+    public async Task UpdateGameWithoutDependenciesAsync(GameRequest game)
+    {
+        game.GameAlias = string.IsNullOrEmpty(game.GameAlias)
+            ? NormalizeGameAlias(game.Name)
+            : game.GameAlias;
+
+        var existingGame = await _gameRepository.GetByIdAsync(Convert.ToInt32(game.Id))
+            ?? throw new KeyNotFoundException("Can't find the Game with this Alias");
+
+        existingGame.GameAlias = game.GameAlias;
+        existingGame.Name = game.Name;
+        existingGame.Price = game.Price;
+        existingGame.UnitInStock = game.UnitInStock;
+        existingGame.Discount = game.Discount;
+        existingGame.Description = game.Description;
+
+        await _gameRepository.UpdateAsync(existingGame);
+    }
+
+    /// <inheritdoc/>
     public async Task RemoveGameAsync(string gameAlias)
     {
         await _gameRepository.RemoveAsync(gameAlias);

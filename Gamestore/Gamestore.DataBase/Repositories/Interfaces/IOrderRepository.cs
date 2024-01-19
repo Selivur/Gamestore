@@ -1,4 +1,5 @@
 ﻿using Gamestore.Database.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gamestore.Database.Repositories.Interfaces;
 
@@ -75,4 +76,20 @@ public interface IOrderRepository
     /// <param name="id">The ID of the order to retrieve.</param>
     /// <returns>Returns the order with associated order details if found; otherwise, returns null.</returns>
     Task<Order?> GetByIdWithOrderDetailsAsync(int id);
+
+    /// <summary>
+    /// Asynchronously retrieves the first open order from the database.
+    /// </summary>
+    /// <returns>The first open order, or null if no open orders are found.</returns>
+    Task<Order?> GetFirstOpenOrderAsync();
+
+    /// <summary>
+    /// Updates the details of an order in the database.
+    /// </summary>
+    /// <param name="orderDetails">The <see cref="OrderDetails"/> entity with updated information.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <exception cref="DbUpdateException">
+    /// Thrown when an error occurs while updating the order details in the database.
+    /// </exception>
+    Task UpdateOrderDetailsAsync(OrderDetails orderDetails);
 }

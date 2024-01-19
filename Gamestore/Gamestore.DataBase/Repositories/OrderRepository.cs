@@ -31,6 +31,16 @@ public class OrderRepository : IOrderRepository
     }
 
     /// <inheritdoc />
+    public async Task<Order?> GetFirstOpenOrderAsync()
+    {
+        return await _context.Orders
+            .Include(o => o.Customer)
+            .Include(od => od.OrderDetails)
+                .ThenInclude(od => od.Game)
+            .FirstOrDefaultAsync(o => o.Status == 0);
+    }
+
+    /// <inheritdoc />
     public async Task<Order?> GetByIdWithOrderDetailsAsync(int id)
     {
         return await _context.Orders
@@ -58,6 +68,14 @@ public class OrderRepository : IOrderRepository
         _context.Entry(order).State = EntityState.Modified;
 
         await SaveChangesAsync("Error when updating the order in the database.");
+    }
+
+    /// <inheritdoc />
+    public async Task UpdateOrderDetailsAsync(OrderDetails orderDetails)
+    {
+        _context.Entry(orderDetails).State = EntityState.Modified;
+
+        await SaveChangesAsync("Error when updating the order details in the database.");
     }
 
     /// <inheritdoc />

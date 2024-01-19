@@ -65,4 +65,14 @@ public interface IGameService
     /// <param name="type">The type of the platform.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains an IEnumerable of game responses.</returns>
     Task<IEnumerable<GameResponse>> GetAllGamesByPlatformTypeAsync(string type);
+
+    /// <summary>
+    /// Updates a game entity without modifying its dependencies.
+    /// </summary>
+    /// <param name="game">The <see cref="GameRequest"/> containing the updated game information.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <exception cref="KeyNotFoundException">
+    /// Thrown when the game with the specified ID is not found.
+    /// </exception>
+    Task UpdateGameWithoutDependenciesAsync(GameRequest game);
 }

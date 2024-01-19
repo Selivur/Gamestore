@@ -15,7 +15,7 @@ public class Order
     /// <summary>
     /// Gets or sets the date when the order was placed.
     /// </summary>
-    public DateTime? OrderDate { get; set; } = DateTime.Now;
+    public DateTime OrderDate { get; set; } = DateTime.Now;
 
     /// <summary>
     /// Gets or sets the total price of the order.
@@ -30,7 +30,7 @@ public class Order
     /// <summary>
     /// Gets or sets the customer associated with the order.
     /// </summary>
-    public Customer Customer { get; set; }
+    public Customer Customer { get; set; } = new Customer();
 
     /// <summary>
     /// Gets or sets the Status of the order.

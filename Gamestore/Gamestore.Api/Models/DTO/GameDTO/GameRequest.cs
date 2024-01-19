@@ -43,4 +43,23 @@ public class GameRequest
     /// Gets or sets the available quantity of the game.
     /// </summary>
     public int UnitInStock { get; set; }
+
+    /// <summary>
+    /// Converts a Game object to a GameResponse object.
+    /// </summary>
+    /// <param name="game">The Game object to convert.</param>
+    /// <returns>The converted GameResponse object.</returns>
+    public static GameRequest FromGameResponse(GameResponse game)
+    {
+        return new GameRequest
+        {
+            GameAlias = game.Key,
+            Id = game.Id.ToString(),
+            Name = game.Name,
+            Description = game.Description ?? string.Empty,
+            Price = game.Price,
+            UnitInStock = game.UnitInStock,
+            Discount = game.Discount,
+        };
+    }
 }

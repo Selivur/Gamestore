@@ -31,12 +31,18 @@ public interface IOrderService
     Task<IEnumerable<OrderResponse>> GetAllOrdersAsync();
 
     /// <summary>
-    /// Adds a new order to the database with the specified game details and updates an existing order if it already exists.
+    /// Adds an order with details for the specified game alias.
     /// </summary>
-    /// <param name="order">The order details to be added or updated.</param>
-    /// <param name="gameAlias">The alias of the game to be associated with the order.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    Task AddOrderWithDetails(OrderRequest order, string gameAlias);
+    /// <param name="gameAlias">The alias of the game for which the order is being added.</param>
+    /// <returns>A task representing the asynchronous operation, returning an <see cref="OrderBuyResponse"/>.</returns>
+    /// <exception cref="KeyNotFoundException">
+    /// Thrown when the specified game alias is not found or there are not enough games in the store.
+    /// </exception>
+    /// <remarks>
+    /// If there is an existing open order, the method either adds the game to the existing order details or creates a new order.
+    /// If there is no existing open order, a new order with details is created.
+    /// </remarks>
+    Task<OrderBuyResponse> AddOrderWithDetails(string gameAlias);
 
     /// <summary>
     /// Retrieves the cart details for a given order ID.

@@ -1,5 +1,4 @@
-﻿using Gamestore.Api.Models.DTO.OrderDTO;
-using Gamestore.Api.Services.Interfaces;
+﻿using Gamestore.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gamestore.Api.Controllers;
@@ -52,15 +51,14 @@ public class OrderController : ControllerBase
     /// <summary>
     /// Creates a new order for a game purchase.
     /// </summary>
-    /// <param name="order">The order details provided in the request body.</param>
     /// <param name="gameAlias">The alias of the game being purchased.</param>
     /// <returns>An ActionResult indicating the success of the operation.</returns>
-    [HttpPut("/game/{gameAlias}/buy")]
-    public async Task<IActionResult> CreateGame([FromBody] OrderRequest order, string gameAlias)
+    [HttpGet("/game/{gameAlias}/buy")]
+    public async Task<IActionResult> CreateGameOrder(string gameAlias)
     {
-        await _orderService.AddOrderWithDetails(order, gameAlias);
+        var result = await _orderService.AddOrderWithDetails(gameAlias);
 
-        return Ok(order);
+        return Ok(result);
     }
 
     /// <summary>

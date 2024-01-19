@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Gamestore.Api.Models.DTO.GameDTO;
 using Gamestore.Api.Models.DTO.OrderDTO;
 using Gamestore.Api.Services.Interfaces;
 using Gamestore.Database.Entities;
@@ -15,43 +16,45 @@ namespace Gamestore.Api.Services;
 /// </summary>
 public class OrderService : IOrderService
 {
-    private readonly IOrderRepository _repository;
+    private readonly IOrderRepository _orderRepository;
+    private readonly IGameService _gameRepository;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OrderService"/> class.
     /// </summary>
-    /// <param name="repository">The order repository providing data access for the service.</param>
-    public OrderService(IOrderRepository repository)
+    /// <param name="orderRepository">The order repository providing data access for the service.</param>
+    public OrderService(IOrderRepository orderRepository, IGameService gameRepository)
     {
-        _repository = repository;
+        _orderRepository = orderRepository;
+        _gameRepository = gameRepository;
     }
 
     /// <inheritdoc/>
     public async Task<OrderResponse?> GetOrderByIdAsync(int id)
     {
-        var order = await _repository.GetByIdAsync(id) ?? throw new KeyNotFoundException("Order not found");
+        var order = await _orderRepository.GetByIdAsync(id) ?? throw new KeyNotFoundException("Order not found");
         return OrderResponse.FromOrder(order);
     }
 
     /// <inheritdoc/>
     public async Task UpdateOrderAsync(OrderRequest order)
     {
-        var existingOrder = await _repository.GetByIdAsync(Convert.ToInt32(order.Id))
+        var existingOrder = await _orderRepository.GetByIdAsync(Convert.ToInt32(order.Id))
             ?? throw new KeyNotFoundException("Can't find the Order with this id");
 
-        await _repository.UpdateAsync(existingOrder);
+        await _orderRepository.UpdateAsync(existingOrder);
     }
 
     /// <inheritdoc/>
     public async Task RemoveOrderAsync(int id)
     {
-        await _repository.RemoveAsync(id);
+        await _orderRepository.RemoveAsync(id);
     }
 
     /// <inheritdoc/>
     public async Task<IEnumerable<OrderResponse>> GetAllOrdersAsync()
     {
-        var orders = await _repository.GetAllAsync();
+        var orders = await _orderRepository.GetAllAsync();
 
         var orderResponses = orders.Select(OrderResponse.FromOrder).ToList();
 
@@ -59,37 +62,101 @@ public class OrderService : IOrderService
     }
 
     /// <inheritdoc/>
-    public async Task AddOrderWithDetails(OrderRequest order, string gameAlias)
+    public async Task<OrderBuyResponse> AddOrderWithDetails(string gameAlias)
     {
-        var existingOrder = await _repository.GetByIdAsync(Convert.ToInt32(order.Id));
+        var existingOrder = await _orderRepository.GetFirstOpenOrderAsync();
 
-        Order newOrder = new()
-        {
-            OrderDate = order.OrderDate,
-            Price = order.Sum,
-            Customer = new Customer()
-            {
-                Id = Convert.ToInt32(order.CustomerId),
-            },
-            OrderDetails = new Collection<OrderDetails>()
-            {
-                new()
-                {
-                    Quantity = order.Quantity,
-                    Price = order.Price,
-                    Discount = order.Discount,
-                },
-            },
-        };
+        var game = await _gameRepository.GetGameByAliasAsync(gameAlias)
+                ?? throw new KeyNotFoundException("Not enough games in store");
 
-        if (existingOrder != null)
+        if (game.UnitInStock != 0)
         {
-            newOrder.Id = existingOrder.Id;
-            await _repository.UpdateGameWithDependencies(newOrder, gameAlias);
+            game.UnitInStock -= 1;
         }
         else
         {
-            await _repository.AddOrderWithDependencies(newOrder, gameAlias);
+            throw new KeyNotFoundException("Not enough games in store");
+        }
+
+        if (existingOrder != null)
+        {
+            var existingOrderDetails = existingOrder.OrderDetails.FirstOrDefault(od => od.Game.GameAlias == gameAlias);
+
+            OrderBuyResponse response = new()
+            {
+                Id = existingOrder.Id.ToString(),
+                OrderDate = existingOrder.OrderDate,
+                ProductID = Convert.ToInt32(game.Id),
+                ProductName = game.Name,
+                Price = game.Price,
+                CreationDate = existingOrder.OrderDate,
+                Discount = existingOrderDetails.Discount,
+                PaidDate = existingOrder.PaymentDate,
+            };
+
+            if (existingOrderDetails != null)
+            {
+                existingOrderDetails.Quantity += 1;
+
+                await _gameRepository.UpdateGameWithoutDependenciesAsync(GameRequest.FromGameResponse(game));
+                await _orderRepository.UpdateOrderDetailsAsync(existingOrderDetails);
+
+                response.Quantity = existingOrderDetails.Quantity;
+            }
+            else
+            {
+                OrderDetails orderDetails = new()
+                {
+                    Quantity = 1,
+                    Price = game.Price,
+                    Discount = game.Discount,
+                    Game = game.ToGame(),
+                };
+                existingOrder.OrderDetails.Add(orderDetails);
+                await _orderRepository.UpdateAsync(existingOrder);
+
+                response.Quantity = 1;
+            }
+
+            response.Sum = response.Quantity * response.Price * response.Discount / 100;
+
+            return response;
+        }
+        else
+        {
+            OrderDetails orderDetails = new()
+            {
+                Quantity = 1,
+                Price = game.Price,
+                Discount = game.Discount,
+                Game = game.ToGame(),
+            };
+            Order order = new()
+            {
+                OrderDate = DateTime.Now,
+                OrderDetails = new Collection<OrderDetails> { orderDetails },
+
+                // Customer?
+                Status = 0,
+            };
+            await _orderRepository.AddAsync(order);
+
+            var orders = await _orderRepository.GetAllAsync();
+            var maxId = orders.Max(od => od.Id);
+            OrderBuyResponse response = new()
+            {
+                Id = (maxId + 1).ToString(),
+                OrderDate = existingOrder.OrderDate,
+                ProductID = Convert.ToInt32(game.Id),
+                ProductName = game.Name,
+                Price = game.Price,
+                CreationDate = existingOrder.OrderDate,
+                Discount = game.Discount,
+                PaidDate = existingOrder.PaymentDate,
+            };
+            response.Sum = response.Quantity * response.Price * response.Discount / 100;
+
+            return response;
         }
     }
 
@@ -133,7 +200,7 @@ public class OrderService : IOrderService
     /// <inheritdoc/>
     public async Task<byte[]> GetBankPDFAsync(int orderId, int validityDays)
     {
-        Order order = await _repository.GetByIdWithOrderDetailsAsync(orderId);
+        Order order = await _orderRepository.GetByIdWithOrderDetailsAsync(orderId);
         using MemoryStream ms = new();
         using (var writer = new PdfWriter(ms).SetSmartMode(true))
         using (var pdf = new PdfDocument(writer))
@@ -154,7 +221,7 @@ public class OrderService : IOrderService
     /// <inheritdoc/>
     public async Task<IEnumerable<CartDetailsDTO>> GetCartDetailsAsync(int orderId)
     {
-        var orders = await _repository.GetAllOrderDetails(orderId);
+        var orders = await _orderRepository.GetAllOrderDetails(orderId);
 
         var orderResponses = orders.Select(CartDetailsDTO.FromOrderDetails).ToList();
 
