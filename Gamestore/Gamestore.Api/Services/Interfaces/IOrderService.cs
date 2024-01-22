@@ -65,8 +65,6 @@ public interface IOrderService
     /// <summary>
     /// Generates a PDF document for a bank invoice based on the provided order information.
     /// </summary>
-    /// <param name="orderId">The ID of the order for which the PDF is generated.</param>
-    /// <param name="validityDays">The number of days the invoice is valid (default is 3 days).</param>
     /// <returns>A byte array representing the generated PDF document.</returns>
     /// <remarks>
     /// The generated PDF contains the following information:
@@ -76,5 +74,17 @@ public interface IOrderService
     /// - Sum.
     /// </remarks>
     /// <returns>A byte array containing the generated PDF document.</returns>
-    Task<byte[]> GetBankPDFAsync(int orderId, int validityDays);
+    Task<byte[]> GetBankPDFAsync();
+
+    /// <summary>
+    /// Gets the details of the open order, if available.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation, returning a collection of <see cref="CartDetailsDTO"/> representing the open order details.
+    /// </returns>
+    /// <remarks>
+    /// This method retrieves the open order and its details from the order repository.
+    /// If no open order is found, an empty collection is returned.
+    /// </remarks>
+    Task<IEnumerable<CartDetailsDTO>> GetOpenOrderDetailsAsync();
 }

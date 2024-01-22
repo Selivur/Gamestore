@@ -1,4 +1,5 @@
-﻿using Gamestore.Api.Services.Interfaces;
+﻿using Gamestore.Api.Models.DTO.OrderDTO;
+using Gamestore.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gamestore.Api.Controllers;
@@ -75,6 +76,25 @@ public class OrderController : ControllerBase
     }
 
     /// <summary>
+    /// Retrieves the details of the open order and returns them as a response.
+    /// </summary>
+    /// <returns>
+    /// A response containing the details of the open order in the form of a collection of <see cref="CartDetailsDTO"/>.
+    /// </returns>
+    /// <remarks>
+    /// This HTTP GET endpoint is designed to be accessed at the route "/cart".
+    /// It calls the <see cref="IOrderService.GetOpenOrderDetailsAsync"/> method to retrieve open order details asynchronously.
+    /// If an open order is found, the details are returned in the response. If no open order is found, an empty response is returned.
+    /// </remarks>
+    [HttpGet("/cart")]
+    public async Task<IActionResult> GetOpenOrderDetails()
+    {
+        var cartDetails = await _orderService.GetOpenOrderDetailsAsync();
+
+        return Ok(cartDetails);
+    }
+
+    /// <summary>
     /// Retrieves payment method information based on the specified name.
     /// </summary>
     /// <returns>An IActionResult containing a list of payment method information.</returns>
@@ -87,15 +107,14 @@ public class OrderController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves a bank invoice PDF for the specified order.
+    /// Retrieves a bank invoice PDF for the open order.
     /// </summary>
-    /// <param name="id">The ID of the order for which the PDF is requested.</param>
     /// <returns>A FileResult containing the bank invoice PDF.</returns>
-    [HttpGet("{id}/invoice-pdf")]
-    public async Task<IActionResult> GetBankInvoicePdf(int id)
+    [HttpGet("invoice-pdf")]
+    public async Task<IActionResult> GetBankInvoicePdf()
     {
-        byte[] pdfBytes = await _orderService.GetBankPDFAsync(id, 3);
+        byte[] pdfBytes = await _orderService.GetBankPDFAsync();
 
-        return File(pdfBytes, "application/pdf", $"invoice_{id}.pdf");
+        return File(pdfBytes, "application/pdf", $"invoice.pdf");
     }
 }

@@ -198,8 +198,10 @@ public class OrderService : IOrderService
     }
 
     /// <inheritdoc/>
-    public async Task<byte[]> GetBankPDFAsync(int orderId, int validityDays)
+    public async Task<byte[]> GetBankPDFAsync()
     {
+        var openOrder = await _orderRepository.GetFirstOpenOrderAsync();
+        var orderId = openOrder.Id;
         Order order = await _orderRepository.GetByIdWithOrderDetailsAsync(orderId);
         using MemoryStream ms = new();
         using (var writer = new PdfWriter(ms).SetSmartMode(true))
@@ -209,13 +211,25 @@ public class OrderService : IOrderService
 
             document.Add(new Paragraph($"User ID: {order.Customer.Id}"));
             document.Add(new Paragraph($"Order ID: {order.Id}"));
-            document.Add(new Paragraph($"Validity Date: {DateTime.Now.AddDays(validityDays)}"));
+            document.Add(new Paragraph($"Validity Date: {DateTime.Now.AddDays(3)}"));
             document.Add(new Paragraph($"Sum: {order.Price}"));
 
             document.Close();
         }
 
         return ms.ToArray();
+    }
+
+    /// <inheritdoc/>
+    public async Task<IEnumerable<CartDetailsDTO>> GetOpenOrderDetailsAsync()
+    {
+        var order = await _orderRepository.GetFirstOpenOrderAsync();
+
+        var orders = await _orderRepository.GetAllOrderDetails(order.Id);
+
+        var orderResponses = orders.Select(CartDetailsDTO.FromOrderDetails).ToList();
+
+        return orderResponses;
     }
 
     /// <inheritdoc/>
