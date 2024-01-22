@@ -44,24 +44,6 @@ public interface IOrderRepository
     Task RemoveAsync(int id);
 
     /// <summary>
-    /// Updates an existing order in the database with the specified game dependency.
-    /// </summary>
-    /// <param name="order">The order to be updated.</param>
-    /// <param name="gameAlias">The alias of the game to be associated with the order.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    /// <exception cref="KeyNotFoundException">Thrown if the game is not found.</exception>
-    Task UpdateGameWithDependencies(Order order, string gameAlias);
-
-    /// <summary>
-    /// Adds a new order to the database with the specified game dependency.
-    /// </summary>
-    /// <param name="order">The order to be added.</param>
-    /// <param name="gameAlias">The alias of the game to be associated with the order.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    /// <exception cref="KeyNotFoundException">Thrown if the game or customer is not found.</exception>
-    Task AddOrderWithDependencies(Order order, string gameAlias);
-
-    /// <summary>
     /// Retrieves all order details for a given order ID.
     /// </summary>
     /// <param name="orderId">The unique identifier of the order.</param>
@@ -92,4 +74,17 @@ public interface IOrderRepository
     /// Thrown when an error occurs while updating the order details in the database.
     /// </exception>
     Task UpdateOrderDetailsAsync(OrderDetails orderDetails);
+
+    /// <summary>
+    /// Removes the order details with the specified ID from the database.
+    /// </summary>
+    /// <param name="id">The ID of the order details to be removed.</param>
+    /// <returns>A task representing the asynchronous operation of removing the order details.</returns>
+    /// <exception cref="ArgumentException">Thrown when no order details are found with the specified ID.</exception>
+    /// <remarks>
+    /// This method locates the order details with the provided ID in the database.
+    /// If found, the order details are removed, and changes are saved asynchronously.
+    /// If no order details are found with the specified ID, an <see cref="ArgumentException"/> is thrown.
+    /// </remarks>
+    Task RemoveOrderDetailsAsync(int id);
 }

@@ -90,73 +90,14 @@ public class OrderRepository : IOrderRepository
     }
 
     /// <inheritdoc />
-    public async Task AddOrderWithDependencies(Order order, string gameAlias)
+    public async Task RemoveOrderDetailsAsync(int id)
     {
-        var orderDetails = order.OrderDetails.First();
+        var order = await _context.OrderDetails.SingleOrDefaultAsync(g => g.Id.Equals(id))
+            ?? throw new ArgumentException($"No order found with the id '{id}'.", nameof(id));
 
-        orderDetails.Game = _context.Games.SingleOrDefault(g => g.GameAlias.Equals(gameAlias))
-            ?? throw new KeyNotFoundException("Game not found with specified alias");
+        _context.OrderDetails.Remove(order);
 
-        order.Customer = _context.Customers.Find(order.Customer.Id)
-            ?? throw new KeyNotFoundException("Customer not found");
-
-        if (orderDetails.Game.UnitInStock < orderDetails.Quantity)
-        {
-            throw new InvalidOperationException("Not enough units in stock for the requested quantity");
-        }
-
-        orderDetails.Game.UnitInStock -= orderDetails.Quantity;
-
-        order.OrderDetails.Clear();
-        order.OrderDetails.Add(orderDetails);
-
-        _context.OrderDetails.Add(orderDetails);
-        _context.Orders.Add(order);
-        await SaveChangesAsync("Error when adding the order to the database.");
-    }
-
-    /// <inheritdoc />
-    public async Task UpdateGameWithDependencies(Order order, string gameAlias)
-    {
-        var existingOrder = _context.Orders
-            .Include(o => o.OrderDetails)
-                .ThenInclude(od => od.Game)
-            .FirstOrDefault(o => o.Id == order.Id);
-
-        if (existingOrder != null)
-        {
-            var existingOrderDetails = existingOrder.OrderDetails
-                .FirstOrDefault(od => od.Game.GameAlias == gameAlias);
-
-            var orderDetails = order.OrderDetails.First();
-
-            existingOrderDetails.Game.UnitInStock += existingOrderDetails.Quantity;
-
-            if (existingOrderDetails.Game.UnitInStock < orderDetails.Quantity)
-            {
-                existingOrderDetails.Game.UnitInStock -= existingOrderDetails.Quantity;
-                throw new InvalidOperationException("Not enough units in stock for the requested quantity");
-            }
-
-            existingOrderDetails.Game.UnitInStock -= orderDetails.Quantity;
-
-            if (existingOrderDetails != null)
-            {
-                existingOrderDetails.Quantity = order.OrderDetails.First().Quantity;
-                existingOrderDetails.Price = order.OrderDetails.First().Price;
-            }
-            else
-            {
-                order.OrderDetails.First().Game = _context.Games
-                    .First(g => g.GameAlias == gameAlias);
-
-                existingOrder.OrderDetails.Add(order.OrderDetails.First());
-            }
-
-            _context.Orders.Update(existingOrder);
-        }
-
-        await SaveChangesAsync("Error when updating the order in the database.");
+        await SaveChangesAsync("Error when deleting the order details from the database.");
     }
 
     /// <inheritdoc />

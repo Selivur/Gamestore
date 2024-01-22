@@ -87,4 +87,17 @@ public interface IOrderService
     /// If no open order is found, an empty collection is returned.
     /// </remarks>
     Task<IEnumerable<CartDetailsDTO>> GetOpenOrderDetailsAsync();
+
+    /// <summary>
+    /// Removes the order details associated with the specified game alias from the open order in the database.
+    /// </summary>
+    /// <param name="gameAlias">The alias of the game for which the order details should be removed.</param>
+    /// <returns>A task representing the asynchronous operation of removing the order details.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown when no order details are found for the specified game alias in the open order.</exception>
+    /// <remarks>
+    /// This method retrieves the open order and its details from the order repository.
+    /// If the specified game alias is associated with any order details in the open order, those details are removed.
+    /// If no order details are found for the specified game alias, a <see cref="KeyNotFoundException"/> is thrown.
+    /// </remarks>
+    Task RemoveOrderDetailsAsync(string gameAlias);
 }

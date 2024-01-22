@@ -221,6 +221,19 @@ public class OrderService : IOrderService
     }
 
     /// <inheritdoc/>
+    public async Task RemoveOrderDetailsAsync(string gameAlias)
+    {
+        var order = await _orderRepository.GetFirstOpenOrderAsync();
+
+        var orders = await _orderRepository.GetAllOrderDetails(order.Id);
+
+        var orderDetails = orders.FirstOrDefault(o => o.Game.GameAlias == gameAlias)
+            ?? throw new KeyNotFoundException($"Can't find order details for the game alias '{gameAlias}' in the open order.");
+
+        await _orderRepository.RemoveOrderDetailsAsync(orderDetails.Id);
+    }
+
+    /// <inheritdoc/>
     public async Task<IEnumerable<CartDetailsDTO>> GetOpenOrderDetailsAsync()
     {
         var order = await _orderRepository.GetFirstOpenOrderAsync();

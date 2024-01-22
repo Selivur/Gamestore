@@ -107,6 +107,18 @@ public class OrderController : ControllerBase
     }
 
     /// <summary>
+    /// Retrieves payment method information based on the specified name.
+    /// </summary>
+    /// <returns>An IActionResult containing a list of payment method information.</returns>
+    [HttpDelete("remove/{gameAlias}")]
+    public async Task<IActionResult> RemoveOrderDetails(string gameAlias)
+    {
+        await _orderService.RemoveOrderDetailsAsync(gameAlias);
+
+        return Ok();
+    }
+
+    /// <summary>
     /// Retrieves a bank invoice PDF for the open order.
     /// </summary>
     /// <returns>A FileResult containing the bank invoice PDF.</returns>
