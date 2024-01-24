@@ -1,5 +1,6 @@
 ﻿using Gamestore.Api.Models.DTO.GameDTO;
 using Gamestore.Api.Models.Wrappers.Game;
+using Gamestore.Database.Entities;
 
 namespace Gamestore.Api.Services.Interfaces;
 
@@ -17,7 +18,7 @@ public interface IGameService
     /// <param name="gameAlias">The alias of the game to retrieve.</param>
     /// <returns>The retrieved game object.</returns>
     /// <remarks>If the game alias is null or empty, the method will return a tuple with a false success value and an error message. If the game is not found in the database, the method will return a tuple with a false success value and an error message. Otherwise, the method will return a tuple with a true success value and the retrieved game object.</remarks>
-    Task<GameResponse?> GetGameByAliasAsync(string gameAlias);
+    Task<GameResponse?> GetGameResponseByAliasAsync(string gameAlias);
 
     /// <summary>
     /// Gets a game by its id.
@@ -69,10 +70,16 @@ public interface IGameService
     /// <summary>
     /// Updates a game entity without modifying its dependencies.
     /// </summary>
-    /// <param name="game">The <see cref="GameRequest"/> containing the updated game information.</param>
+    /// <param name="game">The <see cref="Game"/> containing the updated game information.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     /// <exception cref="KeyNotFoundException">
     /// Thrown when the game with the specified ID is not found.
     /// </exception>
-    Task UpdateGameWithoutDependenciesAsync(GameRequest game);
+    Task UpdateGameWithoutDependenciesAsync(Game game);
+
+    /// <summary>
+    /// Retrieves game from the database.
+    /// </summary>
+    /// <returns>Game objects.</returns>
+    Task<Game> GetGameByAliasAsync(string gameAlias);
 }

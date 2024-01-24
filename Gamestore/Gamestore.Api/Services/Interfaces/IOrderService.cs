@@ -1,4 +1,5 @@
 ﻿using Gamestore.Api.Models.DTO.OrderDTO;
+using Gamestore.Database.Repositories.Interfaces;
 
 namespace Gamestore.Api.Services.Interfaces;
 
@@ -54,15 +55,6 @@ public interface IOrderService
     Task<IEnumerable<CartDetailsDTO>> GetCartDetailsAsync(int orderId);
 
     /// <summary>
-    /// Retrieves a list of all available payment methods.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation that returns a list of payment methods.</returns>
-    /// <remarks>
-    /// The returned list contains <see cref="PaymentDetails"/> objects, each representing the details of a specific payment method.
-    /// </remarks>
-    Task<List<PaymentDetails>> GetAllPaymentMethods();
-
-    /// <summary>
     /// Generates a PDF document for a bank invoice based on the provided order information.
     /// </summary>
     /// <returns>A byte array representing the generated PDF document.</returns>
@@ -100,4 +92,17 @@ public interface IOrderService
     /// If no order details are found for the specified game alias, a <see cref="KeyNotFoundException"/> is thrown.
     /// </remarks>
     Task RemoveOrderDetailsAsync(string gameAlias);
+
+    /// <summary>
+    /// Retrieves all payment methods along with the details of the first open order.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation of getting payment methods and open order details.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown when no open orders are found.</exception>
+    /// <remarks>
+    /// This method creates a <see cref="CreateOrderDTO"/> object containing the payment methods
+    /// and the details of the first open order retrieved
+    /// from the <see cref="IOrderRepository.GetFirstOpenOrderAsync"/> method. If no open orders are found,
+    /// a <see cref="KeyNotFoundException"/> is thrown.
+    /// </remarks>
+    Task<CreateOrderDTO> GetAllPaymentMethodsWithOrder();
 }

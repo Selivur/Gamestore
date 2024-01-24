@@ -1,8 +1,8 @@
 ﻿using System.Collections.ObjectModel;
-using Gamestore.Api.Models.DTO.GameDTO;
 using Gamestore.Api.Models.DTO.OrderDTO;
 using Gamestore.Api.Services.Interfaces;
 using Gamestore.Database.Entities;
+using Gamestore.Database.Entities.Enums;
 using Gamestore.Database.Repositories.Interfaces;
 using iText.Kernel.Pdf;
 using iText.Layout;
@@ -17,7 +17,7 @@ namespace Gamestore.Api.Services;
 public class OrderService : IOrderService
 {
     private readonly IOrderRepository _orderRepository;
-    private readonly IGameService _gameRepository;
+    private readonly IGameService _gameService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OrderService"/> class.
@@ -26,7 +26,7 @@ public class OrderService : IOrderService
     public OrderService(IOrderRepository orderRepository, IGameService gameRepository)
     {
         _orderRepository = orderRepository;
-        _gameRepository = gameRepository;
+        _gameService = gameRepository;
     }
 
     /// <inheritdoc/>
@@ -64,9 +64,9 @@ public class OrderService : IOrderService
     /// <inheritdoc/>
     public async Task<OrderBuyResponse> AddOrderWithDetails(string gameAlias)
     {
-        var existingOrder = await _orderRepository.GetFirstOpenOrderAsync();
+        var openedOrder = await _orderRepository.GetFirstOpenOrderAsync();
 
-        var game = await _gameRepository.GetGameByAliasAsync(gameAlias)
+        var game = await _gameService.GetGameByAliasAsync(gameAlias)
                 ?? throw new KeyNotFoundException("Not enough games in store");
 
         if (game.UnitInStock != 0)
@@ -78,30 +78,17 @@ public class OrderService : IOrderService
             throw new KeyNotFoundException("Not enough games in store");
         }
 
-        if (existingOrder != null)
-        {
-            var existingOrderDetails = existingOrder.OrderDetails.FirstOrDefault(od => od.Game.GameAlias == gameAlias);
+        await _gameService.UpdateGameWithoutDependenciesAsync(game);
 
-            OrderBuyResponse response = new()
-            {
-                Id = existingOrder.Id.ToString(),
-                OrderDate = existingOrder.OrderDate,
-                ProductID = Convert.ToInt32(game.Id),
-                ProductName = game.Name,
-                Price = game.Price,
-                CreationDate = existingOrder.OrderDate,
-                Discount = existingOrderDetails.Discount,
-                PaidDate = existingOrder.PaymentDate,
-            };
+        if (openedOrder != null)
+        {
+            var existingOrderDetails = openedOrder.OrderDetails.FirstOrDefault(od => od.Game.GameAlias == gameAlias);
 
             if (existingOrderDetails != null)
             {
                 existingOrderDetails.Quantity += 1;
 
-                await _gameRepository.UpdateGameWithoutDependenciesAsync(GameRequest.FromGameResponse(game));
                 await _orderRepository.UpdateOrderDetailsAsync(existingOrderDetails);
-
-                response.Quantity = existingOrderDetails.Quantity;
             }
             else
             {
@@ -110,13 +97,26 @@ public class OrderService : IOrderService
                     Quantity = 1,
                     Price = game.Price,
                     Discount = game.Discount,
-                    Game = game.ToGame(),
+                    Game = game,
                 };
-                existingOrder.OrderDetails.Add(orderDetails);
-                await _orderRepository.UpdateAsync(existingOrder);
-
-                response.Quantity = 1;
+                openedOrder.OrderDetails?.Add(orderDetails);
+                await _orderRepository.UpdateAsync(openedOrder);
             }
+
+            OrderBuyResponse response = new()
+            {
+                Id = openedOrder.Id.ToString(),
+                OrderDate = openedOrder.OrderDate,
+                ProductID = Convert.ToInt32(game.Id),
+                ProductName = game.Name,
+
+                // price
+                Price = game.Price,
+                CreationDate = openedOrder.OrderDate,
+                Discount = 10,
+                PaidDate = openedOrder.PaymentDate,
+                Quantity = existingOrderDetails != null ? existingOrderDetails.Quantity : 1,
+            };
 
             response.Sum = response.Quantity * response.Price * response.Discount / 100;
 
@@ -129,7 +129,7 @@ public class OrderService : IOrderService
                 Quantity = 1,
                 Price = game.Price,
                 Discount = game.Discount,
-                Game = game.ToGame(),
+                Game = game,
             };
             Order order = new()
             {
@@ -137,22 +137,23 @@ public class OrderService : IOrderService
                 OrderDetails = new Collection<OrderDetails> { orderDetails },
 
                 // Customer?
-                Status = 0,
+                Status = OrderStatus.Open,
             };
             await _orderRepository.AddAsync(order);
 
             var orders = await _orderRepository.GetAllAsync();
-            var maxId = orders.Max(od => od.Id);
+            var maxId = orders?.Max(od => od.Id) ?? 0;
+
             OrderBuyResponse response = new()
             {
                 Id = (maxId + 1).ToString(),
-                OrderDate = existingOrder.OrderDate,
+                OrderDate = openedOrder.OrderDate,
                 ProductID = Convert.ToInt32(game.Id),
                 ProductName = game.Name,
                 Price = game.Price,
-                CreationDate = existingOrder.OrderDate,
+                CreationDate = openedOrder.OrderDate,
                 Discount = game.Discount,
-                PaidDate = existingOrder.PaymentDate,
+                PaidDate = openedOrder.PaymentDate,
             };
             response.Sum = response.Quantity * response.Price * response.Discount / 100;
 
@@ -161,40 +162,17 @@ public class OrderService : IOrderService
     }
 
     /// <inheritdoc/>
-    public Task<List<PaymentDetails>> GetAllPaymentMethods()
+    public async Task<CreateOrderDTO> GetAllPaymentMethodsWithOrder()
     {
-        List<PaymentDetails> paymentMethods = new()
+        var details = new CreateOrderDTO()
         {
-            new()
-            {
-                Title = "Bank",
-                ImageUrl = "https://www.svgrepo.com/show/533463/bank.svg",
-                Description = "is a financial institution that accepts deposits from the public and creates " +
-                    "a demand deposit while simultaneously making loans. Lending activities can be directly performed by " +
-                    "the bank or indirectly through capital markets.",
-            },
-            new()
-            {
-                Title = "IBox terminal",
-                ImageUrl = "https://www.svgrepo.com/show/315644/terminal.svg",
-                Description = "also known as a point of sale (POS) terminal, credit card machine, card reader," +
-                    " PIN pad, EFTPOS terminal (or by the older term as PDQ terminal which stands for \"Process Data Quickly\")" +
-                    ", is a device which interfaces with payment cards to make electronic funds transfers. The terminal typically " +
-                    "consists of a secure keypad (called a PINpad) for entering PIN, a screen, a means of capturing information " +
-                    "from payments cards and a network connection to access the payment network for authorization.",
-            },
-            new()
-            {
-                Title = "Visa",
-                ImageUrl = "https://www.svgrepo.com/show/473823/visa.svg",
-                Description = "is an American multinational payment card services corporation headquartered " +
-                    "in San Francisco, California. It facilitates electronic funds transfers throughout the world, most " +
-                    "commonly through Visa-branded credit cards, debit cards and prepaid cards.[5] Visa is one of the world's most " +
-                    "valuable companies.",
-            },
+            PaymentMethods = GetAllPaymentMethods(),
+
+            Order = await _orderRepository.GetFirstOpenOrderAsync()
+            ?? throw new KeyNotFoundException("Can't find any open orders"),
         };
 
-        return Task.FromResult(paymentMethods);
+        return details;
     }
 
     /// <inheritdoc/>
@@ -212,8 +190,7 @@ public class OrderService : IOrderService
             document.Add(new Paragraph($"User ID: {order.Customer.Id}"));
             document.Add(new Paragraph($"Order ID: {order.Id}"));
             document.Add(new Paragraph($"Validity Date: {DateTime.Now.AddDays(3)}"));
-            document.Add(new Paragraph($"Sum: {order.Price}"));
-
+            document.Add(new Paragraph($"Sum: {order.OrderDetails.Sum(details => details.Quantity * details.Price * (1 - (details.Discount / 100d)))}"));
             document.Close();
         }
 
@@ -230,6 +207,7 @@ public class OrderService : IOrderService
         var orderDetails = orders.FirstOrDefault(o => o.Game.GameAlias == gameAlias)
             ?? throw new KeyNotFoundException($"Can't find order details for the game alias '{gameAlias}' in the open order.");
 
+        // add game quantity
         await _orderRepository.RemoveOrderDetailsAsync(orderDetails.Id);
     }
 
@@ -253,5 +231,42 @@ public class OrderService : IOrderService
         var orderResponses = orders.Select(CartDetailsDTO.FromOrderDetails).ToList();
 
         return orderResponses;
+    }
+
+    /// <summary>
+    /// Retrieves a collection of payment methods with their details.
+    /// </summary>
+    /// <returns>A collection of <see cref="PaymentDetails"/> representing different payment methods.</returns>
+    /// <remarks>
+    /// This method creates and returns a collection of <see cref="PaymentDetails"/> objects, each representing a different payment method.
+    /// The collection includes the title, image URL, and description for each payment method.
+    /// </remarks>
+    private static ICollection<PaymentDetails> GetAllPaymentMethods()
+    {
+        List<PaymentDetails> paymentMethods = new()
+        {
+            new()
+            {
+                Title = "Bank",
+                ImageUrl = "https://www.svgrepo.com/show/533463/bank.svg",
+                Description = "is a financial institution that accepts deposits from the public and creates " +
+                    "a demand deposit while simultaneously making loans",
+            },
+            new()
+            {
+                Title = "IBox terminal",
+                ImageUrl = "https://www.svgrepo.com/show/315644/terminal.svg",
+                Description = "also known as a point of sale (POS) terminal, credit card machine, card reader," +
+                    " PIN pad, EFTPOS terminal",
+            },
+            new()
+            {
+                Title = "Visa",
+                ImageUrl = "https://www.svgrepo.com/show/473823/visa.svg",
+                Description = "is an American multinational payment card services corporation.",
+            },
+        };
+
+        return paymentMethods;
     }
 }

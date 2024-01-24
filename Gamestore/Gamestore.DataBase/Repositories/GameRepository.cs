@@ -90,7 +90,6 @@ public class GameRepository : IGameRepository
             game.Genre.Add(genre);
         }
 
-        // Handle the Platforms relationship
         game.Platforms.Clear();
         var selectedPlatforms = _context.Platforms.Where(p => platformsId.Contains(p.Id)).ToList();
         foreach (var platform in selectedPlatforms)

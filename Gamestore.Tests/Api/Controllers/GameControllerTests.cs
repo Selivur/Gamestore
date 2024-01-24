@@ -69,7 +69,7 @@ public class GameControllerTests
     {
         // Arrange
         var gameAlias = "TestAlias";
-        _gameServiceMock.Setup(x => x.GetGameByAliasAsync(gameAlias)).ReturnsAsync(new GameResponse { Key = gameAlias, Name = "Test Game" });
+        _gameServiceMock.Setup(x => x.GetGameResponseByAliasAsync(gameAlias)).ReturnsAsync(new GameResponse { Key = gameAlias, Name = "Test Game" });
 
         // Act
         var result = await _gameController.GetGame(gameAlias);
@@ -149,7 +149,7 @@ public class GameControllerTests
             Name = "TestGame",
             Description = "TestDescription",
         };
-        _gameServiceMock.Setup(x => x.GetGameByAliasAsync(gameAlias)).ReturnsAsync(game);
+        _gameServiceMock.Setup(x => x.GetGameResponseByAliasAsync(gameAlias)).ReturnsAsync(game);
 
         // Act
         var result = await _gameController.DownloadGame(gameAlias);

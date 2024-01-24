@@ -86,7 +86,7 @@ public class GameServiceTests
     }
 
     /// <summary>
-    /// Tests the <see cref="GameService.GetGameByAliasAsync"/> method to ensure it returns the expected <see cref="GameResponse"/> when the game exists.
+    /// Tests the <see cref="GameService.GetGameResponseByAliasAsync"/> method to ensure it returns the expected <see cref="GameResponse"/> when the game exists.
     /// </summary>
     [Fact]
     public async Task GetGameByAliasAsync_ShouldReturnGameResponse_WhenGameExists()
@@ -104,7 +104,7 @@ public class GameServiceTests
             .ReturnsAsync(existingGame);
 
         // Act
-        var result = await _gameService.GetGameByAliasAsync(gameAlias);
+        var result = await _gameService.GetGameResponseByAliasAsync(gameAlias);
 
         // Assert
         Assert.NotNull(result);
@@ -114,7 +114,7 @@ public class GameServiceTests
     }
 
     /// <summary>
-    /// Tests the <see cref="GameService.GetGameByAliasAsync"/> method to ensure it throws a <see cref="KeyNotFoundException"/> when the game is not found.
+    /// Tests the <see cref="GameService.GetGameResponseByAliasAsync"/> method to ensure it throws a <see cref="KeyNotFoundException"/> when the game is not found.
     /// </summary>
     [Fact]
     public async Task GetGameByAliasAsync_ShouldThrowException_WhenGameNotFound()
@@ -126,7 +126,7 @@ public class GameServiceTests
             .ReturnsAsync((Game)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<KeyNotFoundException>(() => _gameService.GetGameByAliasAsync(gameAlias));
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _gameService.GetGameResponseByAliasAsync(gameAlias));
     }
 
     /// <summary>

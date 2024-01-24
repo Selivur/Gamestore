@@ -58,7 +58,7 @@ public class GameController : ControllerBase
     [HttpGet("getByAlias/{gameAlias}")]
     public async Task<IActionResult> GetGame(string gameAlias)
     {
-        var result = await _gameService.GetGameByAliasAsync(gameAlias);
+        var result = await _gameService.GetGameResponseByAliasAsync(gameAlias);
 
         return Ok(result);
     }
@@ -97,7 +97,7 @@ public class GameController : ControllerBase
     [HttpGet("{gameAlias}/download")]
     public async Task<IActionResult> DownloadGame(string gameAlias)
     {
-        var game = await _gameService.GetGameByAliasAsync(gameAlias);
+        var game = await _gameService.GetGameResponseByAliasAsync(gameAlias);
 
         var content = GenerateGameFileContent(game);
         var fileName = $"{game.Name}_{DateTime.Now:yyyyMMddHHmmss}.txt";

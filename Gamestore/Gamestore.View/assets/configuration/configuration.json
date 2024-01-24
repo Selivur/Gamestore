@@ -40,6 +40,6 @@
   "buyGameApiUrl": "/game/{key}/buy",
   "cancelGameBuyApiUrl": "/orders/remove/{key}",
   "basketApiUrl": "/cart",
-  "makeOrderInfoApiUrl": "/orders/invoice-pdf",
-  "payApiUrl": "/orders/payment"
+  "makeOrderInfoApiUrl": "/orders/payment",
+  "payApiUrl": "/orders/invoice-pdf"
 }

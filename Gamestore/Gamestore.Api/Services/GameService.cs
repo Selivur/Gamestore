@@ -63,12 +63,21 @@ public class GameService : IGameService
     }
 
     /// <inheritdoc/>
-    public async Task<GameResponse?> GetGameByAliasAsync(string gameAlias)
+    public async Task<GameResponse?> GetGameResponseByAliasAsync(string gameAlias)
     {
         var game = await _gameRepository.GetByAliasAsync(gameAlias)
             ?? throw new KeyNotFoundException("Game not found");
 
         return GameResponse.FromGame(game);
+    }
+
+    /// <inheritdoc/>
+    public async Task<Game> GetGameByAliasAsync(string gameAlias)
+    {
+        var game = await _gameRepository.GetByAliasAsync(gameAlias)
+            ?? throw new KeyNotFoundException("Game not found");
+
+        return game;
     }
 
     /// <inheritdoc/>
@@ -93,7 +102,7 @@ public class GameService : IGameService
     }
 
     /// <inheritdoc/>
-    public async Task UpdateGameWithoutDependenciesAsync(GameRequest game)
+    public async Task UpdateGameWithoutDependenciesAsync(Game game)
     {
         game.GameAlias = string.IsNullOrEmpty(game.GameAlias)
             ? NormalizeGameAlias(game.Name)

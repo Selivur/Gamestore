@@ -101,7 +101,7 @@ public class OrderController : ControllerBase
     [HttpGet("payment")]
     public async Task<IActionResult> GetPaymentMethodInfo()
     {
-        var cartDetails = await _orderService.GetAllPaymentMethods();
+        var cartDetails = await _orderService.GetAllPaymentMethodsWithOrder();
 
         return Ok(cartDetails);
     }
