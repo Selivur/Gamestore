@@ -72,6 +72,11 @@ public class PlatformController : ControllerBase
     [HttpPut("update")]
     public async Task<IActionResult> UpdatePlatform([FromBody] PlatformUpdateWrapper platform)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(GetErrorMessages());
+        }
+
         await _platformService.UpdatePlatformAsync(platform.PlatformRequest);
 
         return Ok();
@@ -101,5 +106,17 @@ public class PlatformController : ControllerBase
         await _platformService.AddPlatformAsync(platform.PlatformTypeRequest.Type);
 
         return Ok();
+    }
+
+    /// <summary>
+    /// Returns a list of error messages from the ModelState object.
+    /// </summary>
+    /// <returns>A list of error messages.</returns>
+    private List<string> GetErrorMessages()
+    {
+        return ModelState.Values
+            .SelectMany(v => v.Errors)
+            .Select(v => v.ErrorMessage)
+            .ToList();
     }
 }

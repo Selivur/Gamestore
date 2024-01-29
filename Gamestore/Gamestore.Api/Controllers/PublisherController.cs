@@ -43,6 +43,11 @@ public class PublisherController : ControllerBase
     [HttpPost("new")]
     public async Task<IActionResult> CreatePublisher([FromBody] PublisherWrapper publisher)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(GetErrorMessages());
+        }
+
         await _publisherService.CreatePublisherAsync(publisher.PublisherRequest);
 
         return Ok();
@@ -69,6 +74,11 @@ public class PublisherController : ControllerBase
     [HttpPut("update")]
     public async Task<IActionResult> UpdatePublisher([FromBody] PublisherWrapper publisher)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(GetErrorMessages());
+        }
+
         await _publisherService.UpdatePublisherAsync(publisher.PublisherRequest);
 
         return Ok();
@@ -114,5 +124,17 @@ public class PublisherController : ControllerBase
         var publishers = await _publisherService.GetPublishersByGameAliasAsync(gameAlias);
 
         return Ok(publishers);
+    }
+
+    /// <summary>
+    /// Returns a list of error messages from the ModelState object.
+    /// </summary>
+    /// <returns>A list of error messages.</returns>
+    private List<string> GetErrorMessages()
+    {
+        return ModelState.Values
+            .SelectMany(v => v.Errors)
+            .Select(v => v.ErrorMessage)
+            .ToList();
     }
 }

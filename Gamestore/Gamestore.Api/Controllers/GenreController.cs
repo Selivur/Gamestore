@@ -57,6 +57,11 @@ public class GenreController : ControllerBase
     [HttpPut("update")]
     public async Task<IActionResult> UpdateGenre([FromBody] GenreUpdateWrapper request)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(GetErrorMessages());
+        }
+
         await _genreService.UpdateGenreAsync(request.GenreRequest);
 
         return Ok();
@@ -83,6 +88,11 @@ public class GenreController : ControllerBase
     [HttpPost("new")]
     public async Task<IActionResult> AddGenre([FromBody] GenreAddWrapper genre)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(GetErrorMessages());
+        }
+
         await _genreService.AddGenreAsync(genre.GenreRequest);
 
         return Ok();
@@ -128,5 +138,17 @@ public class GenreController : ControllerBase
         var genres = await _genreService.GetGenresByGameAliasAsync(gameAlias);
 
         return Ok(genres);
+    }
+
+    /// <summary>
+    /// Returns a list of error messages from the ModelState object.
+    /// </summary>
+    /// <returns>A list of error messages.</returns>
+    private List<string> GetErrorMessages()
+    {
+        return ModelState.Values
+            .SelectMany(v => v.Errors)
+            .Select(v => v.ErrorMessage)
+            .ToList();
     }
 }
