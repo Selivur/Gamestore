@@ -54,19 +54,7 @@ public interface IOrderService
     /// </returns>
     Task<IEnumerable<CartDetailsDTO>> GetCartDetailsAsync(int orderId);
 
-    /// <summary>
-    /// Generates a PDF document for a bank invoice based on the provided order information.
-    /// </summary>
-    /// <returns>A byte array representing the generated PDF document.</returns>
-    /// <remarks>
-    /// The generated PDF contains the following information:
-    /// - User ID
-    /// - Order ID
-    /// - Validity Date (default validity period is 3 days, configurable)
-    /// - Sum.
-    /// </remarks>
-    /// <returns>A byte array containing the generated PDF document.</returns>
-    Task<byte[]> GetBankPDFAsync();
+    Task<byte[]> GetBankPDFAsync(PaymentRequestDTO paymentRequest);
 
     /// <summary>
     /// Gets the details of the open order, if available.
@@ -105,4 +93,17 @@ public interface IOrderService
     /// a <see cref="KeyNotFoundException"/> is thrown.
     /// </remarks>
     Task<CreateOrderDTO> GetAllPaymentMethodsWithOrder();
+
+    /// <summary>
+    /// Retrieves order details for payments made via iBox Terminal.
+    /// </summary>
+    /// <returns>The order details for iBox Terminal payments.</returns>
+    Task<IBoxResponseDTO> GetIBoxTerminalOrderDetailsAsync();
+
+    /// <summary>
+    /// Retrieves order details for payments made via Visa.
+    /// </summary>
+    /// <param name="model">The Visa Transaction object.</param>
+    /// <returns>The order details for Visa payments.</returns>
+    Task<IBoxResponseDTO> GetVisaOrderDetailsAsync(VisaTransactionDTO model);
 }

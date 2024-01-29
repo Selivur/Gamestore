@@ -122,11 +122,26 @@ public class OrderController : ControllerBase
     /// Retrieves a bank invoice PDF for the open order.
     /// </summary>
     /// <returns>A FileResult containing the bank invoice PDF.</returns>
-    [HttpGet("invoice-pdf")]
-    public async Task<IActionResult> GetBankInvoicePdf()
+    [HttpPost("invoice-pdf")]
+    public async Task<IActionResult> GetBankInvoicePdf([FromBody] PaymentRequestDTO paymentRequest)
     {
-        byte[] pdfBytes = await _orderService.GetBankPDFAsync();
+        switch (paymentRequest.Method)
+        {
+            case "IBox terminal":
+                var iBoxOrderDetails = await _orderService.GetIBoxTerminalOrderDetailsAsync();
 
-        return File(pdfBytes, "application/pdf", $"invoice.pdf");
+                return Ok(iBoxOrderDetails);
+            case "Visa":
+                var visaOrderDetails = await _orderService.GetVisaOrderDetailsAsync(paymentRequest.Model
+                    ?? throw new KeyNotFoundException("Missing Visa payment details"));
+
+                return Ok(visaOrderDetails);
+            case "Bank":
+                byte[] pdfBytes = await _orderService.GetBankPDFAsync(paymentRequest);
+
+                return File(pdfBytes, "application/pdf", $"invoice.pdf");
+            default:
+                throw new ArgumentException("Invalid payment method provided.", nameof(paymentRequest.Method));
+        }
     }
 }

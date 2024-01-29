@@ -87,4 +87,21 @@ public interface IOrderRepository
     /// If no order details are found with the specified ID, an <see cref="ArgumentException"/> is thrown.
     /// </remarks>
     Task RemoveOrderDetailsAsync(int id);
+
+    /// <summary>
+    /// Completes the first found open order by setting its status to 'Paid'.
+    /// Then, the change is tracked to the given order by marking it with EntityState as 'Modified'.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <remarks>Throws an exception with the specified error message if any error occurs when saving changes.</remarks>
+    Task CompleteOrder();
+
+    /// <summary>
+    /// Cancels the first found open order by setting its status to 'Cancelled'.
+    /// Then, the change is tracked to the given order by marking it with EntityState as 'Modified'.
+    /// Lastly, the changes are saved in the database.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <remarks>Throws an exception with the specified error message if any error occurs when saving changes.</remarks>
+    Task CancelledOrder();
 }

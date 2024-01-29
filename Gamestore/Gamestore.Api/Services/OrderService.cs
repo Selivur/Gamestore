@@ -18,15 +18,17 @@ public class OrderService : IOrderService
 {
     private readonly IOrderRepository _orderRepository;
     private readonly IGameService _gameService;
+    private readonly IPaymentService _paymentService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OrderService"/> class.
     /// </summary>
     /// <param name="orderRepository">The order repository providing data access for the service.</param>
-    public OrderService(IOrderRepository orderRepository, IGameService gameRepository)
+    public OrderService(IOrderRepository orderRepository, IGameService gameRepository, IPaymentService paymentService)
     {
         _orderRepository = orderRepository;
         _gameService = gameRepository;
+        _paymentService = paymentService;
     }
 
     /// <inheritdoc/>
@@ -176,7 +178,7 @@ public class OrderService : IOrderService
     }
 
     /// <inheritdoc/>
-    public async Task<byte[]> GetBankPDFAsync()
+    public async Task<byte[]> GetBankPDFAsync(PaymentRequestDTO paymentRequest)
     {
         var openOrder = await _orderRepository.GetFirstOpenOrderAsync();
         var orderId = openOrder.Id;
@@ -187,6 +189,7 @@ public class OrderService : IOrderService
         {
             using var document = new Document(pdf);
 
+            document.Add(new Paragraph($"Payment method: {paymentRequest.Method}"));
             document.Add(new Paragraph($"User ID: {order.Customer.Id}"));
             document.Add(new Paragraph($"Order ID: {order.Id}"));
             document.Add(new Paragraph($"Validity Date: {DateTime.Now.AddDays(3)}"));
@@ -231,6 +234,21 @@ public class OrderService : IOrderService
         var orderResponses = orders.Select(CartDetailsDTO.FromOrderDetails).ToList();
 
         return orderResponses;
+    }
+
+    /// <inheritdoc/>
+    public async Task<IBoxResponseDTO> GetIBoxTerminalOrderDetailsAsync()
+    {
+        var response = await _paymentService.ProcessIboxPayment();
+
+        return response;
+    }
+
+    /// <inheritdoc/>
+    public async Task<IBoxResponseDTO> GetVisaOrderDetailsAsync(VisaTransactionDTO model)
+    {
+        // Implementation here. Fetch order details and map to DTO based on model parameter.
+        throw new NotImplementedException();
     }
 
     /// <summary>

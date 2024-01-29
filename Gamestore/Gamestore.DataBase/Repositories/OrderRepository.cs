@@ -1,5 +1,6 @@
 ﻿using Gamestore.Database.Dbcontext;
 using Gamestore.Database.Entities;
+using Gamestore.Database.Entities.Enums;
 using Gamestore.Database.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -109,6 +110,26 @@ public class OrderRepository : IOrderRepository
                 .ThenInclude(od => od.Game)
             .SelectMany(o => o.OrderDetails)
             .ToListAsync();
+    }
+
+    /// <inheritdoc />
+    public async Task CompleteOrder()
+    {
+        var order = await GetFirstOpenOrderAsync();
+        order.Status = OrderStatus.Paid;
+        _context.Entry(order).State = EntityState.Modified;
+
+        await SaveChangesAsync("Error when changed the order status to complete.");
+    }
+
+    /// <inheritdoc />
+    public async Task CancelledOrder()
+    {
+        var order = await GetFirstOpenOrderAsync();
+        order.Status = OrderStatus.Cancelled;
+        _context.Entry(order).State = EntityState.Modified;
+
+        await SaveChangesAsync("Error when changed the order status to cancelled.");
     }
 
     /// <summary>
