@@ -17,6 +17,9 @@ builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped<IPlatformService, PlatformService>();
 builder.Services.AddScoped<IPublisherService, PublisherService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+
+builder.Services.AddHttpClient<IPaymentService, PaymentService>();
 
 builder.Services.AddScoped<IGameRepository, GameRepository>();
 builder.Services.AddScoped<IGenreRepository, GenreRepository>();

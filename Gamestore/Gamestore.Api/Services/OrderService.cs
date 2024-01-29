@@ -183,6 +183,9 @@ public class OrderService : IOrderService
         var openOrder = await _orderRepository.GetFirstOpenOrderAsync();
         var orderId = openOrder.Id;
         Order order = await _orderRepository.GetByIdWithOrderDetailsAsync(orderId);
+
+        await _orderRepository.CompleteOrder();
+
         using MemoryStream ms = new();
         using (var writer = new PdfWriter(ms).SetSmartMode(true))
         using (var pdf = new PdfDocument(writer))
@@ -247,7 +250,10 @@ public class OrderService : IOrderService
     /// <inheritdoc/>
     public async Task<IBoxResponseDTO> GetVisaOrderDetailsAsync(VisaTransactionDTO model)
     {
-        // Implementation here. Fetch order details and map to DTO based on model parameter.
+        var response = await _paymentService.ProcessVisaPayment(model);
+
+        return response;
+
         throw new NotImplementedException();
     }
 

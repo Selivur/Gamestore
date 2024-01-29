@@ -58,4 +58,30 @@ public class PaymentService : IPaymentService
 
         return result;
     }
+
+    /// <inheritdoc/>
+    public async Task<IBoxResponseDTO> ProcessVisaPayment(VisaTransactionDTO model)
+    {
+        var order = await _unitOfWork.GetFirstOpenOrderAsync();
+
+        var responce = await _httpClient.PostAsJsonAsync($"{ApiUrl}/visa", model);
+
+        if (responce.IsSuccessStatusCode)
+        {
+            await _unitOfWork.CompleteOrder();
+        }
+        else
+        {
+            await _unitOfWork.CancelledOrder();
+        }
+
+        var result = new IBoxResponseDTO
+        {
+            OrderId = order.Id,
+            UserId = order.Customer.Id,
+            Sum = order.OrderDetails.Sum(details => details.Price),
+        };
+
+        return result;
+    }
 }
