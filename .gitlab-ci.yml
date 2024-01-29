@@ -2,7 +2,7 @@ variables:
   TEST_PROJECT: 'Gamestore.Tests'
 
 test:
-  image: mcr.microsoft.com/dotnet/sdk:6.0
+  image: mcr.microsoft.com/dotnet/sdk:7.0
   stage: test
   script:
     - 'cd ${TEST_PROJECT}'
