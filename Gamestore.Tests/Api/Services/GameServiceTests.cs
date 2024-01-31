@@ -147,7 +147,7 @@ public class GameServiceTests
 
         var existingGame = new Game
         {
-            Id = 1, // Ensure this matches the Id in GameWrapper
+            Id = 1,
             GameAlias = validGameRequest.GameRequest.GameAlias!,
             Name = "Test Game",
             Description = "A test game description",
