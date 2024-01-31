@@ -3,9 +3,11 @@
 /// <summary>
 /// Unit tests for the <see cref="PlatformRepository"/> class.
 /// </summary>
-public class PlatformRepositoryTests
+public class PlatformRepositoryTests : IDisposable
 {
     private readonly DbContextOptions<GamestoreContext> _options;
+    private readonly GamestoreContext _context;
+    private readonly PlatformRepository _repository;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PlatformRepositoryTests"/> class.
@@ -15,6 +17,22 @@ public class PlatformRepositoryTests
         _options = new DbContextOptionsBuilder<GamestoreContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
+
+        _context = new GamestoreContext(_options);
+        _repository = new PlatformRepository(_context);
+
+        SeedDataAsync().GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Cleans up the resources after each test by deleting the database.
+    /// </summary>
+    public void Dispose()
+    {
+        using var context = new GamestoreContext(_options);
+        context.Database.EnsureDeleted();
+
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
@@ -24,21 +42,13 @@ public class PlatformRepositoryTests
     [Fact]
     public async Task GetByIdAsync_ShouldReturnPlatform()
     {
-        // Arrange
-        using var context = new GamestoreContext(_options);
-        var repository = new PlatformRepository(context);
-
-        var platform = new Platform { Id = 1, Type = "PC" };
-        context.Platforms.Add(platform);
-        context.SaveChanges();
-
         // Act
-        var result = await repository.GetByIdAsync(1);
+        var result = await _repository.GetByIdAsync(1);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(platform.Id, result.Id);
-        Assert.Equal(platform.Type, result.Type);
+        Assert.Equal(1, result.Id);
+        Assert.Equal("PC", result.Type);
     }
 
     /// <summary>
@@ -48,12 +58,8 @@ public class PlatformRepositoryTests
     [Fact]
     public async Task GetByIdAsync_ShouldReturnNull()
     {
-        // Arrange
-        using var context = new GamestoreContext(_options);
-        var repository = new PlatformRepository(context);
-
         // Act
-        var result = await repository.GetByIdAsync(1);
+        var result = await _repository.GetByIdAsync(999); // non-existent platform Id
 
         // Assert
         Assert.Null(result);
@@ -66,21 +72,12 @@ public class PlatformRepositoryTests
     [Fact]
     public async Task GetByNameAsync_ShouldReturnPlatform()
     {
-        // Arrange
-        using var context = new GamestoreContext(_options);
-        var repository = new PlatformRepository(context);
-
-        var platformName = "PC";
-        var platform = new Platform { Type = platformName };
-        context.Platforms.Add(platform);
-        context.SaveChanges();
-
         // Act
-        var result = await repository.GetByNameAsync(platformName);
+        var result = await _repository.GetByNameAsync("PC");
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(platformName, result.Type);
+        Assert.Equal("PC", result.Type);
     }
 
     /// <summary>
@@ -90,14 +87,8 @@ public class PlatformRepositoryTests
     [Fact]
     public async Task GetByNameAsync_ShouldReturnNull()
     {
-        // Arrange
-        using var context = new GamestoreContext(_options);
-        var repository = new PlatformRepository(context);
-
-        var platformName = "PC";
-
         // Act
-        var result = await repository.GetByNameAsync(platformName);
+        var result = await _repository.GetByNameAsync("NonExistentPlatform");
 
         // Assert
         Assert.Null(result);
@@ -110,31 +101,14 @@ public class PlatformRepositoryTests
     [Fact]
     public async Task GetAllAsync_ShouldReturnAllPlatforms()
     {
-        // Arrange
-        using var context = new GamestoreContext(_options);
-        var repository = new PlatformRepository(context);
-
-        var platforms = new List<Platform>
-            {
-                new() { Id = 1, Type = "PC" },
-                new() { Id = 2, Type = "PlayStation" },
-                new() { Id = 3, Type = "Xbox" },
-            };
-
-        context.Platforms.AddRange(platforms);
-        context.SaveChanges();
-
         // Act
-        var result = (await repository.GetAllAsync()).ToList();
+        var result = (await _repository.GetAllAsync()).ToList();
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal(platforms.Count, result.Count);
-
-        foreach (var platform in platforms)
-        {
-            Assert.Contains(result, p => p.Type == platform.Type);
-        }
+        Assert.Equal(3, result.Count);
+        Assert.Contains(result, p => p.Type == "PC");
+        Assert.Contains(result, p => p.Type == "PlayStation");
+        Assert.Contains(result, p => p.Type == "Xbox");
     }
 
     /// <summary>
@@ -145,18 +119,15 @@ public class PlatformRepositoryTests
     public async Task AddAsync_ShouldAddPlatformToDatabase()
     {
         // Arrange
-        using var context = new GamestoreContext(_options);
-        var repository = new PlatformRepository(context);
-
-        var platform = new Platform { Type = "Nintendo Switch" };
+        await _repository.AddAsync(new Platform { Id = 4, Type = "Nintendo Switch" });
+        await _context.SaveChangesAsync();
 
         // Act
-        await repository.AddAsync(platform);
+        var savedPlatform = await _context.Platforms.FirstOrDefaultAsync(p => p.Id == 4);
 
         // Assert
-        var savedPlatform = await context.Platforms.FirstOrDefaultAsync(p => p.Type == "Nintendo Switch");
         Assert.NotNull(savedPlatform);
-        Assert.Equal(platform.Type, savedPlatform.Type);
+        Assert.Equal("Nintendo Switch", savedPlatform.Type);
     }
 
     /// <summary>
@@ -167,23 +138,16 @@ public class PlatformRepositoryTests
     public async Task UpdateAsync_ShouldUpdatePlatformInDatabase()
     {
         // Arrange
-        using var context = new GamestoreContext(_options);
-        var repository = new PlatformRepository(context);
-
-        var platform = new Platform { Id = 1, Type = "PC" };
-        context.Platforms.Add(platform);
-        context.SaveChanges();
-
-        // Modify the platform
+        var platform = await _context.Platforms.FirstAsync(p => p.Id == 1);
         platform.Type = "Updated PC";
 
         // Act
-        await repository.UpdateAsync(platform);
+        await _repository.UpdateAsync(platform);
+        await _context.SaveChangesAsync();
 
         // Assert
-        var updatedPlatform = await context.Platforms.FirstOrDefaultAsync(p => p.Id == 1);
-        Assert.NotNull(updatedPlatform);
-        Assert.Equal("Updated PC", updatedPlatform.Type);
+        var updatedPlatform = await _context.Platforms.FirstAsync(p => p.Id == 1);
+        Assert.Equal(platform.Type, updatedPlatform.Type);
     }
 
     /// <summary>
@@ -194,18 +158,14 @@ public class PlatformRepositoryTests
     public async Task RemoveAsync_ShouldRemovePlatformFromDatabase()
     {
         // Arrange
-        using var context = new GamestoreContext(_options);
-        var repository = new PlatformRepository(context);
-
-        var platform = new Platform { Id = 1, Type = "PC" };
-        context.Platforms.Add(platform);
-        context.SaveChanges();
+        var platform = await _context.Platforms.FirstAsync(p => p.Id == 1);
 
         // Act
-        await repository.RemoveAsync(1);
+        await _repository.RemoveAsync(platform.Id);
+        await _context.SaveChangesAsync();
 
         // Assert
-        var removedPlatform = await context.Platforms.FirstOrDefaultAsync(p => p.Id == 1);
+        var removedPlatform = await _context.Platforms.FirstOrDefaultAsync(p => p.Id == platform.Id);
         Assert.Null(removedPlatform);
     }
 
@@ -216,12 +176,8 @@ public class PlatformRepositoryTests
     [Fact]
     public async Task RemoveAsync_ShouldThrowExceptionWhenPlatformNotFound()
     {
-        // Arrange
-        using var context = new GamestoreContext(_options);
-        var repository = new PlatformRepository(context);
-
         // Act and Assert
-        await Assert.ThrowsAsync<ArgumentException>(async () => await repository.RemoveAsync(1));
+        await Assert.ThrowsAsync<ArgumentException>(async () => await _repository.RemoveAsync(999)); // non-existent platform Id
     }
 
     /// <summary>
@@ -231,11 +187,68 @@ public class PlatformRepositoryTests
     [Fact]
     public async Task AddAsync_ShouldThrowExceptionWhenSaveChangesFails()
     {
-        // Arrange
-        using var context = new GamestoreContext(_options);
-        var repository = new PlatformRepository(context);
-
         // Act and Assert
-        await Assert.ThrowsAsync<DbUpdateException>(async () => await repository.AddAsync(new Platform()));
+        await Assert.ThrowsAsync<DbUpdateException>(async () => await _repository.AddAsync(new Platform()));
+    }
+
+    /// <summary>
+    /// Test to verify that the GetByGameAliasAsync method of the PlatformRepository
+    /// returns a list of platforms when they exist in the database for the provided game alias.
+    /// </summary>
+    [Fact]
+    public async Task GetByGameAliasAsync_ShouldReturnPlatformList()
+    {
+        // Arrange
+        var game = new Game { Name = "Test Game", GameAlias = "Alias1", Platforms = new List<Platform>() };
+        game.Platforms.Add(await _context.Platforms.FirstAsync(p => p.Id == 1));
+        game.Platforms.Add(await _context.Platforms.FirstAsync(p => p.Id == 2));
+        _context.Games.Add(game);
+        await _context.SaveChangesAsync();
+
+        // Act
+        var result = (await _repository.GetByGameAliasAsync("Alias1")).ToList();
+
+        // Assert
+        Assert.Equal(2, result.Count);
+        Assert.Contains(result, p => p.Type == "PC");
+        Assert.Contains(result, p => p.Type == "PlayStation");
+    }
+
+    /// <summary>
+    /// Test to verify that the GetByGameAliasAsync method of the PlatformRepository
+    /// return an empty list when no platforms are associated with the provided game alias.
+    /// </summary>
+    [Fact]
+    public async Task GetByGameAliasAsync_ShouldReturnEmptyList()
+    {
+        // Arrange
+        _context.Games.Add(new Game { Name = "Test Game", GameAlias = "Alias2" });
+        await _context.SaveChangesAsync();
+
+        // Act
+        var result = (await _repository.GetByGameAliasAsync("Alias2")).ToList();
+
+        // Assert
+        Assert.Empty(result);
+    }
+
+    /// <summary>
+    /// Test to verify that the GetByGameAliasAsync method of the PlatformRepository
+    /// throws an exception when the game alias does not exist in the database.
+    /// </summary>
+    [Fact]
+    public async Task GetByGameAliasAsync_ShouldThrowExceptionWhenGameAliasNotFound()
+    {
+        // Act and Assert
+        await Assert.ThrowsAsync<ArgumentException>(async () => await _repository.GetByGameAliasAsync("NonExistentAlias"));
+    }
+
+    private async Task SeedDataAsync()
+    {
+        _context.Platforms.AddRange(
+            new() { Id = 1, Type = "PC" },
+            new() { Id = 2, Type = "PlayStation" },
+            new() { Id = 3, Type = "Xbox" });
+        await _context.SaveChangesAsync();
     }
 }

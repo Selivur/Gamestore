@@ -55,7 +55,7 @@ public class PlatformRepository : IPlatformRepository
     public async Task RemoveAsync(int id)
     {
         var platformToRemove = await _context.Platforms.SingleOrDefaultAsync(g => g.Id.Equals(id))
-                            ?? throw new ArgumentException($"No paltform found with id '{id}'.", nameof(id));
+                            ?? throw new ArgumentException($"No platform found with id '{id}'.", nameof(id));
 
         _context.Platforms.Remove(platformToRemove);
 
