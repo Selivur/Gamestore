@@ -34,7 +34,8 @@ public class OrderService : IOrderService
     /// <inheritdoc/>
     public async Task<OrderResponse?> GetOrderByIdAsync(int id)
     {
-        var order = await _orderRepository.GetByIdAsync(id) ?? throw new KeyNotFoundException("Order not found");
+        var order = await _orderRepository.GetByIdAsync(id)
+            ?? throw new KeyNotFoundException("Order not found");
         return OrderResponse.FromOrder(order);
     }
 
@@ -67,100 +68,20 @@ public class OrderService : IOrderService
     public async Task<OrderBuyResponse> AddOrderWithDetails(string gameAlias)
     {
         var openedOrder = await _orderRepository.GetFirstOpenOrderAsync();
-
-        var game = await _gameService.GetGameByAliasAsync(gameAlias)
-                ?? throw new KeyNotFoundException("Not enough games in store");
-
-        if (game.UnitInStock != 0)
-        {
-            game.UnitInStock -= 1;
-        }
-        else
-        {
-            throw new KeyNotFoundException("Not enough games in store");
-        }
-
-        await _gameService.UpdateGameWithoutDependenciesAsync(game);
+        var game = await UpdateGameQuantityAndGetGameInfo(gameAlias);
+        OrderBuyResponse response;
 
         if (openedOrder != null)
         {
-            var existingOrderDetails = openedOrder.OrderDetails.FirstOrDefault(od => od.Game.GameAlias == gameAlias);
-
-            if (existingOrderDetails != null)
-            {
-                existingOrderDetails.Quantity += 1;
-
-                await _orderRepository.UpdateOrderDetailsAsync(existingOrderDetails);
-            }
-            else
-            {
-                OrderDetails orderDetails = new()
-                {
-                    Quantity = 1,
-                    Price = game.Price,
-                    Discount = game.Discount,
-                    Game = game,
-                };
-                openedOrder.OrderDetails?.Add(orderDetails);
-                await _orderRepository.UpdateAsync(openedOrder);
-            }
-
-            OrderBuyResponse response = new()
-            {
-                Id = openedOrder.Id.ToString(),
-                OrderDate = openedOrder.OrderDate,
-                ProductID = Convert.ToInt32(game.Id),
-                ProductName = game.Name,
-
-                // price
-                Price = game.Price,
-                CreationDate = openedOrder.OrderDate,
-                Discount = 10,
-                PaidDate = openedOrder.PaymentDate,
-                Quantity = existingOrderDetails != null ? existingOrderDetails.Quantity : 1,
-            };
-
-            response.Sum = response.Quantity * response.Price * response.Discount / 100;
-
-            return response;
+            var existingOrderDetails = FindExistingOrderDetails(openedOrder, gameAlias);
+            response = AddExistingOrderDetailsOrUpdateExistingOne(openedOrder, existingOrderDetails, game);
         }
         else
         {
-            OrderDetails orderDetails = new()
-            {
-                Quantity = 1,
-                Price = game.Price,
-                Discount = game.Discount,
-                Game = game,
-            };
-            Order order = new()
-            {
-                OrderDate = DateTime.Now,
-                OrderDetails = new Collection<OrderDetails> { orderDetails },
-
-                // Customer?
-                Status = OrderStatus.Open,
-            };
-            await _orderRepository.AddAsync(order);
-
-            var orders = await _orderRepository.GetAllAsync();
-            var maxId = orders?.Max(od => od.Id) ?? 0;
-
-            OrderBuyResponse response = new()
-            {
-                Id = (maxId + 1).ToString(),
-                OrderDate = openedOrder.OrderDate,
-                ProductID = Convert.ToInt32(game.Id),
-                ProductName = game.Name,
-                Price = game.Price,
-                CreationDate = openedOrder.OrderDate,
-                Discount = game.Discount,
-                PaidDate = openedOrder.PaymentDate,
-            };
-            response.Sum = response.Quantity * response.Price * response.Discount / 100;
-
-            return response;
+            response = await CreateNewOrderandOrderDetails(game);
         }
+
+        return response;
     }
 
     /// <inheritdoc/>
@@ -181,8 +102,7 @@ public class OrderService : IOrderService
     public async Task<byte[]> GetBankPDFAsync(PaymentRequestDTO paymentRequest)
     {
         var openOrder = await _orderRepository.GetFirstOpenOrderAsync();
-        var orderId = openOrder.Id;
-        Order order = await _orderRepository.GetByIdWithOrderDetailsAsync(orderId);
+        var order = await _orderRepository.GetByIdWithOrderDetailsAsync(openOrder.Id);
 
         await _orderRepository.CompleteOrder();
 
@@ -192,11 +112,14 @@ public class OrderService : IOrderService
         {
             using var document = new Document(pdf);
 
+            var sum = order.OrderDetails
+                .Sum(details => details.Quantity * details.Price * (1 - (details.Discount / 100d)));
+
             document.Add(new Paragraph($"Payment method: {paymentRequest.Method}"));
             document.Add(new Paragraph($"User ID: {order.Customer.Id}"));
             document.Add(new Paragraph($"Order ID: {order.Id}"));
             document.Add(new Paragraph($"Validity Date: {DateTime.Now.AddDays(3)}"));
-            document.Add(new Paragraph($"Sum: {order.OrderDetails.Sum(details => details.Quantity * details.Price * (1 - (details.Discount / 100d)))}"));
+            document.Add(new Paragraph($"Sum: {sum}"));
             document.Close();
         }
 
@@ -211,7 +134,8 @@ public class OrderService : IOrderService
         var orders = await _orderRepository.GetAllOrderDetails(order.Id);
 
         var orderDetails = orders.FirstOrDefault(o => o.Game.GameAlias == gameAlias)
-            ?? throw new KeyNotFoundException($"Can't find order details for the game alias '{gameAlias}' in the open order.");
+            ?? throw new KeyNotFoundException($"Can't find order details for the game alias '{gameAlias}' " +
+            $"in the open order.");
 
         // add game quantity
         await _orderRepository.RemoveOrderDetailsAsync(orderDetails.Id);
@@ -292,5 +216,168 @@ public class OrderService : IOrderService
         };
 
         return paymentMethods;
+    }
+
+    /// <summary>
+    /// Adds an order with its details in the system.
+    /// </summary>
+    /// <param name="gameAlias">The alias of the game to add to the order.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result returns an <see cref="OrderBuyResponse"/> that contains the details of the new or updated order.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown when there is no enough count of the game with the specified gameAlias in the store.</exception>
+    /// <remarks>
+    /// This method will update the game's quantity in stock,
+    /// and then it will either add a new order and its details for the game or update an existing one.
+    /// If there is an existing open order, this method will find the order details based on the game alias
+    /// and update the open order and its details. Otherwise, it will create a new order and its details.
+    /// </remarks>
+    private async Task<Game> UpdateGameQuantityAndGetGameInfo(string gameAlias)
+    {
+        var game = await _gameService.GetGameByAliasAsync(gameAlias)
+                ?? throw new KeyNotFoundException("Cant find game with specified Game Alias");
+
+        if (game.UnitInStock == 0)
+        {
+            throw new KeyNotFoundException("Not enough games in store");
+        }
+
+        game.UnitInStock -= 1;
+        await _gameService.UpdateGameWithoutDependenciesAsync(game);
+        return game;
+    }
+
+    /// <summary>
+    /// Finds the existing order details for the specified game alias in an opened order.
+    /// </summary>
+    /// <param name="openedOrder">The opened order to search in.</param>
+    /// <param name="gameAlias">The alias of the game to find in order details.</param>
+    /// <returns>The OrderDetails object for the specified game alias if it exists; throws KeyNotFoundException otherwise.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown when no order details are found for the given game alias.</exception>
+    /// <remarks>
+    /// This method looks through order details of the given opened order to find the details related to the game with the specified alias.
+    /// </remarks>
+    private static OrderDetails FindExistingOrderDetails(Order openedOrder, string gameAlias)
+    {
+        return openedOrder.OrderDetails.FirstOrDefault(od => od.Game.GameAlias == gameAlias)
+            ?? throw new KeyNotFoundException("Can`t find game with specified Game Alias");
+    }
+
+    /// <summary>
+    /// Adds new order details or updates existing one and returns OrderBuyResponse.
+    /// </summary>
+    /// <param name="openedOrder">The opened order to be modified.</param>
+    /// <param name="existingOrderDetails">Existing order details to update. If this is null, new order details are added.</param>
+    /// <param name="game">The game to be added or updated in order details.</param>
+    /// <returns>The OrderBuyResponse for the updated or new order details.</returns>
+    /// <remarks>
+    /// This method checks if the existing order details are not null,
+    /// if they are not null it increments the quantity and updates the order details.
+    /// If they are null, it creates a new order details and updates the opened order
+    /// with these new order details. After the update, it returns OrderBuyResponse for the operation.
+    /// </remarks>
+    private OrderBuyResponse AddExistingOrderDetailsOrUpdateExistingOne(Order openedOrder, OrderDetails existingOrderDetails, Game game)
+    {
+        if (existingOrderDetails != null)
+        {
+            existingOrderDetails.Quantity += 1;
+            _orderRepository.UpdateOrderDetailsAsync(existingOrderDetails);
+        }
+        else
+        {
+            openedOrder.OrderDetails?.Add(CreateOrderDetails(game));
+            _orderRepository.UpdateAsync(openedOrder);
+        }
+
+        return ConstructOrderBuyResponse(openedOrder, game, existingOrderDetails);
+    }
+
+    /// <summary>
+    /// Creates a new OrderDetails object for the specified game.
+    /// </summary>
+    /// <param name="game">The game for which to create the order details.</param>
+    /// <returns>A new OrderDetails object with the specified game details.</returns>
+    private static OrderDetails CreateOrderDetails(Game game)
+    {
+        return new OrderDetails
+        {
+            Quantity = 1,
+            Price = game.Price,
+            Discount = game.Discount,
+            Game = game,
+        };
+    }
+
+    /// <summary>
+    /// Constructs an OrderBuyResponse object based on the provided order, game, and order details.
+    /// </summary>
+    /// <param name="openedOrder">The opened order object.</param>
+    /// <param name="game">The game object.</param>
+    /// <param name="existingOrderDetails">Optional order details. If provided, its quantity is used in the response.</param>
+    /// <returns>An OrderBuyResponse with the calculated sum and order details.</returns>
+    private static OrderBuyResponse ConstructOrderBuyResponse(Order openedOrder, Game game, OrderDetails? existingOrderDetails)
+    {
+        var response = new OrderBuyResponse
+        {
+            Id = openedOrder.Id.ToString(),
+            OrderDate = openedOrder.OrderDate,
+            ProductID = Convert.ToInt32(game.Id),
+            ProductName = game.Name,
+            Price = game.Price,
+            CreationDate = openedOrder.OrderDate,
+            Discount = game.Discount,
+            PaidDate = openedOrder.PaymentDate,
+            Quantity = existingOrderDetails != null ? existingOrderDetails.Quantity : 1,
+        };
+
+        response.Sum = response.Quantity * response.Price * response.Discount / 100;
+        return response;
+    }
+
+    /// <summary>
+    /// Creates a new order and its details, then persists the order in the repository.
+    /// Returns an OrderBuyResponse for the new order.
+    /// </summary>
+    /// <param name="game">The game for which to create the order.</param>
+    /// <returns>A task that represents the asynchronous operation.
+    /// The task result is an OrderBuyResponse for the new order.</returns>
+    private async Task<OrderBuyResponse> CreateNewOrderandOrderDetails(Game game)
+    {
+        var orderDetails = CreateOrderDetails(game);
+        var order = await CreateAndPersistNewOrder(orderDetails);
+
+        var orders = await _orderRepository.GetAllAsync();
+        var maxId = orders?.Max(od => od.Id) ?? 0;
+
+        var response = new OrderBuyResponse
+        {
+            Id = (maxId + 1).ToString(),
+            OrderDate = order.OrderDate,
+            ProductID = Convert.ToInt32(game.Id),
+            ProductName = game.Name,
+            Price = game.Price,
+            CreationDate = order.OrderDate,
+            Discount = game.Discount,
+            PaidDate = order.PaymentDate,
+        };
+        response.Sum = response.Quantity * response.Price * response.Discount / 100;
+        return response;
+    }
+
+    /// <summary>
+    /// Creates a new Order object with the specified order details,
+    /// then adds the order to the repository and returns it.
+    /// </summary>
+    /// <param name="orderDetails">The order details to include in the new order.</param>
+    /// <returns>A task that represents the asynchronous operation.
+    /// The task result is the newly created Order object.</returns>
+    private async Task<Order> CreateAndPersistNewOrder(OrderDetails orderDetails)
+    {
+        var order = new Order
+        {
+            OrderDate = DateTime.Now,
+            OrderDetails = new Collection<OrderDetails> { orderDetails },
+            Status = OrderStatus.Open,
+        };
+        await _orderRepository.AddAsync(order);
+        return order;
     }
 }

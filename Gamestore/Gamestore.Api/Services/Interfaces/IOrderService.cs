@@ -32,16 +32,16 @@ public interface IOrderService
     Task<IEnumerable<OrderResponse>> GetAllOrdersAsync();
 
     /// <summary>
-    /// Adds an order with details for the specified game alias.
+    /// Adds an order with its details in the system.
     /// </summary>
-    /// <param name="gameAlias">The alias of the game for which the order is being added.</param>
-    /// <returns>A task representing the asynchronous operation, returning an <see cref="OrderBuyResponse"/>.</returns>
-    /// <exception cref="KeyNotFoundException">
-    /// Thrown when the specified game alias is not found or there are not enough games in the store.
-    /// </exception>
+    /// <param name="gameAlias">The alias of the game to add to the order.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result returns an <see cref="OrderBuyResponse"/> that contains the details of the new or updated order.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown when there is no enough count of the game with the specified gameAlias in the store.</exception>
     /// <remarks>
-    /// If there is an existing open order, the method either adds the game to the existing order details or creates a new order.
-    /// If there is no existing open order, a new order with details is created.
+    /// This method will update the game's quantity in stock,
+    /// and then it will either add a new order and its details for the game or update an existing one.
+    /// If there is an existing open order, this method will find the order details based on the game alias
+    /// and update the open order and its details. Otherwise, it will create a new order and its details.
     /// </remarks>
     Task<OrderBuyResponse> AddOrderWithDetails(string gameAlias);
 
