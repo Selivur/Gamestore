@@ -107,9 +107,9 @@ public class GameRepository : IGameRepository
     /// <inheritdoc />
     public async Task<IEnumerable<Game>> GetByPublisherNameAsync(string name)
     {
-        var publusherExists = await _context.Publishers.AnyAsync(g => g.CompanyName == name);
+        var exists = await _context.Publishers.AnyAsync(g => g.CompanyName == name);
 
-        if (!publusherExists)
+        if (!exists)
         {
             throw new ArgumentException($"No publisher found with the name '{name}'.", nameof(name));
         }
@@ -125,9 +125,9 @@ public class GameRepository : IGameRepository
     /// <inheritdoc />
     public async Task<IEnumerable<Game>> GetByGenreIdAsync(int id)
     {
-        var publusherExists = await _context.Genres.AnyAsync(g => g.Id == id);
+        var exists = await _context.Genres.AnyAsync(g => g.Id == id);
 
-        if (!publusherExists)
+        if (!exists)
         {
             throw new ArgumentException($"No genre found with the name '{id}'.", nameof(id));
         }
@@ -143,11 +143,11 @@ public class GameRepository : IGameRepository
     /// <inheritdoc />
     public async Task<IEnumerable<Game>> GetByPlatformTypeAsync(string type)
     {
-        var publusherExists = await _context.Platforms.AnyAsync(g => g.Type == type);
+        var exists = await _context.Platforms.AnyAsync(g => g.Type == type);
 
-        if (!publusherExists)
+        if (!exists)
         {
-            throw new ArgumentException($"No publusher found with the name '{type}'.", nameof(type));
+            throw new ArgumentException($"No publisher found with the name '{type}'.", nameof(type));
         }
 
         var gameList = await _context.Platforms
