@@ -175,15 +175,15 @@ public class GameRepositoryTests : IDisposable
 
         // Assert
         var updatedGame = await _context.Games
-            .Include(g => g.Genre)
+            .Include(g => g.Genres)
             .Include(g => g.Platforms)
-            .Include(g => g.Publishers)
+            .Include(g => g.Publisher)
             .FirstOrDefaultAsync(g => g.GameAlias == "game-with-dependencies");
 
         Assert.NotNull(updatedGame);
-        Assert.Equal(genresId.Length, updatedGame.Genre.Count);
+        Assert.Equal(genresId.Length, updatedGame.Genres.Count);
         Assert.Equal(platformsId.Length, updatedGame.Platforms.Count);
-        Assert.Equal(publisherId, updatedGame.Publishers.Id);
+        Assert.Equal(publisherId, updatedGame.Publisher.Id);
     }
 
     /// <summary>
@@ -210,16 +210,16 @@ public class GameRepositoryTests : IDisposable
 
         // Assert
         var addedGame = await _context.Games
-            .Include(g => g.Genre)
+            .Include(g => g.Genres)
             .Include(g => g.Platforms)
-            .Include(g => g.Publishers)
+            .Include(g => g.Publisher)
             .FirstOrDefaultAsync(g => g.GameAlias == "new-game-with-dependencies");
 
         // Assert
         Assert.NotNull(addedGame);
-        Assert.Equal(genresId.Length, addedGame.Genre.Count);
+        Assert.Equal(genresId.Length, addedGame.Genres.Count);
         Assert.Equal(platformsId.Length, addedGame.Platforms.Count);
-        Assert.Equal(publisherId, addedGame.Publishers.Id);
+        Assert.Equal(publisherId, addedGame.Publisher.Id);
     }
 
     /// <summary>
@@ -248,15 +248,15 @@ public class GameRepositoryTests : IDisposable
         await _gameRepository.UpdateGameWithDependencies(addedGame, testGenres.ToArray(), testPlatforms.ToArray(), testPublisher);
 
         var updatedGame = await _context.Games
-            .Include(g => g.Genre)
+            .Include(g => g.Genres)
             .Include(g => g.Platforms)
-            .Include(g => g.Publishers)
+            .Include(g => g.Publisher)
             .SingleAsync(g => g.GameAlias == "updated-game");
 
         // Assert
-        Assert.Equal(testGenres.Count, updatedGame.Genre.Count);
+        Assert.Equal(testGenres.Count, updatedGame.Genres.Count);
         Assert.Equal(testPlatforms.Count, updatedGame.Platforms.Count);
-        Assert.Equal(testPublisher, updatedGame.Publishers.Id);
+        Assert.Equal(testPublisher, updatedGame.Publisher.Id);
     }
 
     /// <summary>
@@ -273,7 +273,7 @@ public class GameRepositoryTests : IDisposable
         var games = await _gameRepository.GetByPublisherNameAsync(publisherName);
 
         // Assert
-        Assert.All(games, g => Assert.Equal(publisherName, g.Publishers.CompanyName));
+        Assert.All(games, g => Assert.Equal(publisherName, g.Publisher.CompanyName));
     }
 
     /// <summary>
@@ -290,7 +290,7 @@ public class GameRepositoryTests : IDisposable
         var games = await _gameRepository.GetByGenreIdAsync(genreId);
 
         // Assert
-        Assert.All(games, g => Assert.Contains(g.Genre, genre => genre.Id == genreId));
+        Assert.All(games, g => Assert.Contains(g.Genres, genre => genre.Id == genreId));
     }
 
     /// <summary>

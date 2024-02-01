@@ -142,7 +142,7 @@ public class PublisherRepositoryTests : IDisposable
         {
             GameAlias = "TestGame",
             Name = "Test Game",
-            Publishers = publisher1,
+            Publisher = publisher1,
         };
 
         _context.Publishers.Add(publisher1);

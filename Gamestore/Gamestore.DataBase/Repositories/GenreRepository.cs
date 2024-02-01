@@ -83,7 +83,7 @@ public class GenreRepository : IGenreRepository
 
         var genreList = await _context.Games
             .Where(g => g.GameAlias == gameAlias)
-            .SelectMany(g => g.Genre)
+            .SelectMany(g => g.Genres)
             .ToListAsync();
 
         return genreList;

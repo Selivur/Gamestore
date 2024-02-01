@@ -69,9 +69,9 @@ public class GameRepository : IGameRepository
     /// <inheritdoc />
     public async Task AddGameWithDependencies(Game game, int[] genresId, int[] platformsId, int publisherId)
     {
-        game.Genre = _context.Genres.Where(g => genresId.Contains(g.Id)).ToList();
+        game.Genres = _context.Genres.Where(g => genresId.Contains(g.Id)).ToList();
         game.Platforms = _context.Platforms.Where(p => platformsId.Contains(p.Id)).ToList();
-        game.Publishers = _context.Publishers.Find(publisherId);
+        game.Publisher = _context.Publishers.Find(publisherId);
 
         _context.Games.Add(game);
         await SaveChangesAsync("Error when adding the game to the database.");
@@ -80,14 +80,14 @@ public class GameRepository : IGameRepository
     /// <inheritdoc />
     public async Task UpdateGameWithDependencies(Game game, int[] genresId, int[] platformsId, int publisherId)
     {
-        game = _context.Games.Include(g => g.Genre).Include(g => g.Platforms)
+        game = _context.Games.Include(g => g.Genres).Include(g => g.Platforms)
         .FirstOrDefault(g => g.Id == game.Id);
 
-        game.Genre.Clear();
+        game.Genres.Clear();
         var selectedGenres = _context.Genres.Where(g => genresId.Contains(g.Id)).ToList();
         foreach (var genre in selectedGenres)
         {
-            game.Genre.Add(genre);
+            game.Genres.Add(genre);
         }
 
         game.Platforms.Clear();
@@ -97,7 +97,7 @@ public class GameRepository : IGameRepository
             game.Platforms.Add(platform);
         }
 
-        game.Publishers = _context.Publishers.Find(publisherId);
+        game.Publisher = _context.Publishers.Find(publisherId);
 
         _context.Games.Update(game);
 

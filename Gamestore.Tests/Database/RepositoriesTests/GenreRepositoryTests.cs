@@ -205,7 +205,7 @@ public class GenreRepositoryTests : IDisposable
         {
             GameAlias = gameAlias,
             Name = "Test Game",
-            Genre = new List<Genre>()
+            Genres = new List<Genre>()
             {
                 await _context.Genres.FirstAsync(g => g.Id == 1),
                 await _context.Genres.FirstAsync(g => g.Id == 2),
@@ -219,8 +219,8 @@ public class GenreRepositoryTests : IDisposable
 
         // Assert
         Assert.NotEmpty(result);
-        Assert.Equal(game.Genre.Count, result.Count);
-        foreach (var genre in game.Genre)
+        Assert.Equal(game.Genres.Count, result.Count);
+        foreach (var genre in game.Genres)
         {
             Assert.Contains(result, g => g.Name == genre.Name);
         }

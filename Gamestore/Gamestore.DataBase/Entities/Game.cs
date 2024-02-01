@@ -50,7 +50,7 @@ public class Game
     /// <summary>
     /// Gets or sets the collection of genres associated with the game.
     /// </summary>
-    public ICollection<Genre> Genre { get; set; }
+    public ICollection<Genre> Genres { get; set; }
 
     /// <summary>
     /// Gets or sets the collection of platforms associated with the game.
@@ -60,5 +60,5 @@ public class Game
     /// <summary>
     /// Gets or sets the publisher associated with the game.
     /// </summary>
-    public Publisher? Publishers { get; set; }
+    public Publisher? Publisher { get; set; }
 }
