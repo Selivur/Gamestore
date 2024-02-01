@@ -117,6 +117,7 @@ public class OrderRepository : IOrderRepository
     {
         var order = await GetFirstOpenOrderAsync();
         order.Status = OrderStatus.Paid;
+        order.PaymentDate = DateTime.Now;
         _context.Entry(order).State = EntityState.Modified;
 
         await SaveChangesAsync("Error when changed the order status to complete.");
