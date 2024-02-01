@@ -137,7 +137,8 @@ public class OrderService : IOrderService
             ?? throw new KeyNotFoundException($"Can't find order details for the game alias '{gameAlias}' " +
             $"in the open order.");
 
-        // add game quantity
+        await RestockGameFromOrderDetailsAsync(gameAlias, orderDetails);
+
         await _orderRepository.RemoveOrderDetailsAsync(orderDetails.Id);
     }
 
@@ -177,8 +178,6 @@ public class OrderService : IOrderService
         var response = await _paymentService.ProcessVisaPayment(model);
 
         return response;
-
-        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -257,8 +256,7 @@ public class OrderService : IOrderService
     /// </remarks>
     private static OrderDetails FindExistingOrderDetails(Order openedOrder, string gameAlias)
     {
-        return openedOrder.OrderDetails.FirstOrDefault(od => od.Game.GameAlias == gameAlias)
-            ?? throw new KeyNotFoundException("Can`t find game with specified Game Alias");
+        return openedOrder.OrderDetails.FirstOrDefault(od => od.Game.GameAlias == gameAlias);
     }
 
     /// <summary>
@@ -274,7 +272,7 @@ public class OrderService : IOrderService
     /// If they are null, it creates a new order details and updates the opened order
     /// with these new order details. After the update, it returns OrderBuyResponse for the operation.
     /// </remarks>
-    private OrderBuyResponse AddExistingOrderDetailsOrUpdateExistingOne(Order openedOrder, OrderDetails existingOrderDetails, Game game)
+    private OrderBuyResponse AddExistingOrderDetailsOrUpdateExistingOne(Order openedOrder, OrderDetails? existingOrderDetails, Game game)
     {
         if (existingOrderDetails != null)
         {
@@ -379,5 +377,21 @@ public class OrderService : IOrderService
         };
         await _orderRepository.AddAsync(order);
         return order;
+    }
+
+    /// <summary>
+    /// Restocks the game units from the order details asynchronously.
+    /// Finds the open order, retrieves all order details, finds the order detail with the given game alias,
+    /// increments the unit in stock for the game, updates the game, and finally removes the order detail.
+    /// </summary>
+    /// <param name="gameAlias">The alias of the game to restock.</param>
+    /// <exception cref="KeyNotFoundException">Thrown when no order details for the given game alias can be found in the open order.</exception>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    private async Task RestockGameFromOrderDetailsAsync(string gameAlias, OrderDetails orderDetails)
+    {
+        var game = _gameService.GetGameByAliasAsync(gameAlias).Result;
+        game.UnitInStock += orderDetails.Quantity;
+
+        await _gameService.UpdateGameWithoutDependenciesAsync(game);
     }
 }
