@@ -198,6 +198,24 @@ public class GenreControllerTests : IDisposable
     }
 
     /// <summary>
+    /// Test method for AddGenre() when an invalid genre object is used.
+    /// The test is considered successful if it results in a BadRequestObjectResult.
+    /// </summary>
+    [Fact]
+    public async Task AddGenre_WhenCalledWithInvalidGenre_ReturnsBadRequestObjectResult()
+    {
+        // Arrange
+        _controller.ModelState.AddModelError("Error", "Model error");
+
+        // Act
+        var genreWrapper = new GenreAddWrapper { GenreRequest = null };
+        var result = await _controller.AddGenre(genreWrapper);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    /// <summary>
     /// Cleans up after each unit test has run.
     /// Verifies all expectations on the mock dependencies and frees resources for garbage collection.
     /// </summary>
