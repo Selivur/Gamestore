@@ -347,4 +347,17 @@ public class OrderControllerTests
         // Act and Assert
         await Assert.ThrowsAsync<ArgumentException>(async () => await _controller.GetBankInvoicePdf(paymentRequest));
     }
+
+    /// <summary>
+    /// Test for GetBankInvoicePdf method with "Visa" payment method but no Visa payment details.
+    /// </summary>
+    [Fact]
+    public async Task GetBankInvoicePdf_WithVisaMethodButNoDetails_ThrowsException()
+    {
+        // Arrange
+        var paymentRequest = new PaymentRequestDTO { Method = "Visa", Model = null };
+
+        // Act and Assert
+        await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _controller.GetBankInvoicePdf(paymentRequest));
+    }
 }
