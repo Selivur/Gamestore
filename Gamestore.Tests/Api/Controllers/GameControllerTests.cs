@@ -195,4 +195,99 @@ public class GameControllerTests
         Assert.NotNull(actualGames);
         Assert.Equal(expectedGames, actualGames);
     }
+
+    /// <summary>
+    /// Test for GetGenre method.
+    /// </summary>
+    [Fact]
+    public async Task GetGenre_WhenCalled_CallsServiceWithCorrectIdAndReturnsResult()
+    {
+        // Arrange
+        var gameId = "1";
+        var expectedGameResponse = new GameResponse { Id = gameId };
+
+        _gameServiceMock
+            .Setup(service => service.GetGameByIdAsync(Convert.ToInt32(gameId)))
+            .ReturnsAsync(expectedGameResponse)
+            .Verifiable("Service method was not called with correct ID");
+
+        // Act
+        var result = await _gameController.GetGenre(gameId);
+
+        // Assert
+        _gameServiceMock.Verify();
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var returnValue = Assert.IsType<GameResponse>(okResult.Value);
+        Assert.Equal(expectedGameResponse, returnValue);
+    }
+
+    /// <summary>
+    /// Test for GetAllGamesByPublisherName method.
+    /// </summary>
+    [Fact]
+    public async Task GetAllGamesByPublisherName_WhenCalled_ReturnsResultFromService()
+    {
+        // Arrange
+        var publisherName = "PublisherName";
+        var expectedGames = new List<GameResponse> { new() { Name = "Test Game 1" }, new() { Name = "Test Game 2" } };
+
+        _gameServiceMock
+            .Setup(service => service.GetAllGamesByPublisherNameAsync(publisherName))
+            .ReturnsAsync(expectedGames);
+
+        // Act
+        var result = await _gameController.GetAllGamesByPublisherName(publisherName);
+
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var actualGames = Assert.IsType<List<GameResponse>>(okResult.Value);
+        Assert.Equal(expectedGames, actualGames);
+    }
+
+    /// <summary>
+    /// Test for GetAllGamesByPlatformType method with ID parameter.
+    /// </summary>
+    [Fact]
+    public async Task GetAllGamesByPlatformType_WhenCalledWithId_ReturnsResultFromService()
+    {
+        // Arrange
+        var platformTypeId = 1;
+        var expectedGames = new List<GameResponse> { new() { Name = "Test Game 1" }, new() { Name = "Test Game 2" } };
+
+        _gameServiceMock
+            .Setup(service => service.GetAllGamesByPlatformTypeAsync(platformTypeId))
+            .ReturnsAsync(expectedGames);
+
+        // Act
+        var result = await _gameController.GetAllGamesByPlatformType(platformTypeId);
+
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var actualGames = Assert.IsType<List<GameResponse>>(okResult.Value);
+        Assert.Equal(expectedGames, actualGames);
+    }
+
+    /// <summary>
+    /// Test for GetAllGamesByPlatformType method with platform type parameter.
+    /// </summary>
+    [Fact]
+    public async Task GetAllGamesByPlatformType_WhenCalledWithPlatformType_ReturnsResultFromService()
+    {
+        // Arrange
+        var platformType = "PlatformType";
+        var expectedGames = new List<GameResponse> { new() { Name = "Test Game 1" }, new() { Name = "Test Game 2" } };
+
+        _gameServiceMock
+            .Setup(service => service.GetAllGamesByPlatformTypeAsync(platformType))
+            .ReturnsAsync(expectedGames);
+
+        // Act
+        var result = await _gameController.GetAllGamesByPlatformType(platformType);
+
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var actualGames = Assert.IsType<List<GameResponse>>(okResult.Value);
+        Assert.Equal(expectedGames, actualGames);
+    }
 }
