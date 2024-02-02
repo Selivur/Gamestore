@@ -57,11 +57,6 @@ public class OrderController : ControllerBase
     [HttpGet("/game/{gameAlias}/buy")]
     public async Task<IActionResult> CreateGameOrder(string gameAlias)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(GetErrorMessages());
-        }
-
         var result = await _orderService.AddOrderWithDetails(gameAlias);
 
         return Ok(result);
@@ -148,17 +143,5 @@ public class OrderController : ControllerBase
             default:
                 throw new ArgumentException("Invalid payment method provided.", nameof(paymentRequest.Method));
         }
-    }
-
-    /// <summary>
-    /// Returns a list of error messages from the ModelState object.
-    /// </summary>
-    /// <returns>A list of error messages.</returns>
-    private List<string> GetErrorMessages()
-    {
-        return ModelState.Values
-            .SelectMany(v => v.Errors)
-            .Select(v => v.ErrorMessage)
-            .ToList();
     }
 }

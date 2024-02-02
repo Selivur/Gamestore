@@ -67,6 +67,11 @@ public class OrderService : IOrderService
     /// <inheritdoc/>
     public async Task<OrderBuyResponse> AddOrderWithDetails(string gameAlias)
     {
+        if (string.IsNullOrEmpty(gameAlias))
+        {
+            throw new ArgumentException("Game alias can't be null or empty.", nameof(gameAlias));
+        }
+
         var openedOrder = await _orderRepository.GetFirstOpenOrderAsync();
         var game = await UpdateGameQuantityAndGetGameInfo(gameAlias);
         OrderBuyResponse response;
