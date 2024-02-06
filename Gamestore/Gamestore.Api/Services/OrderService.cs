@@ -236,8 +236,7 @@ public class OrderService : IOrderService
     /// </remarks>
     private async Task<Game> UpdateGameQuantityAndGetGameInfo(string gameAlias)
     {
-        var game = await _gameService.GetGameByAliasAsync(gameAlias)
-                ?? throw new KeyNotFoundException("Cant find game with specified Game Alias");
+        var game = await _gameService.GetGameByAliasAsync(gameAlias);
 
         if (game.UnitInStock == 0)
         {
@@ -348,7 +347,7 @@ public class OrderService : IOrderService
         var order = await CreateAndPersistNewOrder(orderDetails);
 
         var orders = await _orderRepository.GetAllAsync();
-        var maxId = orders?.Max(od => od.Id) ?? 0;
+        var maxId = orders?.Any() == true ? orders.Max(od => od.Id) : 0;
 
         var response = new OrderBuyResponse
         {
