@@ -62,21 +62,4 @@ public class GameResponse
             Discount = game.Discount,
         };
     }
-
-    /// <summary>
-    /// Converts a GameResponse object to a Game object.
-    /// </summary>
-    /// <returns>The converted Game object.</returns>
-    public Game ToGame()
-    {
-        return new Game
-        {
-            GameAlias = Key,
-            Name = Name,
-            Price = Price,
-            UnitInStock = UnitInStock,
-            Discount = Discount,
-            Description = Description,
-        };
-    }
 }
