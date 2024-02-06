@@ -5,6 +5,10 @@ using Gamestore.Database.Repositories.Interfaces;
 using Moq;
 
 namespace Gamestore.Tests.Api.Services;
+
+/// <summary>
+/// Test class for the <see cref="GameService"/> class.
+/// </summary>
 public class GameServiceTests
 {
     private readonly Mock<IGameRepository> _mockRepository;
