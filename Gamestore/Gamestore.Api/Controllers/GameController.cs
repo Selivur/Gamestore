@@ -1,5 +1,7 @@
 ﻿using System.Text;
+using Gamestore.Api.Models.DTO.CommentDTO;
 using Gamestore.Api.Models.DTO.GameDTO;
+using Gamestore.Api.Models.Wrappers.Comment;
 using Gamestore.Api.Models.Wrappers.Game;
 using Gamestore.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -168,6 +170,35 @@ public class GameController : ControllerBase
         var games = await _gameService.GetAllGamesByPlatformTypeAsync(type);
 
         return Ok(games);
+    }
+
+    /// <summary>
+    /// Retrieves all comments associated with a specific game.
+    /// </summary>
+    /// <param name="gameAlias">The alias of the game.</param>
+    /// <returns>A collection of comments associated with the game.</returns>
+    [HttpGet("{gameAlias}/comments")]
+    public async Task<ActionResult<IEnumerable<CommentResponse>>> GetCommentsByGameAlias(string gameAlias)
+    {
+        var comments = await _gameService.GetCommentsByGameAliasAsync(gameAlias);
+
+        return Ok(comments);
+    }
+
+    /// <summary>
+    /// Adds a comment to a game specified by its alias.
+    /// </summary>
+    /// <param name="gameAlias">The alias of the game to which the comment will be added.</param>
+    /// <param name="commentWrapper">The comment to be added.</param>
+    /// <returns>A list of comments for the game including the newly added comment if the operation is successful; otherwise, an error message.</returns>
+    [HttpPost("{gameAlias}/comments")]
+    public async Task<IActionResult> AddComment(string gameAlias, [FromBody] CommentWrapper commentWrapper)
+    {
+        await _gameService.AddCommentAsync(commentWrapper.Comment, gameAlias);
+
+        var comments = await _gameService.GetCommentsByGameAliasAsync(gameAlias);
+
+        return Ok(comments);
     }
 
     /// <summary>

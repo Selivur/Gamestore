@@ -1,6 +1,7 @@
 ﻿using Gamestore.Api.Models.DTO.GameDTO;
 using Gamestore.Api.Models.Wrappers.Game;
 using Gamestore.Api.Services;
+using Gamestore.Api.Services.Interfaces;
 using Gamestore.Database.Repositories.Interfaces;
 using Moq;
 
@@ -12,6 +13,7 @@ namespace Gamestore.Tests.Api.Services;
 public class GameServiceTests
 {
     private readonly Mock<IGameRepository> _mockRepository;
+    private readonly Mock<ICommentService> _mockCommentService;
     private readonly GameService _gameService;
 
     /// <summary>
@@ -20,7 +22,8 @@ public class GameServiceTests
     public GameServiceTests()
     {
         _mockRepository = new Mock<IGameRepository>();
-        _gameService = new GameService(_mockRepository.Object);
+        _mockCommentService = new Mock<ICommentService>();
+        _gameService = new GameService(_mockRepository.Object, _mockCommentService.Object);
     }
 
     /// <summary>

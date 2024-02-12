@@ -1,4 +1,5 @@
-﻿using Gamestore.Api.Models.DTO.GameDTO;
+﻿using Gamestore.Api.Models.DTO.CommentDTO;
+using Gamestore.Api.Models.DTO.GameDTO;
 using Gamestore.Api.Models.Wrappers.Game;
 using Gamestore.Database.Entities;
 
@@ -82,4 +83,19 @@ public interface IGameService
     /// </summary>
     /// <returns>Game objects.</returns>
     Task<Game> GetGameByAliasAsync(string gameAlias);
+
+    /// <summary>
+    /// Retrieves all comments associated with a specific game.
+    /// </summary>
+    /// <param name="gameAlias">The alias of the game.</param>
+    /// <returns>A collection of comments associated with the game.</returns>
+    Task<IEnumerable<CommentResponse>> GetCommentsByGameAliasAsync(string gameAlias);
+
+    /// <summary>
+    /// Adds a comment to a game specified by its alias.
+    /// </summary>
+    /// <param name="commentRequest">The comment to be added.</param>
+    /// <param name="gameAlias">The alias of the game to which the comment will be added.</param>
+    /// <exception cref="KeyNotFoundException">Thrown when no game with the specified alias is found.</exception>
+    Task AddCommentAsync(CommentRequest commentRequest, string gameAlias);
 }

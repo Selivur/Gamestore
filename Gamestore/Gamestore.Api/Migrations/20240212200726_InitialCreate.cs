@@ -5,7 +5,7 @@
 namespace Gamestore.Api.Migrations;
 
 /// <inheritdoc />
-public partial class UpdateOrderAndOrderDetails : Migration
+public partial class InitialCreate : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
@@ -76,9 +76,10 @@ public partial class UpdateOrderAndOrderDetails : Migration
             {
                 Id = table.Column<int>(type: "int", nullable: false)
                     .Annotation("SqlServer:Identity", "1, 1"),
-                OrderDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                Price = table.Column<int>(type: "int", nullable: false),
+                OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                 CustomerId = table.Column<int>(type: "int", nullable: false),
+                Status = table.Column<int>(type: "int", nullable: false),
+                PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: true),
             },
             constraints: table =>
             {
@@ -103,16 +104,43 @@ public partial class UpdateOrderAndOrderDetails : Migration
                 UnitInStock = table.Column<int>(type: "int", nullable: false),
                 Discount = table.Column<int>(type: "int", nullable: false),
                 Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                PublishersId = table.Column<int>(type: "int", nullable: true),
+                PublisherId = table.Column<int>(type: "int", nullable: true),
             },
             constraints: table =>
             {
                 table.PrimaryKey("PK_Games", x => x.Id);
                 table.ForeignKey(
-                    name: "FK_Games_Publishers_PublishersId",
-                    column: x => x.PublishersId,
+                    name: "FK_Games_Publishers_PublisherId",
+                    column: x => x.PublisherId,
                     principalTable: "Publishers",
                     principalColumn: "Id");
+            });
+
+        migrationBuilder.CreateTable(
+            name: "Comments",
+            columns: table => new
+            {
+                Id = table.Column<int>(type: "int", nullable: false)
+                    .Annotation("SqlServer:Identity", "1, 1"),
+                Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                Body = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                ParentId = table.Column<int>(type: "int", nullable: true),
+                GameId = table.Column<int>(type: "int", nullable: false),
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("PK_Comments", x => x.Id);
+                table.ForeignKey(
+                    name: "FK_Comments_Comments_ParentId",
+                    column: x => x.ParentId,
+                    principalTable: "Comments",
+                    principalColumn: "Id");
+                table.ForeignKey(
+                    name: "FK_Comments_Games_GameId",
+                    column: x => x.GameId,
+                    principalTable: "Games",
+                    principalColumn: "Id",
+                    onDelete: ReferentialAction.Cascade);
             });
 
         migrationBuilder.CreateTable(
@@ -120,11 +148,11 @@ public partial class UpdateOrderAndOrderDetails : Migration
             columns: table => new
             {
                 GamesId = table.Column<int>(type: "int", nullable: false),
-                GenreId = table.Column<int>(type: "int", nullable: false),
+                GenresId = table.Column<int>(type: "int", nullable: false),
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_GameGenre", x => new { x.GamesId, x.GenreId });
+                table.PrimaryKey("PK_GameGenre", x => new { x.GamesId, x.GenresId });
                 table.ForeignKey(
                     name: "FK_GameGenre_Games_GamesId",
                     column: x => x.GamesId,
@@ -132,8 +160,8 @@ public partial class UpdateOrderAndOrderDetails : Migration
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
                 table.ForeignKey(
-                    name: "FK_GameGenre_Genres_GenreId",
-                    column: x => x.GenreId,
+                    name: "FK_GameGenre_Genres_GenresId",
+                    column: x => x.GenresId,
                     principalTable: "Genres",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
@@ -192,9 +220,19 @@ public partial class UpdateOrderAndOrderDetails : Migration
             });
 
         migrationBuilder.CreateIndex(
-            name: "IX_GameGenre_GenreId",
+            name: "IX_Comments_GameId",
+            table: "Comments",
+            column: "GameId");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_Comments_ParentId",
+            table: "Comments",
+            column: "ParentId");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_GameGenre_GenresId",
             table: "GameGenre",
-            column: "GenreId");
+            column: "GenresId");
 
         migrationBuilder.CreateIndex(
             name: "IX_GamePlatform_PlatformsId",
@@ -208,9 +246,9 @@ public partial class UpdateOrderAndOrderDetails : Migration
             unique: true);
 
         migrationBuilder.CreateIndex(
-            name: "IX_Games_PublishersId",
+            name: "IX_Games_PublisherId",
             table: "Games",
-            column: "PublishersId");
+            column: "PublisherId");
 
         migrationBuilder.CreateIndex(
             name: "IX_Genres_Name",
@@ -254,6 +292,9 @@ public partial class UpdateOrderAndOrderDetails : Migration
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
+        migrationBuilder.DropTable(
+            name: "Comments");
+
         migrationBuilder.DropTable(
             name: "GameGenre");
 

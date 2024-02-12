@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using Gamestore.Api.Models.DTO.CommentDTO;
 using Gamestore.Api.Models.DTO.GameDTO;
 using Gamestore.Api.Models.Wrappers.Game;
 using Gamestore.Api.Services.Interfaces;
@@ -14,14 +15,17 @@ namespace Gamestore.Api.Services;
 public class GameService : IGameService
 {
     private readonly IGameRepository _gameRepository;
+    private readonly ICommentService _commentService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GameService"/> class.
     /// </summary>
     /// <param name="repository">The game repository providing data access for the service.</param>
-    public GameService(IGameRepository repository)
+    /// <param name="commentService">The comment service providing comment related operations for the service.</param>
+    public GameService(IGameRepository repository, ICommentService commentService)
     {
         _gameRepository = repository;
+        _commentService = commentService;
     }
 
     /// <inheritdoc/>
@@ -165,6 +169,26 @@ public class GameService : IGameService
         var gameResponses = games.Select(GameResponse.FromGame).ToList();
 
         return gameResponses;
+    }
+
+    /// <inheritdoc/>
+    public async Task AddCommentAsync(CommentRequest commentRequest, string gameAlias)
+    {
+        var game = await _gameRepository.GetByAliasAsync(gameAlias)
+                   ?? throw new KeyNotFoundException("Game not found");
+
+        await _commentService.AddCommentAsync(commentRequest, game);
+    }
+
+    /// <inheritdoc/>
+    public async Task<IEnumerable<CommentResponse>> GetCommentsByGameAliasAsync(string gameAlias)
+    {
+        var game = await _gameRepository.GetByAliasAsync(gameAlias)
+                   ?? throw new KeyNotFoundException("Game not found");
+
+        var comments = await _commentService.GetCommentsByGameIdAsync(game.Id);
+
+        return comments;
     }
 
     private static string NormalizeGameAlias(string name)

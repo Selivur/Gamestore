@@ -27,12 +27,12 @@ namespace Gamestore.Api.Migrations
                     b.Property<int>("GamesId")
                         .HasColumnType("int");
 
-                    b.Property<int>("GenreId")
+                    b.Property<int>("GenresId")
                         .HasColumnType("int");
 
-                    b.HasKey("GamesId", "GenreId");
+                    b.HasKey("GamesId", "GenresId");
 
-                    b.HasIndex("GenreId");
+                    b.HasIndex("GenresId");
 
                     b.ToTable("GameGenre");
                 });
@@ -50,6 +50,37 @@ namespace Gamestore.Api.Migrations
                     b.HasIndex("PlatformsId");
 
                     b.ToTable("GamePlatform");
+                });
+
+            modelBuilder.Entity("Gamestore.Database.Entities.Comment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("GameId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ParentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameId");
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("Gamestore.Database.Entities.Customer", b =>
@@ -94,7 +125,7 @@ namespace Gamestore.Api.Migrations
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PublishersId")
+                    b.Property<int?>("PublisherId")
                         .HasColumnType("int");
 
                     b.Property<int>("UnitInStock")
@@ -105,7 +136,7 @@ namespace Gamestore.Api.Migrations
                     b.HasIndex("GameAlias")
                         .IsUnique();
 
-                    b.HasIndex("PublishersId");
+                    b.HasIndex("PublisherId");
 
                     b.ToTable("Games");
                 });
@@ -146,14 +177,11 @@ namespace Gamestore.Api.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("OrderDate")
+                    b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("PaymentDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -255,7 +283,7 @@ namespace Gamestore.Api.Migrations
 
                     b.HasOne("Gamestore.Database.Entities.Genre", null)
                         .WithMany()
-                        .HasForeignKey("GenreId")
+                        .HasForeignKey("GenresId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -275,13 +303,30 @@ namespace Gamestore.Api.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Gamestore.Database.Entities.Comment", b =>
+                {
+                    b.HasOne("Gamestore.Database.Entities.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Gamestore.Database.Entities.Comment", "ParentComment")
+                        .WithMany("ChildComments")
+                        .HasForeignKey("ParentId");
+
+                    b.Navigation("Game");
+
+                    b.Navigation("ParentComment");
+                });
+
             modelBuilder.Entity("Gamestore.Database.Entities.Game", b =>
                 {
-                    b.HasOne("Gamestore.Database.Entities.Publisher", "Publishers")
+                    b.HasOne("Gamestore.Database.Entities.Publisher", "Publisher")
                         .WithMany("Games")
-                        .HasForeignKey("PublishersId");
+                        .HasForeignKey("PublisherId");
 
-                    b.Navigation("Publishers");
+                    b.Navigation("Publisher");
                 });
 
             modelBuilder.Entity("Gamestore.Database.Entities.Genre", b =>
@@ -317,6 +362,11 @@ namespace Gamestore.Api.Migrations
                         .HasForeignKey("OrderId");
 
                     b.Navigation("Game");
+                });
+
+            modelBuilder.Entity("Gamestore.Database.Entities.Comment", b =>
+                {
+                    b.Navigation("ChildComments");
                 });
 
             modelBuilder.Entity("Gamestore.Database.Entities.Order", b =>
