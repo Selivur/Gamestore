@@ -51,4 +51,9 @@ public class GamestoreContext : DbContext
     /// Gets or sets the DbSet for customers in the database.
     /// </summary>
     public DbSet<Customer> Customers { get; set; }
+
+    /// <summary>
+    /// Gets or sets the DbSet for comments in the database.
+    /// </summary>
+    public DbSet<Comment> Comments { get; set; }
 }
