@@ -202,6 +202,20 @@ public class GameController : ControllerBase
     }
 
     /// <summary>
+    /// Deletes a comment specified by its ID and Game Alias.
+    /// </summary>
+    /// <returns>A message indicating the result of the operation.</returns>
+    [HttpDelete("{gameAlias}/deleteComment/{commentId}")]
+    public async Task<IActionResult> DeleteComment(int commentId, string gameAlias)
+    {
+        await _gameService.DeleteComment(commentId);
+
+        var comments = await _gameService.GetCommentsByGameAliasAsync(gameAlias);
+
+        return Ok(comments);
+    }
+
+    /// <summary>
     /// Generates the content for a game file.
     /// </summary>
     /// <param name="game">The game object to generate the content for.</param>

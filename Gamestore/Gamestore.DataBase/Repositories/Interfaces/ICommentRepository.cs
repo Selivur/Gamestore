@@ -39,4 +39,11 @@ public interface ICommentRepository
     /// <param name="gameId">The ID of the comments to retrieve.</param>
     /// <returns>A collection of comments associated with the game.</returns>
     Task<IEnumerable<Comment>> GetAllByGameIdAsync(int gameId);
+
+    /// <summary>
+    /// Gets a comment by its ID, including its child comments.
+    /// </summary>
+    /// <param name="id">The ID of the comment.</param>
+    /// <returns>The comment with the specified ID, or null if no such comment exists.</returns>
+    Task<Comment?> GetByIdWithChildrenAsync(int id);
 }

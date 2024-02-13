@@ -63,6 +63,14 @@ public class CommentRepository : ICommentRepository
         await SaveChangesAsync("Error when updating the comment in the database.");
     }
 
+    /// <inheritdoc />
+    public async Task<Comment?> GetByIdWithChildrenAsync(int id)
+    {
+        return await _context.Comments
+            .Include(c => c.ChildComments)
+            .FirstOrDefaultAsync(c => c.Id == id);
+    }
+
     /// <summary>
     /// Asynchronously saves changes to the database context and throws a <see cref="DbUpdateException"/>
     /// with the specified error message if no changes were saved.

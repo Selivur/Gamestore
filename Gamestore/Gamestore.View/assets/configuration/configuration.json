@@ -45,7 +45,7 @@
   
   "addCommentApiUrl": "/games/{key}/comments",
   "commentsByGameApiUrl": "/games/{key}/comments",
-  "deleteCommentApiUrl": "/games/deleteCommentApiUrl/{key}",
+  "deleteCommentApiUrl": "/games/{key}/deleteComment/{id}",
   "getBanDurationsApiUrl": "/games/getBanDurationsApiUrl/{key}",
   "banUserApiUrl": "/games/banUserApiUrl/{key}"
 }

@@ -46,7 +46,7 @@ public class Comment
     /// <summary>
     /// Gets or sets the сhild comments of this comment.
     /// </summary>
-    public ICollection<Comment> ChildComments { get; set; }
+    public ICollection<Comment>? ChildComments { get; set; }
 
     /// <summary>
     /// Gets or sets the game associated with the comment.

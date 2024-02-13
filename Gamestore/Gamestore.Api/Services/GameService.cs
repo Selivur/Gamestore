@@ -192,6 +192,12 @@ public class GameService : IGameService
         return comments;
     }
 
+    /// <inheritdoc/>
+    public async Task DeleteComment(int commentId)
+    {
+        await _commentService.RemoveCommentAsync(commentId);
+    }
+
     private static string NormalizeGameAlias(string name)
     {
         return name.Replace(" ", "-").ToLower(CultureInfo.InvariantCulture);

@@ -2,6 +2,7 @@
 using Gamestore.Api.Models.Wrappers.Comment;
 using Gamestore.Api.Services.Interfaces;
 using Gamestore.Database.Entities;
+using Gamestore.Database.Entities.Enums;
 using Gamestore.Database.Repositories.Interfaces;
 
 namespace Gamestore.Api.Services;
@@ -22,12 +23,15 @@ public class CommentService : ICommentService
     /// <inheritdoc/>
     public async Task AddCommentAsync(CommentWrapper commentWrapper, Game game)
     {
+        CommentStatus? status = DetermineCommentStatus(commentWrapper.Action);
+
         Comment comment = new()
         {
             Name = commentWrapper.Comment.Name,
             Body = commentWrapper.Comment.Body,
             Game = game,
             ParentId = commentWrapper.ParentId,
+            Status = status,
         };
 
         await _commentRepository.AddAsync(comment);
@@ -47,9 +51,22 @@ public class CommentService : ICommentService
     }
 
     /// <inheritdoc/>
-    public Task RemoveCommentAsync(int id)
+    public async Task RemoveCommentAsync(int id)
     {
-        throw new NotImplementedException();
+        // TODO add check comment owner
+        var comment = await _commentRepository.GetByIdWithChildrenAsync(id);
+
+        comment.Body = "A comment/quote was deleted";
+
+        if (comment.ChildComments != null)
+        {
+            foreach (var childComment in comment.ChildComments.Where(c => c.Status == CommentStatus.Quote))
+            {
+                childComment.Body = "A comment/quote was deleted";
+            }
+        }
+
+        await _commentRepository.UpdateAsync(comment);
     }
 
     /// <inheritdoc/>
@@ -60,5 +77,19 @@ public class CommentService : ICommentService
         var commentResponses = comments.Where(c => c.ParentId == null).Select(CommentResponse.FromComment).ToList();
 
         return commentResponses;
+    }
+
+    private static CommentStatus? DetermineCommentStatus(string action)
+    {
+        if (action == "Quote")
+        {
+            return CommentStatus.Quote;
+        }
+        else if (action == "Reply")
+        {
+            return CommentStatus.Reply;
+        }
+
+        return null;
     }
 }

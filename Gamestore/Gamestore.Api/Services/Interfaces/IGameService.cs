@@ -99,4 +99,11 @@ public interface IGameService
     /// <param name="gameAlias">The alias of the game to which the comment will be added.</param>
     /// <exception cref="KeyNotFoundException">Thrown when no game with the specified alias is found.</exception>
     Task AddCommentAsync(CommentWrapper commentWrapper, string gameAlias);
+
+    /// <summary>
+    /// Deletes a comment specified by its ID.
+    /// </summary>
+    /// <param name="commentId">The ID of the comment to be deleted.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    Task DeleteComment(int commentId);
 }
