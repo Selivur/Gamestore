@@ -1,4 +1,5 @@
 ﻿using Gamestore.Api.Models.DTO.CommentDTO;
+using Gamestore.Api.Models.Wrappers.Comment;
 using Gamestore.Database.Entities;
 
 namespace Gamestore.Api.Services.Interfaces;
@@ -8,9 +9,9 @@ public interface ICommentService
     /// <summary>
     /// Adds a new comment.
     /// </summary>
-    /// <param name="commentRequest">The comment to add.</param>
+    /// <param name="commentWrapper">The comment to add.</param>
     /// <param name="game">The game to which the comment will be added.</param>
-    Task AddCommentAsync(CommentRequest commentRequest, Game game);
+    Task AddCommentAsync(CommentWrapper commentWrapper, Game game);
 
     /// <summary>
     /// Retrieves a comment by its ID.
@@ -34,7 +35,7 @@ public interface ICommentService
     /// <summary>
     /// Retrieves all comments associated with a specific game.
     /// </summary>
-    /// <param name="id">The ID of game.</param>
+    /// <param name="gameId">The ID of game.</param>
     /// <returns>A collection of comments associated with the game.</returns>
-    Task<IEnumerable<CommentResponse>> GetCommentsByGameIdAsync(int id);
+    Task<IEnumerable<CommentResponse>> GetCommentsByGameIdAsync(int gameId);
 }

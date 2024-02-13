@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using Gamestore.Api.Models.DTO.CommentDTO;
 using Gamestore.Api.Models.DTO.GameDTO;
+using Gamestore.Api.Models.Wrappers.Comment;
 using Gamestore.Api.Models.Wrappers.Game;
 using Gamestore.Api.Services.Interfaces;
 using Gamestore.Database.Entities;
@@ -172,12 +173,12 @@ public class GameService : IGameService
     }
 
     /// <inheritdoc/>
-    public async Task AddCommentAsync(CommentRequest commentRequest, string gameAlias)
+    public async Task AddCommentAsync(CommentWrapper commentWrapper, string gameAlias)
     {
         var game = await _gameRepository.GetByAliasAsync(gameAlias)
                    ?? throw new KeyNotFoundException("Game not found");
 
-        await _commentService.AddCommentAsync(commentRequest, game);
+        await _commentService.AddCommentAsync(commentWrapper, game);
     }
 
     /// <inheritdoc/>

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Gamestore.Database.Entities.Enums;
 
 namespace Gamestore.Database.Entities;
 
@@ -24,6 +25,12 @@ public class Comment
     /// Gets or sets the body of the comment.
     /// </summary>
     public string Body { get; set; }
+
+    /// <summary>
+    /// Gets or sets the status of the comment.
+    /// This is null if the status is not specified.
+    /// </summary>
+    public CommentStatus? Status { get; set; }
 
     /// <summary>
     /// Gets or sets the optional parent comment identifier.

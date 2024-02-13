@@ -36,7 +36,7 @@ public interface ICommentRepository
     /// <summary>
     /// Retrieves all comments associated with a specific game from the database.
     /// </summary>
-    /// <param name="id">The ID of the comments to retrieve.</param>
+    /// <param name="gameId">The ID of the comments to retrieve.</param>
     /// <returns>A collection of comments associated with the game.</returns>
-    Task<IEnumerable<Comment>> GetAllByGameIdAsync(int id);
+    Task<IEnumerable<Comment>> GetAllByGameIdAsync(int gameId);
 }

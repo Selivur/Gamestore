@@ -16,5 +16,11 @@ public class CommentWrapper
     /// Gets or sets the ID of the parent comment.
     /// This is null if the comment is not a reply to another comment.
     /// </summary>
-    public string ParentId { get; set; }
+    public int? ParentId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the action to be performed on the comment.
+    /// This could be "reply", "quote", etc.
+    /// </summary>
+    public string Action { get; set; }
 }

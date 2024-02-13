@@ -29,12 +29,10 @@ public class CommentRepository : ICommentRepository
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<Comment>> GetAllByGameIdAsync(int id)
+    public async Task<IEnumerable<Comment>> GetAllByGameIdAsync(int gameId)
     {
         return await _context.Comments
-            .Where(comment => comment.Game.Id == id && comment.ParentId == null)
-            .Include(comment => comment.ChildComments)
-                .ThenInclude(childComment => childComment.ChildComments)
+            .Where(comment => comment.Game.Id == gameId)
             .ToListAsync();
     }
 

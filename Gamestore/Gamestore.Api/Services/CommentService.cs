@@ -1,4 +1,5 @@
 ﻿using Gamestore.Api.Models.DTO.CommentDTO;
+using Gamestore.Api.Models.Wrappers.Comment;
 using Gamestore.Api.Services.Interfaces;
 using Gamestore.Database.Entities;
 using Gamestore.Database.Repositories.Interfaces;
@@ -19,15 +20,14 @@ public class CommentService : ICommentService
     }
 
     /// <inheritdoc/>
-    public async Task AddCommentAsync(CommentRequest commentRequest, Game game)
+    public async Task AddCommentAsync(CommentWrapper commentWrapper, Game game)
     {
-        // TODO add check ref comment id != id
-        // TODO add reply(external method)
         Comment comment = new()
         {
-            Name = commentRequest.Name,
-            Body = commentRequest.Body,
+            Name = commentWrapper.Comment.Name,
+            Body = commentWrapper.Comment.Body,
             Game = game,
+            ParentId = commentWrapper.ParentId,
         };
 
         await _commentRepository.AddAsync(comment);
@@ -42,7 +42,7 @@ public class CommentService : ICommentService
     /// <inheritdoc/>
     public Task UpdateCommentAsync(CommentRequest commentRequest)
     {
-        // TODO add check ref comment id != id
+        // TODO add check ref comment gameId != gameId
         throw new NotImplementedException();
     }
 
@@ -53,11 +53,11 @@ public class CommentService : ICommentService
     }
 
     /// <inheritdoc/>
-    public async Task<IEnumerable<CommentResponse>> GetCommentsByGameIdAsync(int id)
+    public async Task<IEnumerable<CommentResponse>> GetCommentsByGameIdAsync(int gameId)
     {
-        var comments = await _commentRepository.GetAllByGameIdAsync(id);
+        var comments = await _commentRepository.GetAllByGameIdAsync(gameId);
 
-        var commentResponses = comments.Select(CommentResponse.FromComment).ToList();
+        var commentResponses = comments.Where(c => c.ParentId == null).Select(CommentResponse.FromComment).ToList();
 
         return commentResponses;
     }

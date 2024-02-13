@@ -194,7 +194,7 @@ public class GameController : ControllerBase
     [HttpPost("{gameAlias}/comments")]
     public async Task<IActionResult> AddComment(string gameAlias, [FromBody] CommentWrapper commentWrapper)
     {
-        await _gameService.AddCommentAsync(commentWrapper.Comment, gameAlias);
+        await _gameService.AddCommentAsync(commentWrapper, gameAlias);
 
         var comments = await _gameService.GetCommentsByGameAliasAsync(gameAlias);
 

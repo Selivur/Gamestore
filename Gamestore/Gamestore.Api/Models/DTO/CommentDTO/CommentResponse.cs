@@ -8,6 +8,11 @@ namespace Gamestore.Api.Models.DTO.CommentDTO;
 public class CommentResponse
 {
     /// <summary>
+    /// Gets or sets the unique identifier for the comment.
+    /// </summary>
+    public int Id { get; set; }
+
+    /// <summary>
     /// Gets or sets the name of the author of the comment.
     /// </summary>
     public string Name { get; set; }
@@ -32,6 +37,7 @@ public class CommentResponse
     {
         return new CommentResponse
         {
+            Id = comment.Id,
             Name = comment.Name,
             Body = comment.Body,
             ChildComments = comment.ChildComments?.Select(FromComment).ToList(),
