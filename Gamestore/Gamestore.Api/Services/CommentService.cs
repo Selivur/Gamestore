@@ -25,10 +25,12 @@ public class CommentService : ICommentService
     {
         CommentStatus? status = DetermineCommentStatus(commentWrapper.Action);
 
+        string body = await FormatCommentBodyAsync(commentWrapper.ParentId, commentWrapper.Comment.Body, status);
+
         Comment comment = new()
         {
             Name = commentWrapper.Comment.Name,
-            Body = commentWrapper.Comment.Body,
+            Body = body,
             Game = game,
             ParentId = commentWrapper.ParentId,
             Status = status,
@@ -79,17 +81,30 @@ public class CommentService : ICommentService
         return commentResponses;
     }
 
-    private static CommentStatus? DetermineCommentStatus(string action)
+    private async Task<string> FormatCommentBodyAsync(int? parentId, string body, CommentStatus? status)
     {
-        if (action == "Quote")
+        if (parentId == null || status == null)
         {
-            return CommentStatus.Quote;
-        }
-        else if (action == "Reply")
-        {
-            return CommentStatus.Reply;
+            return body;
         }
 
-        return null;
+        var parentComment = await _commentRepository.GetByIdAsync(parentId.Value);
+
+        return status switch
+        {
+            CommentStatus.Quote => $"<i>{parentComment.Body}</i><br/>{body}",
+            CommentStatus.Reply => $"[{parentComment.Name}], {body}",
+            _ => throw new ArgumentException($"Invalid comment status: {status}"),
+        };
+    }
+
+    private static CommentStatus? DetermineCommentStatus(string action)
+    {
+        return action switch
+        {
+            "Quote" => CommentStatus.Quote,
+            "Reply" => CommentStatus.Reply,
+            _ => null,
+        };
     }
 }
