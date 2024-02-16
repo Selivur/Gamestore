@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Gamestore.Api.Models.DTO;
 using Gamestore.Api.Models.DTO.CommentDTO;
 using Gamestore.Api.Models.DTO.GameDTO;
 using Gamestore.Api.Models.Wrappers.Comment;
@@ -213,6 +214,30 @@ public class GameController : ControllerBase
         var comments = await _gameService.GetCommentsByGameAliasAsync(gameAlias);
 
         return Ok(comments);
+    }
+
+    /// <summary>
+    /// Gets the possible durations for a ban.
+    /// </summary>
+    /// <returns>An IActionResult that represents the result of the action.</returns>
+    [HttpGet("getBanDurations")]
+    public async Task<IActionResult> GetBanDurations()
+    {
+        var banDurationsOptions = await _gameService.GetBanDurationsAsync();
+
+        return Ok(banDurationsOptions);
+    }
+
+    /// <summary>
+    /// Bans a user.
+    /// </summary>
+    /// <param name="request">The ban request.</param>
+    /// <returns>An IActionResult that represents the result of the action.</returns>
+    [HttpPost("banUser")]
+    public async Task<IActionResult> BanUser([FromBody] BanRequest request)
+    {
+        await _gameService.BanUserAsync(request.User, request.Duration);
+        return Ok();
     }
 
     /// <summary>

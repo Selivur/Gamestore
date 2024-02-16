@@ -106,4 +106,17 @@ public interface IGameService
     /// <param name="commentId">The ID of the comment to be deleted.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     Task DeleteComment(int commentId);
+
+    /// <summary>
+    /// Returns the possible durations for a ban.
+    /// </summary>
+    /// <returns>An array of strings representing the possible ban durations.</returns>
+    public Task<string[]> GetBanDurationsAsync();
+
+    /// <summary>
+    /// Bans a user.
+    /// </summary>
+    /// <param name="userName">The name of the user to ban.</param>
+    /// <param name="banDuration">The duration of the ban.</param>
+    Task BanUserAsync(string userName, string banDuration);
 }

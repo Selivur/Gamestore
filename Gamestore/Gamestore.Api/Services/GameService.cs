@@ -17,16 +17,19 @@ public class GameService : IGameService
 {
     private readonly IGameRepository _gameRepository;
     private readonly ICommentService _commentService;
+    private readonly IUserService _userService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GameService"/> class.
     /// </summary>
     /// <param name="repository">The game repository providing data access for the service.</param>
     /// <param name="commentService">The comment service providing comment related operations for the service.</param>
-    public GameService(IGameRepository repository, ICommentService commentService)
+    public GameService(IGameRepository repository, ICommentService commentService, IUserService userService)
     {
         _gameRepository = repository;
         _commentService = commentService;
+        _userService = userService;
+        _userService = userService;
     }
 
     /// <inheritdoc/>
@@ -196,6 +199,21 @@ public class GameService : IGameService
     public async Task DeleteComment(int commentId)
     {
         await _commentService.RemoveCommentAsync(commentId);
+    }
+
+    /// <summary>
+    /// Returns the possible durations for a ban.
+    /// </summary>
+    /// <returns>An array of strings representing the possible ban durations.</returns>
+    public Task<string[]> GetBanDurationsAsync()
+    {
+        return _userService.GetBanDurationsAsync();
+    }
+
+    /// <inheritdoc/>
+    public Task BanUserAsync(string userName, string banDuration)
+    {
+        return _userService.BanUserAsync(userName, banDuration);
     }
 
     private static string NormalizeGameAlias(string name)
