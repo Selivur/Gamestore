@@ -29,7 +29,6 @@ public class GameService : IGameService
         _gameRepository = repository;
         _commentService = commentService;
         _userService = userService;
-        _userService = userService;
     }
 
     /// <inheritdoc/>

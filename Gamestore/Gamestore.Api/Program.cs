@@ -52,7 +52,7 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add<GlobalExceptionHandler>();
     options.Filters.Add<LoggingActionFilter>();
-});
+}).AddNewtonsoftJson();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

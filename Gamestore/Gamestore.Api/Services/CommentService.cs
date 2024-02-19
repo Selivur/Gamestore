@@ -93,7 +93,7 @@ public class CommentService : ICommentService
         return status switch
         {
             CommentStatus.Quote => $"<i>{parentComment.Body}</i><br/>{body}",
-            CommentStatus.Reply => $"[{parentComment.Name}], {body}",
+            CommentStatus.Reply => $"[<a href='/game/GameAlias1#comment{parentComment.Id}'>{parentComment.Name}</a>], {body}",
             _ => throw new ArgumentException($"Invalid comment status: {status}"),
         };
     }

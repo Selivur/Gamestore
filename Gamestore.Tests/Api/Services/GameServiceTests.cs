@@ -14,6 +14,7 @@ public class GameServiceTests
 {
     private readonly Mock<IGameRepository> _mockRepository;
     private readonly Mock<ICommentService> _mockCommentService;
+    private readonly Mock<IUserService> _mockUserService;
     private readonly GameService _gameService;
 
     /// <summary>
@@ -23,7 +24,8 @@ public class GameServiceTests
     {
         _mockRepository = new Mock<IGameRepository>();
         _mockCommentService = new Mock<ICommentService>();
-        _gameService = new GameService(_mockRepository.Object, _mockCommentService.Object);
+        _mockUserService = new Mock<IUserService>();
+        _gameService = new GameService(_mockRepository.Object, _mockCommentService.Object, _mockUserService.Object);
     }
 
     /// <summary>
