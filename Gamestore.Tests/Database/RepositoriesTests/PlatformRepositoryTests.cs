@@ -21,18 +21,7 @@ public class PlatformRepositoryTests : IDisposable
         _context = new GamestoreContext(_options);
         _repository = new PlatformRepository(_context);
 
-        SeedDataAsync().GetAwaiter().GetResult();
-    }
-
-    /// <summary>
-    /// Cleans up the resources after each test by deleting the database.
-    /// </summary>
-    public void Dispose()
-    {
-        using var context = new GamestoreContext(_options);
-        context.Database.EnsureDeleted();
-
-        GC.SuppressFinalize(this);
+        InitializeTestData();
     }
 
     /// <summary>
@@ -243,12 +232,26 @@ public class PlatformRepositoryTests : IDisposable
         await Assert.ThrowsAsync<ArgumentException>(async () => await _repository.GetByGameAliasAsync("NonExistentAlias"));
     }
 
-    private async Task SeedDataAsync()
+    /// <summary>
+    /// Cleans up the resources after each test by deleting the database.
+    /// </summary>
+    public void Dispose()
     {
-        _context.Platforms.AddRange(
+        _context.Database.EnsureDeleted();
+        _context.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    private void InitializeTestData()
+    {
+        var platforms = new List<Platform>
+        {
             new() { Id = 1, Type = "PC" },
             new() { Id = 2, Type = "PlayStation" },
-            new() { Id = 3, Type = "Xbox" });
-        await _context.SaveChangesAsync();
+            new() { Id = 3, Type = "Xbox" },
+        };
+
+        _context.Platforms.AddRange(platforms);
+        _context.SaveChanges();
     }
 }

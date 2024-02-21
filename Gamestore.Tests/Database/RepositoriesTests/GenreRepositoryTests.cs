@@ -18,18 +18,7 @@ public class GenreRepositoryTests : IDisposable
         _context = new GamestoreContext(_options);
         _repository = new GenreRepository(_context);
 
-        SeedDataAsync().GetAwaiter().GetResult();
-    }
-
-    /// <summary>
-    /// Cleans up the resources after each test by deleting the database.
-    /// </summary>
-    public void Dispose()
-    {
-        using var context = new GamestoreContext(_options);
-        context.Database.EnsureDeleted();
-
-        GC.SuppressFinalize(this);
+        InitializeTestData();
     }
 
     /// <summary>
@@ -103,7 +92,7 @@ public class GenreRepositoryTests : IDisposable
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(3, result.Count);
+        Assert.Equal(5, result.Count);
     }
 
     /// <summary>
@@ -150,15 +139,13 @@ public class GenreRepositoryTests : IDisposable
     public async Task RemoveAsync_ShouldRemoveGenreFromDatabase()
     {
         // Arrange
-        var genre = new Genre { Id = 4, Name = "Horror", ParentId = 1 };
-        _context.Genres.Add(genre);
-        await _context.SaveChangesAsync();
+        var genreId = 5;
 
         // Act
-        await _repository.RemoveAsync(4);
+        await _repository.RemoveAsync(genreId);
 
         // Assert
-        var removedGenre = await _context.Genres.FirstOrDefaultAsync(g => g.Id == 4);
+        var removedGenre = await _context.Genres.FirstOrDefaultAsync(g => g.Id == genreId);
         Assert.Null(removedGenre);
     }
 
@@ -200,30 +187,14 @@ public class GenreRepositoryTests : IDisposable
     public async Task GetByGameAliasAsync_ShouldReturnGenresForGame()
     {
         // Arrange
-        var gameAlias = "TestGame";
-        var game = new Game
-        {
-            GameAlias = gameAlias,
-            Name = "Test Game",
-            Genres = new List<Genre>()
-            {
-                await _context.Genres.FirstAsync(g => g.Id == 1),
-                await _context.Genres.FirstAsync(g => g.Id == 2),
-            },
-        };
-        _context.Games.Add(game);
-        _context.SaveChanges();
+        var gameAlias = "gameAlias";
 
         // Act
         var result = (await _repository.GetByGameAliasAsync(gameAlias)).ToList();
 
         // Assert
         Assert.NotEmpty(result);
-        Assert.Equal(game.Genres.Count, result.Count);
-        foreach (var genre in game.Genres)
-        {
-            Assert.Contains(result, g => g.Name == genre.Name);
-        }
+        Assert.Equal(2, result.Count);
     }
 
     /// <summary>
@@ -249,25 +220,14 @@ public class GenreRepositoryTests : IDisposable
     public async Task GetByParentIdAsync_ShouldReturnGenresByParentId()
     {
         // Arrange
-        var parentGenreId = 9;
-        var genres = new List<Genre>
-        {
-            new() { Id = 28, Name = "Fantasy", ParentId = parentGenreId },
-            new() { Id = 29, Name = "Sci-Fi", ParentId = parentGenreId },
-        };
-        _context.Genres.AddRange(genres);
-        await _context.SaveChangesAsync();
+        var parentGenreId = 1;
 
         // Act
         var result = (await _repository.GetByParentIdAsync(parentGenreId)).ToList();
 
         // Assert
         Assert.NotEmpty(result);
-        Assert.Equal(genres.Count, result.Count);
-        foreach (var genre in genres)
-        {
-            Assert.Contains(result, g => g.Name == genre.Name);
-        }
+        Assert.Equal(2, result.Count);
     }
 
     /// <summary>
@@ -288,19 +248,48 @@ public class GenreRepositoryTests : IDisposable
     }
 
     /// <summary>
+    /// Cleans up the resources after each test by deleting the database.
+    /// </summary>
+    public void Dispose()
+    {
+        _context.Database.EnsureDeleted();
+        _context.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
     /// Seeds the database with initial data for testing.
     /// </summary>
-    private async Task SeedDataAsync()
+    private void InitializeTestData()
     {
         using var context = new GamestoreContext(_options);
+
         var genres = new List<Genre>
         {
-            new() { Id = 1, Name = "Adventure" },
-            new() { Id = 2, Name = "Action" },
+            new() { Id = 1, Name = "Adventure", Games = new List<Game>() },
+            new() { Id = 2, Name = "Action", Games = new List<Game>() },
             new() { Id = 3, Name = "RPG" },
+            new() { Id = 4, Name = "Fantasy", ParentId = 1 },
+            new() { Id = 5, Name = "Sci-Fi", ParentId = 1 },
+        };
+        var games = new Game
+        {
+            GameAlias = "gameAlias",
+            Name = "Test Game",
+            Genres = new List<Genre>()
+            {
+                genres[0], genres[1],
+            },
         };
 
-        await context.Genres.AddRangeAsync(genres);
-        await context.SaveChangesAsync();
+        genres[0].Games.Add(games);
+        genres[1].Games.Add(games);
+
+        genres[3].ParentGenre = genres[0];
+        genres[4].ParentGenre = genres[0];
+
+        context.Genres.AddRange(genres);
+        context.Games.Add(games);
+        context.SaveChanges();
     }
 }

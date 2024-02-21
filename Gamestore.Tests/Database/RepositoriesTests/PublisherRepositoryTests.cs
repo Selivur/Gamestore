@@ -172,13 +172,13 @@ public class PublisherRepositoryTests : IDisposable
     /// </summary>
     public void Dispose()
     {
-        Cleanup();
+        _context.Database.EnsureDeleted();
+        _context.Dispose();
         GC.SuppressFinalize(this);
     }
 
     private void InitializeTestData()
     {
-        // Create publisher entities and add to the db context.
         var publishers = new List<Publisher>
         {
             new()
@@ -211,16 +211,6 @@ public class PublisherRepositoryTests : IDisposable
             },
         };
         _context.Publishers.AddRange(publishers);
-
-        _context.SaveChanges();
-    }
-
-    private void Cleanup()
-    {
-        foreach (var entity in _context.Publishers)
-        {
-            _context.Remove(entity);
-        }
 
         _context.SaveChanges();
     }

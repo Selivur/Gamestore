@@ -251,28 +251,9 @@ public class OrderRepositoryTests : IDisposable
     /// </summary>
     public void Dispose()
     {
-        Cleanup();
+        _context.Database.EnsureDeleted();
+        _context.Dispose();
         GC.SuppressFinalize(this);
-    }
-
-    private void Cleanup()
-    {
-        foreach (var entity in _context.Orders)
-        {
-            _context.Remove(entity);
-        }
-
-        foreach (var entity in _context.Customers)
-        {
-            _context.Remove(entity);
-        }
-
-        foreach (var entity in _context.Games)
-        {
-            _context.Remove(entity);
-        }
-
-        _context.SaveChanges();
     }
 
     private void InitializeTestData()
