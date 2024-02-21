@@ -1,6 +1,9 @@
 ﻿using System.Text;
 using Gamestore.Api.Controllers;
+using Gamestore.Api.Models.DTO;
+using Gamestore.Api.Models.DTO.CommentDTO;
 using Gamestore.Api.Models.DTO.GameDTO;
+using Gamestore.Api.Models.Wrappers.Comment;
 using Gamestore.Api.Models.Wrappers.Game;
 using Gamestore.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -289,5 +292,96 @@ public class GameControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result);
         var actualGames = Assert.IsType<List<GameResponse>>(okResult.Value);
         Assert.Equal(expectedGames, actualGames);
+    }
+
+    /// <summary>
+    /// Test to verify that the GetCommentsByGameAlias method of the GameController
+    /// calls the GetCommentsByGameAliasAsync method of the GameService.
+    /// </summary>
+    [Fact]
+    public async Task GetCommentsByGameAlias_ShouldCallGetCommentsByGameAliasAsync()
+    {
+        // Arrange
+        var gameAlias = "ExistingGame";
+
+        // Act
+        await _gameController.GetCommentsByGameAlias(gameAlias);
+
+        // Assert
+        _gameServiceMock.Verify(s => s.GetCommentsByGameAliasAsync(gameAlias), Times.Once);
+    }
+
+    /// <summary>
+    /// Test to verify that the AddComment method of the GameController
+    /// calls the AddCommentAsync and GetCommentsByGameAliasAsync methods of the GameService.
+    /// </summary>
+    [Fact]
+    public async Task AddComment_ShouldCallAddCommentAsyncAndGetCommentsByGameAliasAsync()
+    {
+        // Arrange
+        var gameAlias = "ExistingGame";
+        var commentWrapper = new CommentWrapper
+        {
+            Comment = new CommentRequest { Name = "Test", Body = "Test body" },
+            Action = "Quote",
+            ParentId = 1,
+        };
+
+        // Act
+        await _gameController.AddComment(gameAlias, commentWrapper);
+
+        // Assert
+        _gameServiceMock.Verify(s => s.AddCommentAsync(commentWrapper, gameAlias), Times.Once);
+        _gameServiceMock.Verify(s => s.GetCommentsByGameAliasAsync(gameAlias), Times.Once);
+    }
+
+    /// <summary>
+    /// Test to verify that the DeleteComment method of the GameController
+    /// calls the DeleteComment and GetCommentsByGameAliasAsync methods of the GameService.
+    /// </summary>
+    [Fact]
+    public async Task DeleteComment_ShouldCallDeleteCommentAndGetCommentsByGameAliasAsync()
+    {
+        // Arrange
+        var gameAlias = "ExistingGame";
+        var commentId = 1;
+
+        // Act
+        await _gameController.DeleteComment(commentId, gameAlias);
+
+        // Assert
+        _gameServiceMock.Verify(s => s.DeleteComment(commentId), Times.Once);
+        _gameServiceMock.Verify(s => s.GetCommentsByGameAliasAsync(gameAlias), Times.Once);
+    }
+
+    /// <summary>
+    /// Test to verify that the GetBanDurations method of the GameController
+    /// calls the GetBanDurationsAsync method of the GameService.
+    /// </summary>
+    [Fact]
+    public async Task GetBanDurations_ShouldCallGetBanDurationsAsync()
+    {
+        // Act
+        await _gameController.GetBanDurations();
+
+        // Assert
+        _gameServiceMock.Verify(s => s.GetBanDurationsAsync(), Times.Once);
+    }
+
+    /// <summary>
+    /// Test to verify that the BanUser method of the GameController
+    /// calls the BanUserAsync method of the GameService.
+    /// </summary>
+    [Fact]
+    public async Task BanUser_ShouldCallBanUserAsync()
+    {
+        // Arrange
+        var banRequest = new BanRequest { User = "TestUser", Duration = "1 day" };
+
+        // Act
+        await _gameController.BanUser(banRequest);
+
+        // Assert
+        _gameServiceMock.Verify(s => s.BanUserAsync(banRequest.User, banRequest.Duration), Times.Once);
     }
 }
