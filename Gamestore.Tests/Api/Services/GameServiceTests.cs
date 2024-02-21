@@ -1,4 +1,6 @@
-﻿using Gamestore.Api.Models.DTO.GameDTO;
+﻿using Gamestore.Api.Models.DTO.CommentDTO;
+using Gamestore.Api.Models.DTO.GameDTO;
+using Gamestore.Api.Models.Wrappers.Comment;
 using Gamestore.Api.Models.Wrappers.Game;
 using Gamestore.Api.Services;
 using Gamestore.Api.Services.Interfaces;
@@ -581,5 +583,134 @@ public class GameServiceTests
         Assert.Equal(game.Price, gameResponse.Price);
         Assert.Equal(game.UnitInStock, gameResponse.UnitInStock);
         Assert.Equal(game.Discount, gameResponse.Discount);
+    }
+
+    /// <summary>
+    /// Test to verify that the AddCommentAsync method of the GameService
+    /// throws an exception when the game is not found.
+    /// </summary>
+    [Fact]
+    public async Task AddCommentAsync_ShouldThrowException_WhenGameIsNotFound()
+    {
+        // Arrange
+        var commentWrapper = new CommentWrapper
+        {
+            Comment = new CommentRequest { Name = "Test", Body = "Test body" },
+            Action = "Quote",
+            ParentId = 1,
+        };
+        var gameAlias = "NonExistingGame";
+        _mockRepository.Setup(r => r.GetByAliasAsync(gameAlias)).ReturnsAsync((Game)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _gameService.AddCommentAsync(commentWrapper, gameAlias));
+    }
+
+    /// <summary>
+    /// Test to verify that the GetCommentsByGameAliasAsync method of the GameService
+    /// throws an exception when the game is not found.
+    /// </summary>
+    [Fact]
+    public async Task GetCommentsByGameAliasAsync_ShouldThrowException_WhenGameIsNotFound()
+    {
+        // Arrange
+        var gameAlias = "NonExistingGame";
+        _mockRepository.Setup(r => r.GetByAliasAsync(gameAlias)).ReturnsAsync((Game)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _gameService.GetCommentsByGameAliasAsync(gameAlias));
+    }
+
+    /// <summary>
+    /// Test to verify that the DeleteComment method of the GameService
+    /// calls the RemoveCommentAsync method of the CommentService.
+    /// </summary>
+    [Fact]
+    public async Task DeleteComment_ShouldCallRemoveCommentAsync()
+    {
+        // Arrange
+        var commentId = 1;
+
+        // Act
+        await _gameService.DeleteComment(commentId);
+
+        // Assert
+        _mockCommentService.Verify(s => s.RemoveCommentAsync(commentId), Times.Once);
+    }
+
+    /// <summary>
+    /// Test to verify that the GetBanDurationsAsync method of the GameService
+    /// calls the GetBanDurationsAsync method of the UserService.
+    /// </summary>
+    [Fact]
+    public async Task GetBanDurationsAsync_ShouldCallGetBanDurationsAsync()
+    {
+        // Act
+        await _gameService.GetBanDurationsAsync();
+
+        // Assert
+        _mockUserService.Verify(s => s.GetBanDurationsAsync(), Times.Once);
+    }
+
+    /// <summary>
+    /// Test to verify that the BanUserAsync method of the GameService
+    /// calls the BanUserAsync method of the UserService.
+    /// </summary>
+    [Fact]
+    public async Task BanUserAsync_ShouldCallBanUserAsync()
+    {
+        // Arrange
+        var userName = "TestUser";
+        var banDuration = "1 day";
+
+        // Act
+        await _gameService.BanUserAsync(userName, banDuration);
+
+        // Assert
+        _mockUserService.Verify(s => s.BanUserAsync(userName, banDuration), Times.Once);
+    }
+
+    /// <summary>
+    /// Test to verify that the AddCommentAsync method of the GameService
+    /// calls the AddCommentAsync method of the CommentService when the game is found.
+    /// </summary>
+    [Fact]
+    public async Task AddCommentAsync_ShouldCallAddCommentAsync_WhenGameIsFound()
+    {
+        // Arrange
+        var commentWrapper = new CommentWrapper
+        {
+            Comment = new CommentRequest { Name = "Test", Body = "Test body" },
+            Action = "Quote",
+            ParentId = 1,
+        };
+        var gameAlias = "ExistingGame";
+        var game = new Game { GameAlias = gameAlias, Name = "Test Game" };
+        _mockRepository.Setup(r => r.GetByAliasAsync(gameAlias)).ReturnsAsync(game);
+
+        // Act
+        await _gameService.AddCommentAsync(commentWrapper, gameAlias);
+
+        // Assert
+        _mockCommentService.Verify(s => s.AddCommentAsync(commentWrapper, game), Times.Once);
+    }
+
+    /// <summary>
+    /// Test to verify that the GetCommentsByGameAliasAsync method of the GameService
+    /// calls the GetCommentsByGameIdAsync method of the CommentService when the game is found.
+    /// </summary>
+    [Fact]
+    public async Task GetCommentsByGameAliasAsync_ShouldCallGetCommentsByGameIdAsync_WhenGameIsFound()
+    {
+        // Arrange
+        var gameAlias = "ExistingGame";
+        var game = new Game { GameAlias = gameAlias, Name = "Test Game" };
+        _mockRepository.Setup(r => r.GetByAliasAsync(gameAlias)).ReturnsAsync(game);
+
+        // Act
+        await _gameService.GetCommentsByGameAliasAsync(gameAlias);
+
+        // Assert
+        _mockCommentService.Verify(s => s.GetCommentsByGameIdAsync(game.Id), Times.Once);
     }
 }
