@@ -14,19 +14,6 @@ public interface ICommentService
     Task AddCommentAsync(CommentWrapper commentWrapper, Game game);
 
     /// <summary>
-    /// Retrieves a comment by its ID.
-    /// </summary>
-    /// <param name="id">The ID of the comment to retrieve.</param>
-    /// <returns>The retrieved comment.</returns>
-    Task<CommentResponse?> GetCommentByIdAsync(int id);
-
-    /// <summary>
-    /// Updates an existing comment.
-    /// </summary>
-    /// <param name="commentRequest">The comment to update.</param>
-    Task UpdateCommentAsync(CommentRequest commentRequest);
-
-    /// <summary>
     /// Removes a comment by its ID.
     /// </summary>
     /// <param name="id">The ID of the comment to remove.</param>

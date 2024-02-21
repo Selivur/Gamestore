@@ -40,22 +40,8 @@ public class CommentService : ICommentService
     }
 
     /// <inheritdoc/>
-    public Task<CommentResponse?> GetCommentByIdAsync(int id)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    public Task UpdateCommentAsync(CommentRequest commentRequest)
-    {
-        // TODO add check ref comment gameId != gameId
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
     public async Task RemoveCommentAsync(int id)
     {
-        // TODO add check comment owner
         var comment = await _commentRepository.GetByIdWithChildrenAsync(id);
 
         comment.Body = "A comment/quote was deleted";
@@ -83,7 +69,7 @@ public class CommentService : ICommentService
 
     private async Task<string> FormatCommentBodyAsync(int? parentId, string body, CommentStatus? status)
     {
-        if (parentId == null || status == null)
+        if (parentId == null)
         {
             return body;
         }
