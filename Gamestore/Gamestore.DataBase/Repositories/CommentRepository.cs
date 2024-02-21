@@ -46,7 +46,6 @@ public class CommentRepository : ICommentRepository
     /// <inheritdoc />
     public async Task RemoveAsync(int id)
     {
-        // TODO cascade remove
         var comment = await _context.Comments.SingleOrDefaultAsync(g => g.Id.Equals(id))
                    ?? throw new ArgumentException($"No comment found with the ID '{id}'.", nameof(id));
 
