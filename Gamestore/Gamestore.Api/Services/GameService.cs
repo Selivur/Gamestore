@@ -200,13 +200,28 @@ public class GameService : IGameService
         await _commentService.RemoveCommentAsync(commentId);
     }
 
-    /// <summary>
-    /// Returns the possible durations for a ban.
-    /// </summary>
-    /// <returns>An array of strings representing the possible ban durations.</returns>
+    /// <inheritdoc/>
     public Task<string[]> GetBanDurationsAsync()
     {
         return _userService.GetBanDurationsAsync();
+    }
+
+    /// <inheritdoc/>
+    public async Task<string[]> GetPublishedDateOptions()
+    {
+        return await Task.FromResult(new string[] { "last week", "last month", "last year", "2 years", "3 years" });
+    }
+
+    /// <inheritdoc/>
+    public async Task<string[]> GetSortingOptions()
+    {
+        return await Task.FromResult(new string[] { "Genre", "Platform", "Publisher" });
+    }
+
+    /// <inheritdoc/>
+    public async Task<string[]> GetPagingOptions()
+    {
+        return await Task.FromResult(new string[] { "10", "20", "50", "100", "all" });
     }
 
     /// <inheritdoc/>

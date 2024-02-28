@@ -11,6 +11,9 @@
   "updateGameApiUrl": "/games/update",
   "addGameApiUrl": "/games/new",
   "deleteGameApiUrl": "/games/remove/{key}",
+  "getPublishedDateOptionsApiUrl": "/games/getPublishedDateOptionsApiUrl",
+  "getSortingOptionsApiUrl": "/games/getSortingOptionsApiUrl",
+  "getPaggingOptionsApiUrl": "/games/getPagingOptionsApiUrl",
 
   "genreApiUrl": "/genres/{id}",
   "genresApiUrl": "/genres",

@@ -25,7 +25,7 @@ public class Order
     /// <summary>
     /// Gets or sets the customer associated with the order.
     /// </summary>
-    public Customer Customer { get; set; } = new Customer();
+    public Customer? Customer { get; set; } = new Customer { Name = "Ivan" };
 
     /// <summary>
     /// Gets or sets the Status of the order.

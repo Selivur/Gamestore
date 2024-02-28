@@ -241,6 +241,42 @@ public class GameController : ControllerBase
     }
 
     /// <summary>
+    /// Asynchronously gets the options for the published date filter.
+    /// </summary>
+    /// <returns>An IActionResult that represents the result of the action.</returns>
+    [HttpGet("getPublishedDateOptionsApiUrl")]
+    public async Task<IActionResult> GetPublishedDateOption()
+    {
+        var options = await _gameService.GetPublishedDateOptions();
+
+        return Ok(options);
+    }
+
+    /// <summary>
+    /// Asynchronously gets the options for the sorting type filter.
+    /// </summary>
+    /// <returns>An IActionResult that represents the result of the action.</returns>
+    [HttpGet("getSortingOptionsApiUrl")]
+    public async Task<IActionResult> GetSortingOptionsApiUrl()
+    {
+        var options = await _gameService.GetSortingOptions();
+
+        return Ok(options);
+    }
+
+    /// <summary>
+    /// Asynchronously gets the options for the page count filter.
+    /// </summary>
+    /// <returns>An IActionResult that represents the result of the action.</returns>
+    [HttpGet("getPagingOptionsApiUrl")]
+    public async Task<IActionResult> GetPagingOptionsApiUrl()
+    {
+        var options = await _gameService.GetPagingOptions();
+
+        return Ok(options);
+    }
+
+    /// <summary>
     /// Generates the content for a game file.
     /// </summary>
     /// <param name="game">The game object to generate the content for.</param>

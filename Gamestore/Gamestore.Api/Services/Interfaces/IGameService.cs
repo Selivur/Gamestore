@@ -111,7 +111,7 @@ public interface IGameService
     /// Returns the possible durations for a ban.
     /// </summary>
     /// <returns>An array of strings representing the possible ban durations.</returns>
-    public Task<string[]> GetBanDurationsAsync();
+    Task<string[]> GetBanDurationsAsync();
 
     /// <summary>
     /// Bans a user.
@@ -119,4 +119,22 @@ public interface IGameService
     /// <param name="userName">The name of the user to ban.</param>
     /// <param name="banDuration">The duration of the ban.</param>
     Task BanUserAsync(string userName, string banDuration);
+
+    /// <summary>
+    /// Asynchronously gets the options for the published date filter.
+    /// </summary>
+    /// <returns>A string array containing the options for the published date filter.</returns>
+    Task<string[]> GetPublishedDateOptions();
+
+    /// <summary>
+    /// Asynchronously gets the options for the sorting type filter.
+    /// </summary>
+    /// <returns>A string array containing the options for the sorting type filter.</returns>
+    Task<string[]> GetSortingOptions();
+
+    /// <summary>
+    /// Asynchronously gets the options for the page count filter.
+    /// </summary>
+    /// <returns>A string array containing the options for the page count filter.</returns>
+    Task<string[]> GetPagingOptions();
 }
