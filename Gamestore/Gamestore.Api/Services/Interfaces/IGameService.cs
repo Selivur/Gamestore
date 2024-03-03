@@ -46,7 +46,16 @@ public interface IGameService
     /// Retrieves all games from the database.
     /// </summary>
     /// <returns>An IEnumerable of Game objects.</returns>
-    Task<IEnumerable<GameResponse>> GetAllGamesAsync();
+    Task<IEnumerable<GameResponse>> GetAllGamesAsync(
+        int[]? genres,
+        int? maxPrice,
+        int? minPrice,
+        string? name,
+        string? datePublishing,
+        string? sort,
+        int? page,
+        int? pageCount,
+        string? trigger);
 
     /// <summary>
     /// Asynchronously gets a list of game responses by publisher name.
@@ -137,4 +146,18 @@ public interface IGameService
     /// </summary>
     /// <returns>A string array containing the options for the page count filter.</returns>
     Task<string[]> GetPagingOptions();
+
+    /// <summary>
+    /// Retrieves a game by its alias and updates its views count.
+    /// </summary>
+    /// <param name="gameAlias">The alias of the game.</param>
+    /// <returns>The game with the specified alias.</returns>
+    Task<GameResponse> GetGameByAliasWithViewsUpdateAsync(string gameAlias);
+
+    /// <summary>
+    /// Retrieves a game by its ID and updates its views count.
+    /// </summary>
+    /// <param name="id">The ID of the game.</param>
+    /// <returns>The game with the specified ID.</returns>
+    Task<GameResponse> GetGameByIdWithViewsUpdateAsync(int id);
 }

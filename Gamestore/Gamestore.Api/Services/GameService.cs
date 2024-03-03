@@ -135,9 +135,21 @@ public class GameService : IGameService
     }
 
     /// <inheritdoc/>
-    public async Task<IEnumerable<GameResponse>> GetAllGamesAsync()
+    public async Task<IEnumerable<GameResponse>> GetAllGamesAsync(int[]? genres, int? maxPrice, int? minPrice, string? name, string? datePublishing, string? sort, int? page, int? pageCount, string? trigger)
     {
         var games = await _gameRepository.GetAllAsync();
+
+        games = FilterByGenre(games, genres);
+        games = FilterByPrice(games, minPrice, maxPrice);
+        games = FilterByName(games, name);
+        games = FilterByPublishingDate(games, datePublishing);
+
+        games = SortGames(games, sort);
+
+        if (page.HasValue && pageCount.HasValue)
+        {
+            games = games.Skip((page.Value - 1) * pageCount.Value).Take(pageCount.Value);
+        }
 
         var gameResponses = games.Select(GameResponse.FromGame).ToList();
 
@@ -215,7 +227,7 @@ public class GameService : IGameService
     /// <inheritdoc/>
     public async Task<string[]> GetSortingOptions()
     {
-        return await Task.FromResult(new string[] { "Genre", "Platform", "Publisher" });
+        return await Task.FromResult(new string[] { "Most popular", "Most popular", "Price ASC", "Price DESC", "New" });
     }
 
     /// <inheritdoc/>
@@ -228,6 +240,112 @@ public class GameService : IGameService
     public Task BanUserAsync(string userName, string banDuration)
     {
         return _userService.BanUserAsync(userName, banDuration);
+    }
+
+    /// <inheritdoc/>
+    public async Task<GameResponse> GetGameByAliasWithViewsUpdateAsync(string gameAlias)
+    {
+        var game = GetGameByAliasAsync(gameAlias);
+
+        await UpdateViews(await game);
+
+        return GameResponse.FromGame(await game);
+    }
+
+    /// <inheritdoc/>
+    public async Task<GameResponse> GetGameByIdWithViewsUpdateAsync(int id)
+    {
+        var game = await _gameRepository.GetByIdAsync(id)
+                   ?? throw new KeyNotFoundException("Game not found");
+
+        await UpdateViews(game);
+
+        return GameResponse.FromGame(game);
+    }
+
+    private async Task UpdateViews(Game game)
+    {
+        game.Views += 1;
+        await _gameRepository.UpdateAsync(game);
+    }
+
+    private static IEnumerable<Game> FilterByGenre(IEnumerable<Game> games, int[]? genres)
+    {
+        if (genres is { Length: > 0 })
+        {
+            games = games.Where(game => game.Genres.Any(genre => genres.Contains(genre.Id)));
+        }
+
+        return games;
+    }
+
+    private static IEnumerable<Game> FilterByPrice(IEnumerable<Game> games, int? minPrice, int? maxPrice)
+    {
+        if (maxPrice > 0)
+        {
+            games = games.Where(game => game.Price <= maxPrice);
+        }
+
+        if (minPrice > 0)
+        {
+            games = games.Where(game => game.Price >= minPrice);
+        }
+
+        return games;
+    }
+
+    private static IEnumerable<Game> FilterByName(IEnumerable<Game> games, string? name)
+    {
+        if (!string.IsNullOrEmpty(name))
+        {
+            games = games.Where(game => game.Name.Contains(name));
+        }
+
+        return games;
+    }
+
+    private static IEnumerable<Game> FilterByPublishingDate(IEnumerable<Game> games, string? datePublishing)
+    {
+        if (!string.IsNullOrEmpty(datePublishing))
+        {
+            if (DateTime.TryParse(datePublishing, out DateTime date))
+            {
+                games = games.Where(game => game.PublishDate >= date);
+            }
+        }
+
+        return games;
+    }
+
+    private static IEnumerable<Game> SortGames(IEnumerable<Game> games, string? sort)
+    {
+        if (string.IsNullOrEmpty(sort))
+        {
+            return games;
+        }
+
+        switch (sort)
+        {
+            case "Most popular":
+                games = games.OrderByDescending(game => game.Views);
+                break;
+            case "Most commented":
+                games = games.OrderByDescending(game => game.Comments.Count);
+                break;
+            case "Price ASC":
+                games = games.OrderBy(game => game.Price);
+                break;
+            case "Price DESC":
+                games = games.OrderByDescending(game => game.Price);
+                break;
+            case "New":
+                games = games.OrderByDescending(game => game.PublishDate);
+                break;
+            default:
+                break;
+        }
+
+        return games;
     }
 
     private static string NormalizeGameAlias(string name)

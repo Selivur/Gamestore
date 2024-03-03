@@ -18,6 +18,11 @@ public class Game
     public int Id { get; set; }
 
     /// <summary>
+    /// Gets or sets the views of the game.
+    /// </summary>
+    public uint Views { get; set; }
+
+    /// <summary>
     /// Gets or sets the game alias.
     /// </summary>
     public string GameAlias { get; set; }
@@ -45,12 +50,22 @@ public class Game
     /// <summary>
     /// Gets or sets the description of the game.
     /// </summary>
+    public DateTime PublishDate { get; set; } = DateTime.Now;
+
+    /// <summary>
+    /// Gets or sets the description of the game.
+    /// </summary>
     public string? Description { get; set; }
 
     /// <summary>
     /// Gets or sets the collection of genres associated with the game.
     /// </summary>
     public ICollection<Genre> Genres { get; set; }
+
+    /// <summary>
+    /// Gets or sets the collection of comments associated with the game.
+    /// </summary>
+    public ICollection<Comment> Comments { get; set; }
 
     /// <summary>
     /// Gets or sets the collection of platforms associated with the game.

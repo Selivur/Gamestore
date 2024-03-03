@@ -33,9 +33,9 @@ public class GameController : ControllerBase
     /// <param name="id">The id of the game to retrieve.</param>
     /// <returns>An IActionResult containing the retrieved game if successful.</returns>
     [HttpGet("getById/{id}")]
-    public async Task<IActionResult> GetGenre(string id)
+    public async Task<IActionResult> GetGameById(string id)
     {
-        var result = await _gameService.GetGameByIdAsync(Convert.ToInt32(id));
+        var result = await _gameService.GetGameByIdWithViewsUpdateAsync(Convert.ToInt32(id));
 
         return Ok(result);
     }
@@ -66,7 +66,7 @@ public class GameController : ControllerBase
     [HttpGet("getByAlias/{gameAlias}")]
     public async Task<IActionResult> GetGame(string gameAlias)
     {
-        var result = await _gameService.GetGameResponseByAliasAsync(gameAlias);
+        var result = await _gameService.GetGameByAliasWithViewsUpdateAsync(gameAlias);
 
         return Ok(result);
     }
@@ -127,9 +127,9 @@ public class GameController : ControllerBase
     /// Returns an HTTP 200 OK response with the list of games.
     /// </returns>
     [HttpGet]
-    public async Task<IActionResult> GetAllGames()
+    public async Task<IActionResult> GetAllGames(int[]? genres, int? maxPrice, int? minPrice, string? name, string? datePublishing, string? sort, int? page, int? pageCount, string? trigger)
     {
-        var games = await _gameService.GetAllGamesAsync();
+        var games = await _gameService.GetAllGamesAsync(genres, maxPrice, minPrice, name, datePublishing, sort, page, pageCount, trigger);
 
         return Ok(games);
     }

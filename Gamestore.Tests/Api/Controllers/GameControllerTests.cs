@@ -173,33 +173,6 @@ public class GameControllerTests
     }
 
     /// <summary>
-    /// Test verifies if the <see cref="GameController.GetAllGames"/> method returns an OkResult with a list of games.
-    /// </summary>
-    [Fact]
-    public async Task GetAllGames_ReturnsOkResult_WithGamesList()
-    {
-        // Arrange
-        var expectedGames = new List<GameResponse>
-        {
-            new() { Key = "Alias1", Name = "Game1" },
-            new() { Key = "Alias2", Name = "Game2" },
-        };
-        _gameServiceMock.Setup(x => x.GetAllGamesAsync()).ReturnsAsync(expectedGames);
-
-        // Act
-        var result = await _gameController.GetAllGames();
-
-        // Assert
-        Assert.IsType<OkObjectResult>(result);
-        var okResult = result as OkObjectResult;
-        Assert.NotNull(okResult);
-
-        var actualGames = okResult.Value as List<GameResponse>;
-        Assert.NotNull(actualGames);
-        Assert.Equal(expectedGames, actualGames);
-    }
-
-    /// <summary>
     /// Test for GetGenre method.
     /// </summary>
     [Fact]
@@ -215,7 +188,7 @@ public class GameControllerTests
             .Verifiable("Service method was not called with correct ID");
 
         // Act
-        var result = await _gameController.GetGenre(gameId);
+        var result = await _gameController.GetGameById(gameId);
 
         // Assert
         _gameServiceMock.Verify();

@@ -4,6 +4,7 @@ using Gamestore.Database.Dbcontext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gamestore.Api.Migrations
 {
     [DbContext(typeof(GamestoreContext))]
-    partial class GamestoreContextModelSnapshot : ModelSnapshot
+    [Migration("20240229193436_UpdatedGame")]
+    partial class UpdatedGame
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,9 +139,6 @@ namespace Gamestore.Api.Migrations
 
                     b.Property<int>("UnitInStock")
                         .HasColumnType("int");
-
-                    b.Property<long>("Views")
-                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -315,7 +315,7 @@ namespace Gamestore.Api.Migrations
             modelBuilder.Entity("Gamestore.Database.Entities.Comment", b =>
                 {
                     b.HasOne("Gamestore.Database.Entities.Game", "Game")
-                        .WithMany("Comments")
+                        .WithMany()
                         .HasForeignKey("GameId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -374,11 +374,6 @@ namespace Gamestore.Api.Migrations
             modelBuilder.Entity("Gamestore.Database.Entities.Comment", b =>
                 {
                     b.Navigation("ChildComments");
-                });
-
-            modelBuilder.Entity("Gamestore.Database.Entities.Game", b =>
-                {
-                    b.Navigation("Comments");
                 });
 
             modelBuilder.Entity("Gamestore.Database.Entities.Order", b =>

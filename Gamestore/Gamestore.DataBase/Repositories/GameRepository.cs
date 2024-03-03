@@ -37,7 +37,7 @@ public class GameRepository : IGameRepository
     /// <inheritdoc />
     public async Task<IEnumerable<Game>> GetAllAsync()
     {
-        return await _context.Games.ToListAsync();
+        return await _context.Games.Include(g => g.Comments).ToListAsync();
     }
 
     /// <inheritdoc />

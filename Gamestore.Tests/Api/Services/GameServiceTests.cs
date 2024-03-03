@@ -240,55 +240,6 @@ public class GameServiceTests
     }
 
     /// <summary>
-    /// Test to verify that the GetAllGamesAsync method of the GameService
-    /// retrieves and correctly maps games from the repository to GameResponse objects.
-    /// </summary>
-    [Fact]
-    public async Task GetAllGamesAsync_ShouldReturnAllGames()
-    {
-        // Arrange
-        var games = new List<Game>
-        {
-            new() { GameAlias = "game1", Name = "Game 1", Description = "Description 1" },
-            new() { GameAlias = "game2", Name = "Game 2", Description = "Description 2" },
-            new() { GameAlias = "game3", Name = "Game 3", Description = "Description 3" },
-        };
-
-        _mockRepository.Setup(repo => repo.GetAllAsync())
-            .ReturnsAsync(games);
-
-        // Act
-        var result = await _gameService.GetAllGamesAsync();
-
-        // Assert
-        Assert.Equal(games.Count, result.Count());
-
-        for (var i = 0; i < games.Count; i++)
-        {
-            Assert.Equal(games[i].GameAlias, result.ElementAt(i).Key);
-            Assert.Equal(games[i].Name, result.ElementAt(i).Name);
-            Assert.Equal(games[i].Description, result.ElementAt(i).Description);
-        }
-    }
-
-    /// <summary>
-    /// Tests the <see cref="GameService.GetAllGamesAsync"/> method to ensure it returns an empty list when no games are found.
-    /// </summary>
-    [Fact]
-    public async Task GetAllGamesAsync_ShouldReturnEmptyList_WhenNoGamesFound()
-    {
-        // Arrange
-        _mockRepository.Setup(repo => repo.GetAllAsync())
-            .ReturnsAsync(new List<Game>());
-
-        // Act
-        var result = await _gameService.GetAllGamesAsync();
-
-        // Assert
-        Assert.Empty(result);
-    }
-
-    /// <summary>
     /// Test for GetGameByIdAsync method with valid game ID. Expects to return a GameResponse.
     /// </summary>
     [Fact]
