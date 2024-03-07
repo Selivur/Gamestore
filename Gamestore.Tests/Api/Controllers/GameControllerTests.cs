@@ -183,7 +183,7 @@ public class GameControllerTests
         var expectedGameResponse = new GameResponse { Id = gameId };
 
         _gameServiceMock
-            .Setup(service => service.GetGameByIdAsync(Convert.ToInt32(gameId)))
+            .Setup(service => service.GetGameByIdWithViewsUpdateAsync(Convert.ToInt32(gameId)))
             .ReturnsAsync(expectedGameResponse)
             .Verifiable("Service method was not called with correct ID");
 
