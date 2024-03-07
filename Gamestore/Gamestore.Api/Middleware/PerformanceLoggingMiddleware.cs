@@ -26,13 +26,10 @@ public class PerformanceLoggingMiddleware
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     public async Task Invoke(HttpContext context)
     {
-        // Start measuring the time
         var watch = Stopwatch.StartNew();
 
-        // Pass the request to the next middleware in the pipeline
         await _next(context);
 
-        // Stop measuring and log the elapsed time
         watch.Stop();
         var elapsedMilliseconds = watch.ElapsedMilliseconds;
         LogPerformance(elapsedMilliseconds);

@@ -23,13 +23,10 @@ public class IpAddressLoggingMiddleware
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     public async Task Invoke(HttpContext context)
     {
-        // Get the IP address from the connection information
         var ipAddress = context.Connection.RemoteIpAddress.ToString();
 
-        // Log the IP address
         LogIpAddress(ipAddress);
 
-        // Pass the request to the next middleware in the pipeline
         await _next(context);
     }
 
