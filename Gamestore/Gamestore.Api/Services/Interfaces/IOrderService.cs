@@ -31,6 +31,8 @@ public interface IOrderService
     /// <returns>An IEnumerable of Order objects.</returns>
     Task<IEnumerable<OrderResponse>> GetAllOrdersAsync();
 
+    Task<IEnumerable<OrderResponse>> GetOrdersBetweenDatesAsync(DateTime startDate, DateTime endDate);
+
     /// <summary>
     /// Adds an order with its details in the system.
     /// </summary>

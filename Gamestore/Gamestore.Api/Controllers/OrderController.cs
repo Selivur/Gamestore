@@ -42,9 +42,9 @@ public class OrderController : ControllerBase
     /// Returns an HTTP 200 OK response with the list of orders.
     /// </returns>
     [HttpGet]
-    public async Task<IActionResult> GetAllOrders()
+    public async Task<IActionResult> GetAllOrders(DateTime start, DateTime end)
     {
-        var orders = await _orderService.GetAllOrdersAsync();
+        var orders = await _orderService.GetOrdersBetweenDatesAsync(start, end);
 
         return Ok(orders);
     }

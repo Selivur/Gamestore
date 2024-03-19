@@ -7,6 +7,7 @@ using Gamestore.Database.Dbcontext;
 using Gamestore.Database.Repositories;
 using Gamestore.Database.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Exceptions;
 
@@ -20,7 +21,7 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
-builder.Host.UseSerilog(); // Use Serilog as the logging framework
+builder.Host.UseSerilog();
 
 builder.Services.AddCors();
 
@@ -40,12 +41,23 @@ builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
 builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<IShipperRepository, ShipperRepository>();
+builder.Services.AddScoped<MongoOrderRepository>();
 
 builder.Services.AddScoped<LoggingActionFilter>();
 builder.Services.AddScoped<GlobalExceptionHandler>();
 
 builder.Services.AddDbContext<GamestoreContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Gamestore.Api")));
+
+builder.Services.Configure<MongoSettings>(
+    builder.Configuration.GetSection("MongoDatabase"));
+
+builder.Services.AddSingleton(sp =>
+{
+    var mongoSettings = sp.GetRequiredService<IOptions<MongoSettings>>();
+    return new MongoContext(mongoSettings);
+});
 
 // Add services to the container.
 builder.Services.AddControllers(options =>

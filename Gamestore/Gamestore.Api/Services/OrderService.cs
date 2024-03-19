@@ -3,6 +3,7 @@ using Gamestore.Api.Models.DTO.OrderDTO;
 using Gamestore.Api.Services.Interfaces;
 using Gamestore.Database.Entities;
 using Gamestore.Database.Entities.Enums;
+using Gamestore.Database.Repositories;
 using Gamestore.Database.Repositories.Interfaces;
 using iText.Kernel.Pdf;
 using iText.Layout;
@@ -16,17 +17,19 @@ namespace Gamestore.Api.Services;
 /// </summary>
 public class OrderService : IOrderService
 {
-    private readonly IOrderRepository _orderRepository;
+    private readonly IOrderRepository _sqlOrderRepository;
+    private readonly MongoOrderRepository _mongoOrderRepository;
     private readonly IGameService _gameService;
     private readonly IPaymentService _paymentService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OrderService"/> class.
     /// </summary>
-    /// <param name="orderRepository">The order repository providing data access for the service.</param>
-    public OrderService(IOrderRepository orderRepository, IGameService gameRepository, IPaymentService paymentService)
+    /// <param name="sqlOrderRepository">The order repository providing data access for the service.</param>
+    public OrderService(IOrderRepository sqlOrderRepository, MongoOrderRepository mongoOrderRepository, IGameService gameRepository, IPaymentService paymentService)
     {
-        _orderRepository = orderRepository;
+        _sqlOrderRepository = sqlOrderRepository;
+        _mongoOrderRepository = mongoOrderRepository;
         _gameService = gameRepository;
         _paymentService = paymentService;
     }
@@ -34,7 +37,7 @@ public class OrderService : IOrderService
     /// <inheritdoc/>
     public async Task<OrderResponse?> GetOrderByIdAsync(int id)
     {
-        var order = await _orderRepository.GetByIdAsync(id)
+        var order = await _sqlOrderRepository.GetByIdAsync(id)
             ?? throw new KeyNotFoundException("Order not found");
         return OrderResponse.FromOrder(order);
     }
@@ -42,24 +45,41 @@ public class OrderService : IOrderService
     /// <inheritdoc/>
     public async Task UpdateOrderAsync(OrderRequest order)
     {
-        var existingOrder = await _orderRepository.GetByIdAsync(Convert.ToInt32(order.Id))
+        var existingOrder = await _sqlOrderRepository.GetByIdAsync(Convert.ToInt32(order.Id))
             ?? throw new KeyNotFoundException("Can't find the Order with this id");
 
-        await _orderRepository.UpdateAsync(existingOrder);
+        await _sqlOrderRepository.UpdateAsync(existingOrder);
     }
 
     /// <inheritdoc/>
     public async Task RemoveOrderAsync(int id)
     {
-        await _orderRepository.RemoveAsync(id);
+        await _sqlOrderRepository.RemoveAsync(id);
     }
 
     /// <inheritdoc/>
     public async Task<IEnumerable<OrderResponse>> GetAllOrdersAsync()
     {
-        var orders = await _orderRepository.GetAllAsync();
+        var orders = await _sqlOrderRepository.GetAllAsync();
 
         var orderResponses = orders.Select(OrderResponse.FromOrder).ToList();
+
+        return orderResponses;
+    }
+
+    /// <inheritdoc/>
+    public async Task<IEnumerable<OrderResponse>> GetOrdersBetweenDatesAsync(DateTime startDate, DateTime endDate)
+    {
+        var sqlOrders = await _sqlOrderRepository.GetAllAsync();
+        var mongoOrders = await _mongoOrderRepository.GetAllAsync();
+
+        var allOrders = sqlOrders.Concat(mongoOrders);
+
+        var filteredOrders = allOrders
+            .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate)
+            .ToList();
+
+        var orderResponses = filteredOrders.Select(OrderResponse.FromOrder).ToList();
 
         return orderResponses;
     }
@@ -72,7 +92,7 @@ public class OrderService : IOrderService
             throw new ArgumentException("Game alias can't be null or empty.", nameof(gameAlias));
         }
 
-        var openedOrder = await _orderRepository.GetFirstOpenOrderAsync();
+        var openedOrder = await _sqlOrderRepository.GetFirstOpenOrderAsync();
         var game = await UpdateGameQuantityAndGetGameInfo(gameAlias);
         OrderBuyResponse response;
 
@@ -96,7 +116,7 @@ public class OrderService : IOrderService
         {
             PaymentMethods = GetAllPaymentMethods(),
 
-            Order = await _orderRepository.GetFirstOpenOrderAsync()
+            Order = await _sqlOrderRepository.GetFirstOpenOrderAsync()
             ?? throw new KeyNotFoundException("Can't find any open orders"),
         };
 
@@ -106,10 +126,10 @@ public class OrderService : IOrderService
     /// <inheritdoc/>
     public async Task<byte[]> GetBankPDFAsync(PaymentRequestDTO paymentRequest)
     {
-        var openOrder = await _orderRepository.GetFirstOpenOrderAsync();
-        var order = await _orderRepository.GetByIdWithOrderDetailsAsync(openOrder.Id);
+        var openOrder = await _sqlOrderRepository.GetFirstOpenOrderAsync();
+        var order = await _sqlOrderRepository.GetByIdWithOrderDetailsAsync(openOrder.Id);
 
-        await _orderRepository.CompleteOrder();
+        await _sqlOrderRepository.CompleteOrder();
 
         using MemoryStream ms = new();
         using (var writer = new PdfWriter(ms).SetSmartMode(true))
@@ -134,9 +154,9 @@ public class OrderService : IOrderService
     /// <inheritdoc/>
     public async Task RemoveOrderDetailsAsync(string gameAlias)
     {
-        var order = await _orderRepository.GetFirstOpenOrderAsync();
+        var order = await _sqlOrderRepository.GetFirstOpenOrderAsync();
 
-        var orders = await _orderRepository.GetAllOrderDetails(order.Id);
+        var orders = await _sqlOrderRepository.GetAllOrderDetails(order.Id);
 
         var orderDetails = orders.FirstOrDefault(o => o.Game.GameAlias == gameAlias)
             ?? throw new KeyNotFoundException($"Can't find order details for the game alias '{gameAlias}' " +
@@ -144,15 +164,15 @@ public class OrderService : IOrderService
 
         await RestockGameFromOrderDetailsAsync(gameAlias, orderDetails);
 
-        await _orderRepository.RemoveOrderDetailsAsync(orderDetails.Id);
+        await _sqlOrderRepository.RemoveOrderDetailsAsync(orderDetails.Id);
     }
 
     /// <inheritdoc/>
     public async Task<IEnumerable<CartDetailsDTO>> GetOpenOrderDetailsAsync()
     {
-        var order = await _orderRepository.GetFirstOpenOrderAsync();
+        var order = await _sqlOrderRepository.GetFirstOpenOrderAsync();
 
-        var orders = await _orderRepository.GetAllOrderDetails(order.Id);
+        var orders = await _sqlOrderRepository.GetAllOrderDetails(order.Id);
 
         var orderResponses = orders.Select(CartDetailsDTO.FromOrderDetails).ToList();
 
@@ -162,7 +182,7 @@ public class OrderService : IOrderService
     /// <inheritdoc/>
     public async Task<IEnumerable<CartDetailsDTO>> GetCartDetailsAsync(int orderId)
     {
-        var orders = await _orderRepository.GetAllOrderDetails(orderId);
+        var orders = await _sqlOrderRepository.GetAllOrderDetails(orderId);
 
         var orderResponses = orders.Select(CartDetailsDTO.FromOrderDetails).ToList();
 
@@ -281,12 +301,12 @@ public class OrderService : IOrderService
         if (existingOrderDetails != null)
         {
             existingOrderDetails.Quantity += 1;
-            _orderRepository.UpdateOrderDetailsAsync(existingOrderDetails);
+            _sqlOrderRepository.UpdateOrderDetailsAsync(existingOrderDetails);
         }
         else
         {
             openedOrder.OrderDetails?.Add(CreateOrderDetails(game));
-            _orderRepository.UpdateAsync(openedOrder);
+            _sqlOrderRepository.UpdateAsync(openedOrder);
         }
 
         return ConstructOrderBuyResponse(openedOrder, game, existingOrderDetails);
@@ -346,7 +366,7 @@ public class OrderService : IOrderService
         var orderDetails = CreateOrderDetails(game);
         var order = await CreateAndPersistNewOrder(orderDetails);
 
-        var orders = await _orderRepository.GetAllAsync();
+        var orders = await _sqlOrderRepository.GetAllAsync();
         var maxId = orders?.Any() == true ? orders.Max(od => od.Id) : 0;
 
         var response = new OrderBuyResponse
@@ -379,7 +399,7 @@ public class OrderService : IOrderService
             OrderDetails = new Collection<OrderDetails> { orderDetails },
             Status = OrderStatus.Open,
         };
-        await _orderRepository.AddAsync(order);
+        await _sqlOrderRepository.AddAsync(order);
         return order;
     }
 

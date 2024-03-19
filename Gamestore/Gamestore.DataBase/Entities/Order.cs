@@ -36,4 +36,14 @@ public class Order
     /// Gets or sets the Payment Date of the order.
     /// </summary>
     public DateTime? PaymentDate { get; set; }
+
+    public static Order FromMongoOrder(MongoOrder mongoOrder)
+    {
+        return new Order
+        {
+            Id = mongoOrder.Id,
+            Customer = new Customer { Name = mongoOrder.CustomerId },
+            OrderDate = mongoOrder.OrderDate,
+        };
+    }
 }

@@ -38,7 +38,7 @@
   "updatePublisherApiUrl": "/publishers/update",
 
   "orderApiUrl": "/orders/{id}",
-  "ordersApiUrl": "/orders",
+  "historyApiUrl": "/orders",
   "orderDetailsApiUrl": "/cart/{id}",
   "buyGameApiUrl": "/game/{key}/buy",
   "cancelGameBuyApiUrl": "/orders/remove/{key}",
