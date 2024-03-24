@@ -18,7 +18,7 @@ namespace Gamestore.Api.Services;
 public class OrderService : IOrderService
 {
     private readonly IOrderRepository _sqlOrderRepository;
-    private readonly MongoOrderRepository _mongoOrderRepository;
+    private readonly IOrderRepository _mongoOrderRepository;
     private readonly IGameService _gameService;
     private readonly IPaymentService _paymentService;
 

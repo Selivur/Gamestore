@@ -1,8 +1,8 @@
-﻿using Gamestore.Database.Entities;
+﻿using Gamestore.Database.Entities.MongoDB;
 
 namespace Gamestore.Database.Repositories.Interfaces;
 
 public interface IShipperRepository
 {
-    Task<List<Shippers>> GetAllShippersAsync();
+    Task<List<ProductShipper>> GetAllShippersAsync();
 }

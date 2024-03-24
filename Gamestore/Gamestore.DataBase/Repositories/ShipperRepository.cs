@@ -1,5 +1,5 @@
 ﻿using Gamestore.Database.Dbcontext;
-using Gamestore.Database.Entities;
+using Gamestore.Database.Entities.MongoDB;
 using Gamestore.Database.Repositories.Interfaces;
 using MongoDB.Driver;
 
@@ -13,7 +13,7 @@ public class ShipperRepository : IShipperRepository
         _context = context;
     }
 
-    public async Task<List<Shippers>> GetAllShippersAsync()
+    public async Task<List<ProductShipper>> GetAllShippersAsync()
     {
         return await _context.Shippers.Find(shipper => true).ToListAsync();
     }

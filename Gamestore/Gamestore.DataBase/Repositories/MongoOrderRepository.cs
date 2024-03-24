@@ -1,12 +1,13 @@
 ﻿using Gamestore.Database.Dbcontext;
 using Gamestore.Database.Entities;
+using Gamestore.Database.Entities.MongoDB;
 using Gamestore.Database.Repositories.Interfaces;
 using MongoDB.Driver;
 
 namespace Gamestore.Database.Repositories;
 public class MongoOrderRepository : IOrderRepository
 {
-    private readonly IMongoCollection<MongoOrder> _orders;
+    private readonly IMongoCollection<ProductOrder> _orders;
 
     public MongoOrderRepository(MongoContext context)
     {

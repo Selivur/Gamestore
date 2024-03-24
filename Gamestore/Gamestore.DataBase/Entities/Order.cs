@@ -1,4 +1,5 @@
 ﻿using Gamestore.Database.Entities.Enums;
+using Gamestore.Database.Entities.MongoDB;
 
 namespace Gamestore.Database.Entities;
 
@@ -37,13 +38,13 @@ public class Order
     /// </summary>
     public DateTime? PaymentDate { get; set; }
 
-    public static Order FromMongoOrder(MongoOrder mongoOrder)
+    public static Order FromMongoOrder(ProductOrder productOrder)
     {
         return new Order
         {
-            Id = mongoOrder.Id,
-            Customer = new Customer { Name = mongoOrder.CustomerId },
-            OrderDate = mongoOrder.OrderDate,
+            Id = productOrder.OrderID,
+            Customer = new Customer { Name = productOrder.CustomerId },
+            OrderDate = productOrder.OrderDate,
         };
     }
 }
