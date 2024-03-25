@@ -71,4 +71,12 @@ public class MongoContext
     {
         get { return _database.GetCollection<ProductSupplier>("suppliers"); }
     }
+
+    /// <summary>
+    /// Gets the collection of logs.
+    /// </summary>
+    public IMongoCollection<Log> Logs
+    {
+        get { return _database.GetCollection<Log>("logs"); }
+    }
 }

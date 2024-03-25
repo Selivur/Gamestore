@@ -2,7 +2,9 @@
 using Gamestore.Database.Entities;
 using Gamestore.Database.Entities.Enums;
 using Gamestore.Database.Repositories.Interfaces;
+using Gamestore.Database.Services;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
 
 namespace Gamestore.Database.Repositories;
 
@@ -13,14 +15,16 @@ namespace Gamestore.Database.Repositories;
 public class OrderRepository : IOrderRepository
 {
     private readonly GamestoreContext _context;
+    private readonly DataBaseLogger _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OrderRepository"/> class.
     /// </summary>
     /// <param name="context">The database context for interacting with the underlying data store.</param>
-    public OrderRepository(GamestoreContext context)
+    public OrderRepository(GamestoreContext context, MongoContext mongoContext)
     {
         _context = context;
+        _logger = new DataBaseLogger(mongoContext);
     }
 
     /// <inheritdoc />
@@ -60,13 +64,22 @@ public class OrderRepository : IOrderRepository
     public async Task AddAsync(Order order)
     {
         _context.Orders.Add(order);
+
         await SaveChangesAsync("Error when adding the order to the database.");
     }
 
     /// <inheritdoc />
     public async Task UpdateAsync(Order order)
     {
+        var oldOrder = await _context.Orders.AsNoTracking().FirstAsync(o => o.Id == order.Id);
+
         _context.Entry(order).State = EntityState.Modified;
+
+        _logger.LogChange(
+            action: CrudOperation.Update,
+            entityType: nameof(Order),
+            oldObject: oldOrder.ToBsonDocument(),
+            newObject: order.ToBsonDocument());
 
         await SaveChangesAsync("Error when updating the order in the database.");
     }
