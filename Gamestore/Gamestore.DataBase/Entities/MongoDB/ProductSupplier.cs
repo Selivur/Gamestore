@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -20,7 +21,7 @@ public class ProductSupplier
     /// <summary>
     /// Gets or sets the unique identifier for the supplier.
     /// </summary>
-    [Key]
+    [NotMapped]
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; }
@@ -28,12 +29,14 @@ public class ProductSupplier
     /// <summary>
     /// Gets or sets the supplier ID.
     /// </summary>
+    [Column("Id")]
     [BsonElement("SupplierID")]
     public int SupplierId { get; set; }
 
     /// <summary>
     /// Gets or sets the company name.
     /// </summary>
+    [Key]
     [BsonElement("CompanyName")]
     public string CompanyName { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using Gamestore.Database.Entities;
+using Gamestore.Database.Entities.MongoDB;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gamestore.Database.Dbcontext;
@@ -56,4 +57,34 @@ public class GamestoreContext : DbContext
     /// Gets or sets the DbSet for comments in the database.
     /// </summary>
     public DbSet<Comment> Comments { get; set; }
+
+    /// <summary>
+    /// Gets or sets the collection of products.
+    /// </summary>
+    public DbSet<Product> Products { get; set; }
+
+    /// <summary>
+    /// Gets or sets the collection of product suppliers.
+    /// </summary>
+    public DbSet<ProductSupplier> ProductSuppliers { get; set; }
+
+    /// <summary>
+    /// Gets or sets the collection of product order details.
+    /// </summary>
+    public DbSet<ProductOrderDetails> ProductOrderDetails { get; set; }
+
+    /// <summary>
+    /// Gets or sets the collection of product categories.
+    /// </summary>
+    public DbSet<ProductCategory> ProductCategories { get; set; }
+
+    /// <summary>
+    /// Gets or sets the collection of product orders.
+    /// </summary>
+    public DbSet<ProductOrder> ProductOrders { get; set; }
+
+    /// <summary>
+    /// Gets or sets the collection of product shippers.
+    /// </summary>
+    public DbSet<ProductShipper> ProductShippers { get; set; }
 }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -10,17 +11,9 @@ namespace Gamestore.Database.Entities.MongoDB;
 public class ProductCategory
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ProductCategory"/> class.
-    /// </summary>
-    public ProductCategory()
-    {
-        Id = Guid.NewGuid().ToString();
-    }
-
-    /// <summary>
     /// Gets or sets the unique identifier for the category.
     /// </summary>
-    [Key]
+    [NotMapped]
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; }
@@ -28,6 +21,8 @@ public class ProductCategory
     /// <summary>
     /// Gets or sets the category ID.
     /// </summary>
+    [Key]
+    [Column("Id")]
     [BsonElement("CategoryID")]
     public int CategoryID { get; set; }
 

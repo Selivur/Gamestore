@@ -27,7 +27,7 @@ public class MongoContext
     /// <summary>
     /// Gets the collection of shippers.
     /// </summary>
-    public IMongoCollection<ProductShipper> Shippers
+    public IMongoCollection<ProductShipper> ProductShippers
     {
         get { return _database.GetCollection<ProductShipper>("shippers"); }
     }
@@ -35,7 +35,7 @@ public class MongoContext
     /// <summary>
     /// Gets the collection of orders.
     /// </summary>
-    public IMongoCollection<ProductOrder> Orders
+    public IMongoCollection<ProductOrder> ProductOrders
     {
         get { return _database.GetCollection<ProductOrder>("orders"); }
     }
@@ -43,7 +43,7 @@ public class MongoContext
     /// <summary>
     /// Gets the collection of products.
     /// </summary>
-    public IMongoCollection<Product> Product
+    public IMongoCollection<Product> Products
     {
         get { return _database.GetCollection<Product>("products"); }
     }
@@ -51,7 +51,7 @@ public class MongoContext
     /// <summary>
     /// Gets the collection of categories.
     /// </summary>
-    public IMongoCollection<ProductCategory> Categories
+    public IMongoCollection<ProductCategory> ProductCategories
     {
         get { return _database.GetCollection<ProductCategory>("categories"); }
     }
@@ -59,7 +59,7 @@ public class MongoContext
     /// <summary>
     /// Gets the collection of order details.
     /// </summary>
-    public IMongoCollection<ProductOrderDetails> OrderDetails
+    public IMongoCollection<ProductOrderDetails> ProductOrderDetails
     {
         get { return _database.GetCollection<ProductOrderDetails>("orderDetails"); }
     }
@@ -67,7 +67,7 @@ public class MongoContext
     /// <summary>
     /// Gets the collection of suppliers.
     /// </summary>
-    public IMongoCollection<ProductSupplier> Suppliers
+    public IMongoCollection<ProductSupplier> ProductSuppliers
     {
         get { return _database.GetCollection<ProductSupplier>("suppliers"); }
     }
