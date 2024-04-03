@@ -37,7 +37,17 @@ public class ProductService : IProductService
     /// <inheritdoc />
     public async Task<Product> GetProductByNameAsync(string name)
     {
-        return await _sqlProductRepository.GetProductByNameAsync(name);
+        var product = await _sqlProductRepository.GetProductByNameAsync(name);
+        if (product != null)
+        {
+            return product;
+        }
+
+        product = await _mongoProductRepository.GetProductByNameAsync(name);
+
+        return product != null
+            ? product
+            : null;
     }
 
     /// <inheritdoc />

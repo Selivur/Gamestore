@@ -18,7 +18,7 @@ public interface IProductRepository
     /// </summary>
     /// <param name="name">The ID of the product.</param>
     /// <returns>The product with the given ID, or null if no such product exists.</returns>
-    Task<Product> GetProductByNameAsync(string name);
+    Task<Product?> GetProductByNameAsync(string name);
 
     /// <summary>
     /// Adds a new product.
