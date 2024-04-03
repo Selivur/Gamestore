@@ -25,7 +25,7 @@ public class Log
     /// Gets or sets the entity type of the log entry.
     /// </summary>
     [BsonElement("EntityType")]
-    public string EntityType { get; set; }
+    public string? EntityType { get; set; }
 
     /// <summary>
     /// Gets or sets the old version of the object.

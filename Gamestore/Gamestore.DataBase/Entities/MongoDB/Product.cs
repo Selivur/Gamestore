@@ -79,4 +79,10 @@ public class Product
     /// </summary>
     [BsonElement("Discontinued")]
     public bool Discontinued { get; set; }
+
+    [ForeignKey("SupplierID")]
+    public ProductSupplier? Supplier { get; set; }
+
+    [ForeignKey("CategoryID")]
+    public ProductCategory? Category { get; set; }
 }

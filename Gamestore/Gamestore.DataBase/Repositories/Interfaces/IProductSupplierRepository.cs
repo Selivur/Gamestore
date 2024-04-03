@@ -14,11 +14,11 @@ public interface IProductSupplierRepository
     Task<IEnumerable<ProductSupplier>> GetAllProductSuppliersAsync();
 
     /// <summary>
-    /// Gets a product supplier by its ID.
+    /// Gets a product supplier by its Company Name.
     /// </summary>
-    /// <param name="id">The ID of the product supplier.</param>
+    /// <param name="companyName">The ID of the product supplier.</param>
     /// <returns>The product supplier with the given ID, or null if no such product supplier exists.</returns>
-    Task<ProductSupplier> GetProductSupplierByIdAsync(int id);
+    Task<ProductSupplier> GetProductSupplierByCompanyNameAsync(string companyName);
 
     /// <summary>
     /// Adds a new product supplier.

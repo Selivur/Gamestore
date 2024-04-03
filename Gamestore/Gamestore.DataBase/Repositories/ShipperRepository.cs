@@ -15,6 +15,6 @@ public class ShipperRepository : IShipperRepository
 
     public async Task<List<ProductShipper>> GetAllShippersAsync()
     {
-        return await _context.Shippers.Find(shipper => true).ToListAsync();
+        return await _context.ProductShippers.Find(shipper => true).ToListAsync();
     }
 }

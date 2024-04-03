@@ -28,9 +28,9 @@ public class SQLProductSupplierRepository : IProductSupplierRepository
     }
 
     /// <inheritdoc />
-    public async Task<ProductSupplier> GetProductSupplierByIdAsync(int id)
+    public async Task<ProductSupplier> GetProductSupplierByCompanyNameAsync(string companyName)
     {
-        return await _context.ProductSuppliers.FindAsync(id);
+        return await _context.ProductSuppliers.SingleAsync(ps => ps.CompanyName == companyName);
     }
 
     /// <inheritdoc />

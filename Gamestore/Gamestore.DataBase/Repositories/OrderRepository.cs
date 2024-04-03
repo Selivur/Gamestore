@@ -77,7 +77,7 @@ public class OrderRepository : IOrderRepository
 
         _logger.LogChange(
             action: CrudOperation.Update,
-            entityType: nameof(Order),
+            entityType: typeof(Order).FullName,
             oldObject: oldOrder.ToBsonDocument(),
             newObject: order.ToBsonDocument());
 

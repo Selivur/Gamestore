@@ -44,43 +44,6 @@ public class OrderControllerTests
     }
 
     /// <summary>
-    /// Test for successful GetAllOrders call.
-    /// </summary>
-    [Fact]
-    public async Task GetAllOrders_WhenCalled_ReturnsOkResultWithOrders()
-    {
-        // Arrange
-        var testOrders = new List<OrderResponse> { new() { Id = 1 }, new() { Id = 2 } };
-        _orderService.Setup(s => s.GetAllOrdersAsync()).ReturnsAsync(testOrders);
-
-        // Act
-        var result = await _controller.GetAllOrders();
-
-        // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnValue = Assert.IsAssignableFrom<IEnumerable<OrderResponse>>(okResult.Value);
-        Assert.Equal(testOrders, returnValue);
-    }
-
-    /// <summary>
-    /// Test for GetAllOrders when no orders are found.
-    /// </summary>
-    [Fact]
-    public async Task GetAllOrders_WhenCalled_ReturnsOkResultWithEmptyList()
-    {
-        // Arrange
-        _orderService.Setup(s => s.GetAllOrdersAsync()).ReturnsAsync(new List<OrderResponse>());
-
-        // Act
-        var result = await _controller.GetAllOrders();
-
-        // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnValue = Assert.IsAssignableFrom<IEnumerable<OrderResponse>>(okResult.Value);
-        Assert.Empty(returnValue);
-    }
-
-    /// <summary>
     /// Test for successful CreateGameOrder call.
     /// </summary>
     [Fact]

@@ -1,10 +1,12 @@
 ﻿using Gamestore.Database.Entities.Enums;
+using Microsoft.Extensions.Options;
 
 namespace Gamestore.Tests.Database.RepositoriesTests;
 public class OrderRepositoryTests : IDisposable
 {
     private readonly OrderRepository _repository;
     private readonly GamestoreContext _context;
+    private readonly MongoContext _mongoContext;
 
     private Order _testOrder;
 
@@ -15,7 +17,14 @@ public class OrderRepositoryTests : IDisposable
             .Options;
 
         _context = new GamestoreContext(options);
-        _repository = new OrderRepository(_context);
+
+        var mongoSettings = Options.Create(new MongoSettings
+        {
+            ConnectionString = "mongodb://localhost:27017",
+            Database = "Northwind",
+        });
+        _mongoContext = new MongoContext(mongoSettings);
+        _repository = new OrderRepository(_context, _mongoContext);
 
         InitializeTestData();
     }

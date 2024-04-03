@@ -49,4 +49,10 @@ public class ProductOrderDetails
     /// </summary>
     [BsonElement("Discount")]
     public decimal Discount { get; set; }
+
+    [ForeignKey("ProductID")]
+    public Product? Product { get; set; }
+
+    [ForeignKey("OrderID")]
+    public ProductOrderDetails? OrderDetails { get; set; }
 }

@@ -25,7 +25,7 @@ public class DataBaseLogger
     /// <summary>
     /// Logs an entity change.
     /// </summary>
-    public void LogChange(CrudOperation action, string entityType, BsonDocument oldObject, BsonDocument newObject)
+    public void LogChange(CrudOperation action, string? entityType, BsonDocument oldObject, BsonDocument newObject)
     {
         var log = new Log
         {

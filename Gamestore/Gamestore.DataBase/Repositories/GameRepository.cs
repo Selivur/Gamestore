@@ -80,8 +80,10 @@ public class GameRepository : IGameRepository
     /// <inheritdoc />
     public async Task UpdateGameWithDependencies(Game game, int[] genresId, int[] platformsId, int publisherId)
     {
-        game = _context.Games.Include(g => g.Genres).Include(g => g.Platforms)
-        .FirstOrDefault(g => g.Id == game.Id);
+        game = _context.Games
+            .Include(g => g.Genres)
+            .Include(g => g.Platforms)
+            .FirstOrDefault(g => g.Id == game.Id);
 
         game.Genres.Clear();
         var selectedGenres = _context.Genres.Where(g => genresId.Contains(g.Id)).ToList();

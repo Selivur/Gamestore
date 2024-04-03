@@ -28,9 +28,9 @@ public class MongoProductSupplierRepository : IProductSupplierRepository
     }
 
     /// <inheritdoc />
-    public async Task<ProductSupplier> GetProductSupplierByIdAsync(int id)
+    public async Task<ProductSupplier> GetProductSupplierByCompanyNameAsync(string companyName)
     {
-        return await _context.ProductSuppliers.Find(p => p.SupplierId == id).FirstOrDefaultAsync();
+        return await _context.ProductSuppliers.Find(p => p.CompanyName == companyName).FirstOrDefaultAsync();
     }
 
     /// <inheritdoc />

@@ -11,7 +11,7 @@ public class MongoOrderRepository : IOrderRepository
 
     public MongoOrderRepository(MongoContext context)
     {
-        _orders = context.Orders;
+        _orders = context.ProductOrders;
     }
 
     public Task AddAsync(Order order)
