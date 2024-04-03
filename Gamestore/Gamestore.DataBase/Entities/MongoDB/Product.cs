@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -8,6 +9,7 @@ namespace Gamestore.Database.Entities.MongoDB;
 /// <summary>
 /// Represents a product with its details.
 /// </summary>
+[Index(nameof(ProductName), IsUnique = true)]
 public class Product
 {
     /// <summary>

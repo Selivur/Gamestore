@@ -14,11 +14,11 @@ public interface IProductRepository
     Task<IEnumerable<Product>> GetAllProductsAsync();
 
     /// <summary>
-    /// Gets a product by its ID.
+    /// Gets a product by its name.
     /// </summary>
-    /// <param name="id">The ID of the product.</param>
+    /// <param name="name">The ID of the product.</param>
     /// <returns>The product with the given ID, or null if no such product exists.</returns>
-    Task<Product> GetProductByIdAsync(int id);
+    Task<Product> GetProductByNameAsync(string name);
 
     /// <summary>
     /// Adds a new product.

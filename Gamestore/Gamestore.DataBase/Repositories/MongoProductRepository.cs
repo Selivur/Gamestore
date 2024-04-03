@@ -28,9 +28,9 @@ public class MongoProductRepository : IProductRepository
     }
 
     /// <inheritdoc />
-    public async Task<Product> GetProductByIdAsync(int id)
+    public async Task<Product> GetProductByNameAsync(string name)
     {
-        return await _context.Products.Find(p => p.ProductID == id).FirstOrDefaultAsync();
+        return await _context.Products.Find(p => p.ProductName == name).FirstOrDefaultAsync();
     }
 
     /// <inheritdoc />
