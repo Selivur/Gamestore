@@ -1,7 +1,10 @@
 ﻿using Gamestore.Database.Dbcontext;
+using Gamestore.Database.Entities.Enums;
 using Gamestore.Database.Entities.MongoDB;
 using Gamestore.Database.Repositories.Interfaces;
+using Gamestore.Database.Services;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
 
 namespace Gamestore.Database.Repositories;
 
@@ -11,14 +14,16 @@ namespace Gamestore.Database.Repositories;
 public class SQLProductRepository : IProductRepository
 {
     private readonly GamestoreContext _context;
+    private readonly DataBaseLogger _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SQLProductRepository"/> class.
     /// </summary>
     /// <param name="context">The database context.</param>
-    public SQLProductRepository(GamestoreContext context)
+    public SQLProductRepository(GamestoreContext context, MongoContext mongoContext)
     {
         _context = context;
+        _logger = new DataBaseLogger(mongoContext);
     }
 
     /// <inheritdoc />
@@ -37,14 +42,15 @@ public class SQLProductRepository : IProductRepository
     public async Task AddProductAsync(Product product)
     {
         _context.Products.Add(product);
-        await _context.SaveChangesAsync();
+        await SaveChangesAsync("Error when adding the product in the database.", CrudOperation.Add, null, product.ToBsonDocument());
     }
 
     /// <inheritdoc />
     public async Task UpdateProductAsync(Product product)
     {
+        var oldObject = await _context.ProductCategories.AsNoTracking().FirstAsync(o => o.Id == product.Id);
         _context.Entry(product).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
+        await SaveChangesAsync("Error when updating the product in the database.", CrudOperation.Update, oldObject.ToBsonDocument(), product.ToBsonDocument());
     }
 
     /// <inheritdoc />
@@ -54,7 +60,29 @@ public class SQLProductRepository : IProductRepository
         if (product != null)
         {
             _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync("Error when deleting the product in the database.", CrudOperation.Delete, product.ToBsonDocument(), null);
         }
+    }
+
+    /// <summary>
+    /// Asynchronously saves changes to the database context and throws a <see cref="DbUpdateException"/>
+    /// with the specified error message if no changes were saved.
+    /// </summary>
+    /// <param name="errorMessage">The error message to be included in the exception if no changes were saved.</param>
+    /// <returns>An asynchronous task representing the operation's completion or throwing a <see cref="DbUpdateException"/>.</returns>
+    private async Task SaveChangesAsync(string errorMessage, CrudOperation operation, BsonDocument oldObject, BsonDocument newObject)
+    {
+        var saved = await _context.SaveChangesAsync();
+
+        if (saved == 0)
+        {
+            throw new DbUpdateException(errorMessage);
+        }
+
+        _logger.LogChange(
+            action: operation,
+            entityType: typeof(Product).FullName,
+            oldObject: oldObject,
+            newObject: newObject);
     }
 }
