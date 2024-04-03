@@ -53,7 +53,19 @@ public class ProductService : IProductService
     /// <inheritdoc />
     public async Task UpdateProductAsync(Product product)
     {
-        await _sqlProductRepository.UpdateProductAsync(product);
         await _mongoProductRepository.UpdateProductAsync(product);
+
+        var existingProduct = await _sqlProductRepository.GetProductByNameAsync(product.ProductName);
+
+        if (existingProduct != null)
+        {
+            await _sqlProductRepository.UpdateProductAsync(product);
+        }
+        else
+        {
+            await _sqlProductRepository.AddProductAsync(product);
+        }
+
+        // tip: ask about unique obj between two db
     }
 }
