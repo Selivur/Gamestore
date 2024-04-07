@@ -40,9 +40,9 @@ builder.Services.AddScoped<IGenreRepository, GenreRepository>();
 builder.Services.AddScoped<IPlatformRepository, PlatformRepository>();
 builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IMongoOrderRepository, MongoOrderRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IShipperRepository, ShipperRepository>();
-builder.Services.AddScoped<MongoOrderRepository>();
 
 builder.Services.AddScoped<LoggingActionFilter>();
 builder.Services.AddScoped<GlobalExceptionHandler>();

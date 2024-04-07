@@ -38,7 +38,11 @@ public class SQLProductCategoryRepository : IProductCategoryRepository
     public async Task AddProductCategoryAsync(ProductCategory productCategory)
     {
         _context.ProductCategories.Add(productCategory);
-        await SaveChangesAsync("Error when adding the Product Category in the database.", CrudOperation.Add, null, productCategory.ToBsonDocument());
+        await SaveChangesAsync(
+            "Error when adding the Product Category in the database.",
+            CrudOperation.Add,
+            null,
+            productCategory.ToBsonDocument());
     }
 
     /// <inheritdoc />
@@ -46,7 +50,11 @@ public class SQLProductCategoryRepository : IProductCategoryRepository
     {
         var oldObject = await _context.ProductCategories.AsNoTracking().FirstAsync(o => o.Id == productCategory.Id);
         _context.Entry(productCategory).State = EntityState.Modified;
-        await SaveChangesAsync("Error when updating the Product Category in the database.", CrudOperation.Update, oldObject.ToBsonDocument(), productCategory.ToBsonDocument());
+        await SaveChangesAsync(
+            "Error when updating the Product Category in the database.",
+            CrudOperation.Update,
+            oldObject.ToBsonDocument(),
+            productCategory.ToBsonDocument());
     }
 
     /// <inheritdoc />
@@ -56,7 +64,11 @@ public class SQLProductCategoryRepository : IProductCategoryRepository
         if (productCategory != null)
         {
             _context.ProductCategories.Remove(productCategory);
-            await SaveChangesAsync("Error when deleting the Product Category in the database.", CrudOperation.Delete, productCategory.ToBsonDocument(), null);
+            await SaveChangesAsync(
+                "Error when deleting the Product Category in the database.",
+                CrudOperation.Delete,
+                productCategory.ToBsonDocument(),
+                null);
         }
     }
 

@@ -16,7 +16,7 @@ public class OrderServiceTests
     private readonly Mock<IGameService> _mockGameService;
     private readonly Mock<IPaymentService> _mockPaymentService;
     private readonly IOrderService _orderService;
-    private readonly Mock<MongoOrderRepository> _mockMongoOrderRepository;
+    private readonly Mock<IMongoOrderRepository> _mockMongoOrderRepository;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OrderServiceTests"/> class.
@@ -25,7 +25,7 @@ public class OrderServiceTests
     public OrderServiceTests()
     {
         _mockOrderRepository = new Mock<IOrderRepository>();
-        _mockMongoOrderRepository = new Mock<MongoOrderRepository>();
+        _mockMongoOrderRepository = new Mock<IMongoOrderRepository>();
         _mockGameService = new Mock<IGameService>();
         _mockPaymentService = new Mock<IPaymentService>();
         _orderService = new OrderService(_mockOrderRepository.Object, _mockMongoOrderRepository.Object, _mockGameService.Object, _mockPaymentService.Object);

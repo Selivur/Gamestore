@@ -20,15 +20,23 @@ public class ProductService : IProductService
         var existingProductSql = await _sqlProductRepository.GetProductByNameAsync(product.ProductName);
         var existingProductMongo = await _mongoProductRepository.GetProductByNameAsync(product.ProductName);
 
-        if (existingProductSql == null && existingProductMongo == null)
+        if (existingProductSql == null)
         {
             await _sqlProductRepository.AddProductAsync(product);
-
-            // await _mongoProductRepository.AddProductAsync(product);
         }
         else
         {
             throw new InvalidOperationException($"Product with name {product.ProductName} already exists.");
+        }
+
+        if (existingProductMongo == null)
+        {
+            await _mongoProductRepository.AddProductAsync(product);
+        }
+        else
+        {
+            existingProductMongo.UnitsInStock = product.UnitsInStock;
+            await _mongoProductRepository.UpdateProductAsync(existingProductMongo);
         }
 
         return product;
@@ -65,7 +73,5 @@ public class ProductService : IProductService
         {
             await _sqlProductRepository.AddProductAsync(product);
         }
-
-        // tip: ask about unique obj between two db
     }
 }

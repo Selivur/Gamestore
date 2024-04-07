@@ -3,7 +3,6 @@ using Gamestore.Api.Models.DTO.OrderDTO;
 using Gamestore.Api.Services.Interfaces;
 using Gamestore.Database.Entities;
 using Gamestore.Database.Entities.Enums;
-using Gamestore.Database.Repositories;
 using Gamestore.Database.Repositories.Interfaces;
 using iText.Kernel.Pdf;
 using iText.Layout;
@@ -18,7 +17,7 @@ namespace Gamestore.Api.Services;
 public class OrderService : IOrderService
 {
     private readonly IOrderRepository _sqlOrderRepository;
-    private readonly IOrderRepository _mongoOrderRepository;
+    private readonly IMongoOrderRepository _mongoOrderRepository;
     private readonly IGameService _gameService;
     private readonly IPaymentService _paymentService;
 
@@ -26,7 +25,7 @@ public class OrderService : IOrderService
     /// Initializes a new instance of the <see cref="OrderService"/> class.
     /// </summary>
     /// <param name="sqlOrderRepository">The order repository providing data access for the service.</param>
-    public OrderService(IOrderRepository sqlOrderRepository, MongoOrderRepository mongoOrderRepository, IGameService gameRepository, IPaymentService paymentService)
+    public OrderService(IOrderRepository sqlOrderRepository, IMongoOrderRepository mongoOrderRepository, IGameService gameRepository, IPaymentService paymentService)
     {
         _sqlOrderRepository = sqlOrderRepository;
         _mongoOrderRepository = mongoOrderRepository;

@@ -5,7 +5,7 @@ using Gamestore.Database.Repositories.Interfaces;
 using MongoDB.Driver;
 
 namespace Gamestore.Database.Repositories;
-public class MongoOrderRepository : IOrderRepository
+public class MongoOrderRepository : IMongoOrderRepository
 {
     private readonly IMongoCollection<ProductOrder> _orders;
 
