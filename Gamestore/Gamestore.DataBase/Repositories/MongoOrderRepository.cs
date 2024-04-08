@@ -1,5 +1,4 @@
-﻿using Gamestore.Database.Dbcontext;
-using Gamestore.Database.Entities;
+﻿using Gamestore.Database.Entities;
 using Gamestore.Database.Entities.MongoDB;
 using Gamestore.Database.Repositories.Interfaces;
 using MongoDB.Driver;
@@ -9,9 +8,9 @@ public class MongoOrderRepository : IMongoOrderRepository
 {
     private readonly IMongoCollection<ProductOrder> _orders;
 
-    public MongoOrderRepository(MongoContext context)
+    public MongoOrderRepository(IMongoCollection<ProductOrder> orders)
     {
-        _orders = context.ProductOrders;
+        _orders = orders;
     }
 
     public Task AddAsync(Order order)
