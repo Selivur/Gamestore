@@ -1,20 +1,19 @@
-﻿using Gamestore.Database.Dbcontext;
-using Gamestore.Database.Entities.MongoDB;
+﻿using Gamestore.Database.Entities.MongoDB;
 using Gamestore.Database.Repositories.Interfaces;
 using MongoDB.Driver;
 
 namespace Gamestore.Database.Repositories;
 public class ShipperRepository : IShipperRepository
 {
-    private readonly MongoContext _context;
+    private readonly IMongoCollection<ProductShipper> _shippers;
 
-    public ShipperRepository(MongoContext context)
+    public ShipperRepository(IMongoCollection<ProductShipper> shippers)
     {
-        _context = context;
+        _shippers = shippers;
     }
 
     public async Task<List<ProductShipper>> GetAllShippersAsync()
     {
-        return await _context.ProductShippers.Find(shipper => true).ToListAsync();
+        return await _shippers.Find(shipper => true).ToListAsync();
     }
 }
