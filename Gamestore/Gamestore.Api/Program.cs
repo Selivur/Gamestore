@@ -4,12 +4,15 @@ using Gamestore.Api.Middleware;
 using Gamestore.Api.Services;
 using Gamestore.Api.Services.Interfaces;
 using Gamestore.Database.Dbcontext;
+using Gamestore.Database.Entities.MongoDB;
 using Gamestore.Database.Repositories;
 using Gamestore.Database.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 using Serilog;
 using Serilog.Exceptions;
+using Log = Serilog.Log;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +49,30 @@ builder.Services.AddScoped<IShipperRepository, ShipperRepository>();
 
 builder.Services.AddScoped<LoggingActionFilter>();
 builder.Services.AddScoped<GlobalExceptionHandler>();
+
+builder.Services.AddSingleton(sp =>
+{
+    var mongoSettings = sp.GetRequiredService<IOptions<MongoSettings>>();
+    return new MongoContext(mongoSettings);
+});
+
+builder.Services.AddSingleton(sp =>
+{
+    var mongoSettings = sp.GetRequiredService<IOptions<MongoSettings>>().Value;
+    var client = new MongoClient(mongoSettings.ConnectionString);
+    var database = client.GetDatabase(mongoSettings.Database);
+
+    return database.GetCollection<ProductOrder>("ProductOrders");
+});
+
+builder.Services.AddSingleton(sp =>
+{
+    var mongoSettings = sp.GetRequiredService<IOptions<MongoSettings>>().Value;
+    var client = new MongoClient(mongoSettings.ConnectionString);
+    var database = client.GetDatabase(mongoSettings.Database);
+
+    return database.GetCollection<ProductShipper>("ProductShippers");
+});
 
 builder.Services.AddDbContext<GamestoreContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Gamestore.Api")));
