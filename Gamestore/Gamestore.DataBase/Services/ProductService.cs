@@ -1,14 +1,14 @@
 ﻿using Gamestore.Database.Entities.MongoDB;
-using Gamestore.Database.Repositories;
+using Gamestore.Database.Repositories.Interfaces;
 using Gamestore.Database.Services.Interfaces;
 
 namespace Gamestore.Database.Services;
 public class ProductService : IProductService
 {
-    private readonly SQLProductRepository _sqlProductRepository;
-    private readonly MongoProductRepository _mongoProductRepository;
+    private readonly IProductRepository _sqlProductRepository;
+    private readonly IProductRepository _mongoProductRepository;
 
-    public ProductService(SQLProductRepository sqlProductRepository, MongoProductRepository mongoProductRepository)
+    public ProductService(IProductRepository sqlProductRepository, IProductRepository mongoProductRepository)
     {
         _sqlProductRepository = sqlProductRepository;
         _mongoProductRepository = mongoProductRepository;
