@@ -20,14 +20,12 @@ public class ProductService : IProductService
         var existingProductSql = await _sqlProductRepository.GetProductByNameAsync(product.ProductName);
         var existingProductMongo = await _mongoProductRepository.GetProductByNameAsync(product.ProductName);
 
-        if (existingProductSql == null)
-        {
-            await _sqlProductRepository.AddProductAsync(product);
-        }
-        else
+        if (existingProductSql != null)
         {
             throw new InvalidOperationException($"Product with name {product.ProductName} already exists.");
         }
+
+        await _sqlProductRepository.AddProductAsync(product);
 
         if (existingProductMongo == null)
         {
@@ -45,17 +43,9 @@ public class ProductService : IProductService
     /// <inheritdoc />
     public async Task<Product> GetProductByNameAsync(string name)
     {
-        var product = await _sqlProductRepository.GetProductByNameAsync(name);
-        if (product != null)
-        {
-            return product;
-        }
+        var product = await _sqlProductRepository.GetProductByNameAsync(name) ?? await _mongoProductRepository.GetProductByNameAsync(name);
 
-        product = await _mongoProductRepository.GetProductByNameAsync(name);
-
-        return product != null
-            ? product
-            : null;
+        return product;
     }
 
     /// <inheritdoc />

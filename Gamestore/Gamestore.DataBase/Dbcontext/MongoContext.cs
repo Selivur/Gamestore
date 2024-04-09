@@ -27,56 +27,35 @@ public class MongoContext
     /// <summary>
     /// Gets the collection of shippers.
     /// </summary>
-    public IMongoCollection<ProductShipper> ProductShippers
-    {
-        get { return _database.GetCollection<ProductShipper>("shippers"); }
-    }
+    public IMongoCollection<ProductShipper> ProductShippers => _database.GetCollection<ProductShipper>("shippers");
 
     /// <summary>
     /// Gets the collection of orders.
     /// </summary>
-    public IMongoCollection<ProductOrder> ProductOrders
-    {
-        get { return _database.GetCollection<ProductOrder>("orders"); }
-    }
+    public IMongoCollection<ProductOrder> ProductOrders => _database.GetCollection<ProductOrder>("orders");
 
     /// <summary>
     /// Gets the collection of products.
     /// </summary>
-    public IMongoCollection<Product> Products
-    {
-        get { return _database.GetCollection<Product>("products"); }
-    }
+    public IMongoCollection<Product> Products => _database.GetCollection<Product>("products");
 
     /// <summary>
     /// Gets the collection of categories.
     /// </summary>
-    public IMongoCollection<ProductCategory> ProductCategories
-    {
-        get { return _database.GetCollection<ProductCategory>("categories"); }
-    }
+    public IMongoCollection<ProductCategory> ProductCategories => _database.GetCollection<ProductCategory>("categories");
 
     /// <summary>
     /// Gets the collection of order details.
     /// </summary>
-    public IMongoCollection<ProductOrderDetails> ProductOrderDetails
-    {
-        get { return _database.GetCollection<ProductOrderDetails>("orderDetails"); }
-    }
+    public IMongoCollection<ProductOrderDetails> ProductOrderDetails => _database.GetCollection<ProductOrderDetails>("orderDetails");
 
     /// <summary>
     /// Gets the collection of suppliers.
     /// </summary>
-    public IMongoCollection<ProductSupplier> ProductSuppliers
-    {
-        get { return _database.GetCollection<ProductSupplier>("suppliers"); }
-    }
+    public IMongoCollection<ProductSupplier> ProductSuppliers => _database.GetCollection<ProductSupplier>("suppliers");
 
     /// <summary>
     /// Gets the collection of logs.
     /// </summary>
-    public IMongoCollection<Log> Logs
-    {
-        get { return _database.GetCollection<Log>("logs"); }
-    }
+    public IMongoCollection<Log> Logs => _database.GetCollection<Log>("logs");
 }
