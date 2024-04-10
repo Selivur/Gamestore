@@ -1,7 +1,11 @@
 ﻿using Gamestore.Database.Dbcontext;
 using Gamestore.Database.Entities;
+using Gamestore.Database.Entities.Enums;
+using Gamestore.Database.Entities.MongoDB;
 using Gamestore.Database.Repositories.Interfaces;
+using Gamestore.Database.Services;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
 
 namespace Gamestore.Database.Repositories;
 
@@ -12,6 +16,7 @@ namespace Gamestore.Database.Repositories;
 public class PublisherRepository : IPublisherRepository
 {
     private readonly GamestoreContext _context;
+    private readonly DataBaseLogger _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PublisherRepository"/> class.
@@ -20,6 +25,7 @@ public class PublisherRepository : IPublisherRepository
     public PublisherRepository(GamestoreContext context)
     {
         _context = context;
+        _logger = new DataBaseLogger();
     }
 
     /// <inheritdoc />
@@ -44,7 +50,7 @@ public class PublisherRepository : IPublisherRepository
     public async Task AddAsync(Publisher publisher)
     {
         _context.Publishers.Add(publisher);
-        await SaveChangesAsync("Error when adding the publisher to the database.");
+        await SaveChangesAsync("Error when adding the publisher to the database.", CrudOperation.Add, null, publisher.ToBsonDocument());
     }
 
     /// <inheritdoc />
@@ -52,7 +58,9 @@ public class PublisherRepository : IPublisherRepository
     {
         _context.Entry(publisher).State = EntityState.Modified;
 
-        await SaveChangesAsync("Error when updating the publisher in the database.");
+        var oldObject = await _context.Publishers.AsNoTracking().FirstAsync(o => o.Id == publisher.Id);
+
+        await SaveChangesAsync("Error when updating the publisher in the database.", CrudOperation.Update, oldObject.ToBsonDocument(), publisher.ToBsonDocument());
     }
 
     /// <inheritdoc />
@@ -63,7 +71,7 @@ public class PublisherRepository : IPublisherRepository
 
         _context.Publishers.Remove(publisher);
 
-        await SaveChangesAsync("Error when deleting the publisher from the database.");
+        await SaveChangesAsync("Error when deleting the publisher from the database.", CrudOperation.Delete, publisher.ToBsonDocument(), null);
     }
 
     /// <inheritdoc />
@@ -89,7 +97,7 @@ public class PublisherRepository : IPublisherRepository
     /// </summary>
     /// <param name="errorMessage">The error message to be included in the exception if no changes were saved.</param>
     /// <returns>An asynchronous task representing the operation's completion or throwing a <see cref="DbUpdateException"/>.</returns>
-    private async Task SaveChangesAsync(string errorMessage)
+    private async Task SaveChangesAsync(string errorMessage, CrudOperation operation, BsonDocument oldObject, BsonDocument newObject)
     {
         var saved = await _context.SaveChangesAsync();
 
@@ -97,5 +105,11 @@ public class PublisherRepository : IPublisherRepository
         {
             throw new DbUpdateException(errorMessage);
         }
+
+        _logger.LogChange(
+            action: operation,
+            entityType: typeof(ProductSupplier).FullName,
+            oldObject: oldObject,
+            newObject: newObject);
     }
 }

@@ -1,7 +1,11 @@
 ﻿using Gamestore.Database.Dbcontext;
 using Gamestore.Database.Entities;
+using Gamestore.Database.Entities.Enums;
+using Gamestore.Database.Entities.MongoDB;
 using Gamestore.Database.Repositories.Interfaces;
+using Gamestore.Database.Services;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
 
 namespace Gamestore.Database.Repositories;
 
@@ -11,6 +15,7 @@ namespace Gamestore.Database.Repositories;
 public class GenreRepository : IGenreRepository
 {
     private readonly GamestoreContext _context;
+    private readonly DataBaseLogger _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GenreRepository"/> class.
@@ -19,6 +24,7 @@ public class GenreRepository : IGenreRepository
     public GenreRepository(GamestoreContext context)
     {
         _context = context;
+        _logger = new DataBaseLogger();
     }
 
     /// <inheritdoc />
@@ -44,7 +50,7 @@ public class GenreRepository : IGenreRepository
     {
         _context.Genres.Add(genre);
 
-        await SaveChangesAsync("Error when adding the platform from the database.");
+        await SaveChangesAsync("Error when adding the genre from the database.", CrudOperation.Add, null, genre.ToBsonDocument());
     }
 
     /// <inheritdoc />
@@ -52,7 +58,9 @@ public class GenreRepository : IGenreRepository
     {
         _context.Entry(genre).State = EntityState.Modified;
 
-        await SaveChangesAsync("Error when updating the platform from the database.");
+        var oldObject = await _context.Genres.AsNoTracking().FirstAsync(o => o.Id == genre.Id);
+
+        await SaveChangesAsync("Error when updating the genre from the database.", CrudOperation.Update, oldObject.ToBsonDocument(), genre.ToBsonDocument());
     }
 
     /// <inheritdoc />
@@ -68,7 +76,7 @@ public class GenreRepository : IGenreRepository
 
         _context.Genres.Remove(genreToRemove);
 
-        await SaveChangesAsync("Error when deleting the platform from the database.");
+        await SaveChangesAsync("Error when deleting the genre from the database.", CrudOperation.Delete, genreToRemove.ToBsonDocument(), null);
     }
 
     /// <inheritdoc />
@@ -103,12 +111,19 @@ public class GenreRepository : IGenreRepository
     /// </summary>
     /// <param name="errorMessage">The error message to be included in the exception if no changes were saved.</param>
     /// <returns>An asynchronous task representing the operation's completion or throwing a <see cref="DbUpdateException"/>.</returns>
-    private async Task SaveChangesAsync(string errorMessage)
+    private async Task SaveChangesAsync(string errorMessage, CrudOperation operation, BsonDocument oldObject, BsonDocument newObject)
     {
         var saved = await _context.SaveChangesAsync();
+
         if (saved == 0)
         {
             throw new DbUpdateException(errorMessage);
         }
+
+        _logger.LogChange(
+            action: operation,
+            entityType: typeof(ProductSupplier).FullName,
+            oldObject: oldObject,
+            newObject: newObject);
     }
 }

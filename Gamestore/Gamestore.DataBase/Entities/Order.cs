@@ -6,7 +6,7 @@ namespace Gamestore.Database.Entities;
 /// <summary>
 /// Represents an order entity in the Gamestore database.
 /// </summary>
-public class Order
+public class Order : ICloneable
 {
     /// <summary>
     /// Gets or sets the unique identifier of the order.
@@ -46,5 +46,14 @@ public class Order
             Customer = new Customer { Name = productOrder.CustomerId },
             OrderDate = productOrder.OrderDate,
         };
+    }
+
+    /// <summary>
+    /// Creates a shallow copy of the current object.
+    /// </summary>
+    /// <returns>A shallow copy of the current object.</returns>
+    public object Clone()
+    {
+        return MemberwiseClone();
     }
 }

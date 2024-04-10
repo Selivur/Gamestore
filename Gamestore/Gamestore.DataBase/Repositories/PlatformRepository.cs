@@ -1,7 +1,11 @@
 ﻿using Gamestore.Database.Dbcontext;
 using Gamestore.Database.Entities;
+using Gamestore.Database.Entities.Enums;
+using Gamestore.Database.Entities.MongoDB;
 using Gamestore.Database.Repositories.Interfaces;
+using Gamestore.Database.Services;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
 
 namespace Gamestore.Database.Repositories;
 
@@ -11,10 +15,12 @@ namespace Gamestore.Database.Repositories;
 public class PlatformRepository : IPlatformRepository
 {
     private readonly GamestoreContext _context;
+    private readonly DataBaseLogger _logger;
 
     public PlatformRepository(GamestoreContext context)
     {
         _context = context;
+        _logger = new DataBaseLogger();
     }
 
     /// <inheritdoc />
@@ -40,7 +46,7 @@ public class PlatformRepository : IPlatformRepository
     {
         _context.Platforms.Add(platform);
 
-        await SaveChangesAsync("Error when adding the platform from the database.");
+        await SaveChangesAsync("Error when adding the platform from the database.", CrudOperation.Add, null, platform.ToBsonDocument());
     }
 
     /// <inheritdoc />
@@ -48,7 +54,9 @@ public class PlatformRepository : IPlatformRepository
     {
         _context.Entry(platform).State = EntityState.Modified;
 
-        await SaveChangesAsync("Error when updating the platform from the database.");
+        var oldObject = await _context.Platforms.AsNoTracking().FirstAsync(o => o.Id == platform.Id);
+
+        await SaveChangesAsync("Error when updating the platform from the database.", CrudOperation.Update, oldObject.ToBsonDocument(), platform.ToBsonDocument());
     }
 
     /// <inheritdoc />
@@ -59,7 +67,7 @@ public class PlatformRepository : IPlatformRepository
 
         _context.Platforms.Remove(platformToRemove);
 
-        await SaveChangesAsync("Error when deleting the platform from the database.");
+        await SaveChangesAsync("Error when deleting the platform from the database.", CrudOperation.Delete, platformToRemove.ToBsonDocument(), null);
     }
 
     /// <inheritdoc />
@@ -86,12 +94,19 @@ public class PlatformRepository : IPlatformRepository
     /// </summary>
     /// <param name="errorMessage">The error message to be included in the exception if no changes were saved.</param>
     /// <returns>An asynchronous task representing the operation's completion or throwing a <see cref="DbUpdateException"/>.</returns>
-    private async Task SaveChangesAsync(string errorMessage)
+    private async Task SaveChangesAsync(string errorMessage, CrudOperation operation, BsonDocument oldObject, BsonDocument newObject)
     {
         var saved = await _context.SaveChangesAsync();
+
         if (saved == 0)
         {
             throw new DbUpdateException(errorMessage);
         }
+
+        _logger.LogChange(
+            action: operation,
+            entityType: typeof(ProductSupplier).FullName,
+            oldObject: oldObject,
+            newObject: newObject);
     }
 }

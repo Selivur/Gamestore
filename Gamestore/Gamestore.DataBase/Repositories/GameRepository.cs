@@ -1,7 +1,11 @@
 ﻿using Gamestore.Database.Dbcontext;
 using Gamestore.Database.Entities;
+using Gamestore.Database.Entities.Enums;
+using Gamestore.Database.Entities.MongoDB;
 using Gamestore.Database.Repositories.Interfaces;
+using Gamestore.Database.Services;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
 
 namespace Gamestore.Database.Repositories;
 
@@ -12,6 +16,7 @@ namespace Gamestore.Database.Repositories;
 public class GameRepository : IGameRepository
 {
     private readonly GamestoreContext _context;
+    private readonly DataBaseLogger _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GameRepository"/> class.
@@ -20,6 +25,7 @@ public class GameRepository : IGameRepository
     public GameRepository(GamestoreContext context)
     {
         _context = context;
+        _logger = new DataBaseLogger();
     }
 
     /// <inheritdoc />
@@ -44,7 +50,7 @@ public class GameRepository : IGameRepository
     public async Task AddAsync(Game game)
     {
         _context.Games.Add(game);
-        await SaveChangesAsync("Error when adding the game to the database.");
+        await SaveChangesAsync("Error when adding the game to the database.", CrudOperation.Add, null, game.ToBsonDocument());
     }
 
     /// <inheritdoc />
@@ -52,7 +58,9 @@ public class GameRepository : IGameRepository
     {
         _context.Entry(game).State = EntityState.Modified;
 
-        await SaveChangesAsync("Error when updating the game in the database.");
+        var oldObject = await _context.Games.AsNoTracking().FirstAsync(o => o.Id == game.Id);
+
+        await SaveChangesAsync("Error when updating the game in the database.", CrudOperation.Update, oldObject.ToBsonDocument(), game.ToBsonDocument());
     }
 
     /// <inheritdoc />
@@ -63,23 +71,26 @@ public class GameRepository : IGameRepository
 
         _context.Games.Remove(game);
 
-        await SaveChangesAsync("Error when deleting the game from the database.");
+        await SaveChangesAsync("Error when deleting the game from the database.", CrudOperation.Delete, game.ToBsonDocument(), null);
     }
 
     /// <inheritdoc />
     public async Task AddGameWithDependencies(Game game, int[] genresId, int[] platformsId, int publisherId)
     {
+        var clonedGame = (Game)game.Clone();
         game.Genres = _context.Genres.Where(g => genresId.Contains(g.Id)).ToList();
         game.Platforms = _context.Platforms.Where(p => platformsId.Contains(p.Id)).ToList();
         game.Publisher = _context.Publishers.Find(publisherId);
 
         _context.Games.Add(game);
-        await SaveChangesAsync("Error when adding the game to the database.");
+
+        await SaveChangesAsync("Error when adding the game to the database.", CrudOperation.Add, null, clonedGame.ToBsonDocument());
     }
 
     /// <inheritdoc />
     public async Task UpdateGameWithDependencies(Game game, int[] genresId, int[] platformsId, int publisherId)
     {
+        var oldObject = await _context.Games.AsNoTracking().FirstAsync(o => o.Id == game.Id);
         game = _context.Games
             .Include(g => g.Genres)
             .Include(g => g.Platforms)
@@ -103,7 +114,7 @@ public class GameRepository : IGameRepository
 
         _context.Games.Update(game);
 
-        await SaveChangesAsync("Error when updating the game in the database.");
+        await SaveChangesAsync("Error when updating the game in the database.", CrudOperation.Update, oldObject.ToBsonDocument(), game.ToBsonDocument());
     }
 
     /// <inheritdoc />
@@ -166,7 +177,7 @@ public class GameRepository : IGameRepository
     /// </summary>
     /// <param name="errorMessage">The error message to be included in the exception if no changes were saved.</param>
     /// <returns>An asynchronous task representing the operation's completion or throwing a <see cref="DbUpdateException"/>.</returns>
-    private async Task SaveChangesAsync(string errorMessage)
+    private async Task SaveChangesAsync(string errorMessage, CrudOperation operation, BsonDocument oldObject, BsonDocument newObject)
     {
         var saved = await _context.SaveChangesAsync();
 
@@ -174,5 +185,11 @@ public class GameRepository : IGameRepository
         {
             throw new DbUpdateException(errorMessage);
         }
+
+        _logger.LogChange(
+            action: operation,
+            entityType: typeof(ProductSupplier).FullName,
+            oldObject: oldObject,
+            newObject: newObject);
     }
 }

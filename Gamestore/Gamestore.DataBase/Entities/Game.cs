@@ -8,7 +8,7 @@ namespace Gamestore.Database.Entities;
 /// Represents a game entity in the Gamestore database.
 /// </summary>
 [Index(nameof(GameAlias), IsUnique = true)]
-public class Game
+public class Game : ICloneable
 {
     /// <summary>
     /// Gets or sets the unique identifier of the game.
@@ -76,4 +76,13 @@ public class Game
     /// Gets or sets the publisher associated with the game.
     /// </summary>
     public Publisher? Publisher { get; set; }
+
+    /// <summary>
+    /// Creates a shallow copy of the current object.
+    /// </summary>
+    /// <returns>A shallow copy of the current object.</returns>
+    public object Clone()
+    {
+        return MemberwiseClone();
+    }
 }

@@ -7,7 +7,7 @@ namespace Gamestore.Database.Entities;
 /// <summary>
 /// Represents a comment in the database.
 /// </summary>
-public class Comment
+public class Comment : ICloneable
 {
     /// <summary>
     /// Gets or sets the unique identifier for the comment.
@@ -52,4 +52,13 @@ public class Comment
     /// Gets or sets the game associated with the comment.
     /// </summary>
     public Game Game { get; set; }
+
+    /// <summary>
+    /// Creates a shallow copy of the current object.
+    /// </summary>
+    /// <returns>A shallow copy of the current object.</returns>
+    public object Clone()
+    {
+        return MemberwiseClone();
+    }
 }

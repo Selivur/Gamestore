@@ -1,6 +1,7 @@
 ﻿using Gamestore.Database.Dbcontext;
 using Gamestore.Database.Entities;
 using Gamestore.Database.Entities.Enums;
+using Gamestore.Database.Entities.MongoDB;
 using Gamestore.Database.Repositories.Interfaces;
 using Gamestore.Database.Services;
 using Microsoft.EntityFrameworkCore;
@@ -65,23 +66,17 @@ public class OrderRepository : IOrderRepository
     {
         _context.Orders.Add(order);
 
-        await SaveChangesAsync("Error when adding the order to the database.");
+        await SaveChangesAsync("Error when adding the order to the database.", CrudOperation.Add, null, order.ToBsonDocument());
     }
 
     /// <inheritdoc />
     public async Task UpdateAsync(Order order)
     {
-        var oldOrder = await _context.Orders.AsNoTracking().FirstAsync(o => o.Id == order.Id);
-
         _context.Entry(order).State = EntityState.Modified;
 
-        _logger.LogChange(
-            action: CrudOperation.Update,
-            entityType: typeof(Order).FullName,
-            oldObject: oldOrder.ToBsonDocument(),
-            newObject: order.ToBsonDocument());
+        var oldOrder = await _context.Orders.AsNoTracking().FirstAsync(o => o.Id == order.Id);
 
-        await SaveChangesAsync("Error when updating the order in the database.");
+        await SaveChangesAsync("Error when updating the order in the database.", CrudOperation.Update, oldOrder.ToBsonDocument(), order.ToBsonDocument());
     }
 
     /// <inheritdoc />
@@ -89,7 +84,9 @@ public class OrderRepository : IOrderRepository
     {
         _context.Entry(orderDetails).State = EntityState.Modified;
 
-        await SaveChangesAsync("Error when updating the order details in the database.");
+        var oldOrderDetails = await _context.Orders.AsNoTracking().FirstAsync(o => o.Id == orderDetails.Id);
+
+        await SaveChangesAsync("Error when updating the order details in the database.", CrudOperation.Update, oldOrderDetails.ToBsonDocument(), orderDetails.ToBsonDocument());
     }
 
     /// <inheritdoc />
@@ -100,7 +97,7 @@ public class OrderRepository : IOrderRepository
 
         _context.Orders.Remove(order);
 
-        await SaveChangesAsync("Error when deleting the order from the database.");
+        await SaveChangesAsync("Error when deleting the order from the database.", CrudOperation.Delete, order.ToBsonDocument(), null);
     }
 
     /// <inheritdoc />
@@ -111,7 +108,7 @@ public class OrderRepository : IOrderRepository
 
         _context.OrderDetails.Remove(order);
 
-        await SaveChangesAsync("Error when deleting the order details from the database.");
+        await SaveChangesAsync("Error when deleting the order details from the database.", CrudOperation.Delete, order.ToBsonDocument(), null);
     }
 
     /// <inheritdoc />
@@ -129,21 +126,27 @@ public class OrderRepository : IOrderRepository
     public async Task CompleteOrder()
     {
         var order = await GetFirstOpenOrderAsync();
+
+        var oldObject = (Order)order.Clone();
+
         order.Status = OrderStatus.Paid;
         order.PaymentDate = DateTime.Now;
         _context.Entry(order).State = EntityState.Modified;
 
-        await SaveChangesAsync("Error when changed the order status to complete.");
+        await SaveChangesAsync("Error when changed the order status to complete.", CrudOperation.Update, oldObject.ToBsonDocument(), order.ToBsonDocument());
     }
 
     /// <inheritdoc />
     public async Task CancelledOrder()
     {
         var order = await GetFirstOpenOrderAsync();
+
+        var oldObject = (Order)order.Clone();
+
         order.Status = OrderStatus.Cancelled;
         _context.Entry(order).State = EntityState.Modified;
 
-        await SaveChangesAsync("Error when changed the order status to cancelled.");
+        await SaveChangesAsync("Error when changed the order status to cancelled.", CrudOperation.Update, oldObject.ToBsonDocument(), order.ToBsonDocument());
     }
 
     /// <summary>
@@ -152,7 +155,7 @@ public class OrderRepository : IOrderRepository
     /// </summary>
     /// <param name="errorMessage">The error message to be included in the exception if no changes were saved.</param>
     /// <returns>An asynchronous task representing the operation's completion or throwing a <see cref="DbUpdateException"/>.</returns>
-    private async Task SaveChangesAsync(string errorMessage)
+    private async Task SaveChangesAsync(string errorMessage, CrudOperation operation, BsonDocument oldObject, BsonDocument newObject)
     {
         var saved = await _context.SaveChangesAsync();
 
@@ -160,5 +163,11 @@ public class OrderRepository : IOrderRepository
         {
             throw new DbUpdateException(errorMessage);
         }
+
+        _logger.LogChange(
+            action: operation,
+            entityType: typeof(ProductSupplier).FullName,
+            oldObject: oldObject,
+            newObject: newObject);
     }
 }
