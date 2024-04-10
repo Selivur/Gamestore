@@ -20,10 +20,10 @@ public class SQLProductSupplierRepository : IProductSupplierRepository
     /// Initializes a new instance of the <see cref="SQLProductSupplierRepository"/> class.
     /// </summary>
     /// <param name="context">The database context.</param>
-    public SQLProductSupplierRepository(GamestoreContext context, MongoContext mongoContext)
+    public SQLProductSupplierRepository(GamestoreContext context)
     {
         _context = context;
-        _logger = new DataBaseLogger(mongoContext);
+        _logger = new DataBaseLogger();
     }
 
     /// <inheritdoc />
@@ -48,7 +48,7 @@ public class SQLProductSupplierRepository : IProductSupplierRepository
     /// <inheritdoc />
     public async Task UpdateProductSupplierAsync(ProductSupplier productSupplier)
     {
-        var oldObject = await _context.ProductCategories.AsNoTracking().FirstAsync(o => o.Id == productSupplier.Id);
+        var oldObject = await _context.ProductSuppliers.AsNoTracking().FirstAsync(o => o.SupplierId == productSupplier.SupplierId);
         _context.Entry(productSupplier).State = EntityState.Modified;
         await SaveChangesAsync("Error when updating the  product supplier in the database.", CrudOperation.Update, oldObject.ToBsonDocument(), productSupplier.ToBsonDocument());
     }

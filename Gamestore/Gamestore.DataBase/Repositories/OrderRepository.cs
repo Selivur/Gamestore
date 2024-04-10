@@ -21,10 +21,10 @@ public class OrderRepository : IOrderRepository
     /// Initializes a new instance of the <see cref="OrderRepository"/> class.
     /// </summary>
     /// <param name="context">The database context for interacting with the underlying data store.</param>
-    public OrderRepository(GamestoreContext context, MongoContext mongoContext)
+    public OrderRepository(GamestoreContext context)
     {
         _context = context;
-        _logger = new DataBaseLogger(mongoContext);
+        _logger = new DataBaseLogger();
     }
 
     /// <inheritdoc />

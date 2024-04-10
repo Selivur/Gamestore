@@ -22,10 +22,42 @@ public class MongoOrderRepositoryTests
         _repository = new MongoOrderRepository(_mockCollection.Object);
 
         _orders = new List<ProductOrder>
+        {
+            new()
             {
-                new() { OrderID = 1, CustomerId = "Customer1" },
-                new() { OrderID = 2, CustomerId = "Customer2" },
-            };
+                OrderID = 1,
+                CustomerId = "Customer1",
+                EmployeeID = 1,
+                OrderDate = DateTime.Now,
+                RequiredDate = DateTime.Now.AddDays(7),
+                ShippedDate = DateTime.Now.AddDays(2),
+                ShipVia = 1,
+                Freight = 10.5,
+                ShipName = "Ship Name 1",
+                ShipAddress = "Ship Address 1",
+                ShipCity = "Ship City 1",
+                ShipRegion = "Ship Region 1",
+                ShipPostalCode = "12345",
+                ShipCountry = "Ship Country 1",
+            },
+            new()
+            {
+                OrderID = 2,
+                CustomerId = "Customer2",
+                EmployeeID = 2,
+                OrderDate = DateTime.Now.AddDays(-7),
+                RequiredDate = DateTime.Now.AddDays(14),
+                ShippedDate = null,
+                ShipVia = 2,
+                Freight = 15.75,
+                ShipName = "Ship Name 2",
+                ShipAddress = "Ship Address 2",
+                ShipCity = "Ship City 2",
+                ShipRegion = "Ship Region 2",
+                ShipPostalCode = "54321",
+                ShipCountry = "Ship Country 2",
+            },
+        };
     }
 
     /// <summary>

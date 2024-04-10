@@ -1,6 +1,6 @@
-﻿using Gamestore.Database.Dbcontext;
-using Gamestore.Database.Entities.Enums;
+﻿using Gamestore.Database.Entities.Enums;
 using Gamestore.Database.Entities.MongoDB;
+using Gamestore.Database.Services.Interfaces;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -9,22 +9,19 @@ namespace Gamestore.Database.Services;
 /// <summary>
 /// Handles logging of entity changes.
 /// </summary>
-public class DataBaseLogger
+public class DataBaseLogger : IDataBaseLogger
 {
     private readonly IMongoCollection<Log> _logCollection;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DataBaseLogger"/> class.
-    /// </summary>
-    /// <param name="context">The MongoDB database.</param>
-    public DataBaseLogger(MongoContext context)
+    public DataBaseLogger()
     {
-        _logCollection = context.Logs;
+        var client = new MongoClient("mongodb://localhost:27017");
+        var database = client.GetDatabase("Northwind");
+
+        _logCollection = database.GetCollection<Log>("Logs");
     }
 
-    /// <summary>
-    /// Logs an entity change.
-    /// </summary>
+    /// <inheritdoc/>
     public void LogChange(CrudOperation action, string? entityType, BsonDocument oldObject, BsonDocument newObject)
     {
         var log = new Log

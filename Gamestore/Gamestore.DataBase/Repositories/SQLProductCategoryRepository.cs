@@ -2,7 +2,7 @@
 using Gamestore.Database.Entities.Enums;
 using Gamestore.Database.Entities.MongoDB;
 using Gamestore.Database.Repositories.Interfaces;
-using Gamestore.Database.Services;
+using Gamestore.Database.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
 
@@ -10,16 +10,16 @@ namespace Gamestore.Database.Repositories;
 public class SQLProductCategoryRepository : IProductCategoryRepository
 {
     private readonly GamestoreContext _context;
-    private readonly DataBaseLogger _logger;
+    private readonly IDataBaseLogger _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SQLProductCategoryRepository"/> class.
     /// </summary>
     /// <param name="context">The database context.</param>
-    public SQLProductCategoryRepository(GamestoreContext context, MongoContext mongoContext)
+    public SQLProductCategoryRepository(GamestoreContext context, IDataBaseLogger logger)
     {
         _context = context;
-        _logger = new DataBaseLogger(mongoContext);
+        _logger = logger;
     }
 
     /// <inheritdoc />
@@ -48,7 +48,7 @@ public class SQLProductCategoryRepository : IProductCategoryRepository
     /// <inheritdoc />
     public async Task UpdateProductCategoryAsync(ProductCategory productCategory)
     {
-        var oldObject = await _context.ProductCategories.AsNoTracking().FirstAsync(o => o.Id == productCategory.Id);
+        var oldObject = await _context.ProductCategories.AsNoTracking().FirstAsync(o => o.CategoryID == productCategory.CategoryID);
         _context.Entry(productCategory).State = EntityState.Modified;
         await SaveChangesAsync(
             "Error when updating the Product Category in the database.",
