@@ -1,4 +1,7 @@
-﻿namespace Gamestore.Tests.Database.RepositoriesTests;
+﻿using Gamestore.Database.Services.Interfaces;
+using Moq;
+
+namespace Gamestore.Tests.Database.RepositoriesTests;
 
 /// <summary>
 /// Unit tests for the <see cref="PlatformRepository"/> class.
@@ -8,6 +11,7 @@ public class PlatformRepositoryTests : IDisposable
     private readonly DbContextOptions<GamestoreContext> _options;
     private readonly GamestoreContext _context;
     private readonly PlatformRepository _repository;
+    private readonly Mock<IDataBaseLogger> _mockLogger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PlatformRepositoryTests"/> class.
@@ -18,8 +22,9 @@ public class PlatformRepositoryTests : IDisposable
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 
+        _mockLogger = new Mock<IDataBaseLogger>();
         _context = new GamestoreContext(_options);
-        _repository = new PlatformRepository(_context);
+        _repository = new PlatformRepository(_context, _mockLogger.Object);
 
         InitializeTestData();
     }

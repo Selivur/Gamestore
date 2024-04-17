@@ -7,6 +7,8 @@ using Gamestore.Database.Dbcontext;
 using Gamestore.Database.Entities.MongoDB;
 using Gamestore.Database.Repositories;
 using Gamestore.Database.Repositories.Interfaces;
+using Gamestore.Database.Services;
+using Gamestore.Database.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -46,6 +48,8 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IMongoOrderRepository, MongoOrderRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IShipperRepository, ShipperRepository>();
+
+builder.Services.AddScoped<IDataBaseLogger, DataBaseLogger>();
 
 builder.Services.AddScoped<LoggingActionFilter>();
 builder.Services.AddScoped<GlobalExceptionHandler>();

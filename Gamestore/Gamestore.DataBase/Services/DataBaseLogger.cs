@@ -18,7 +18,7 @@ public class DataBaseLogger : IDataBaseLogger
         var client = new MongoClient("mongodb://localhost:27017");
         var database = client.GetDatabase("Northwind");
 
-        _logCollection = database.GetCollection<Log>("Logs");
+        _logCollection = database.GetCollection<Log>("logs");
     }
 
     /// <inheritdoc/>

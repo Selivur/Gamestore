@@ -3,7 +3,7 @@ using Gamestore.Database.Entities;
 using Gamestore.Database.Entities.Enums;
 using Gamestore.Database.Entities.MongoDB;
 using Gamestore.Database.Repositories.Interfaces;
-using Gamestore.Database.Services;
+using Gamestore.Database.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
 
@@ -16,16 +16,16 @@ namespace Gamestore.Database.Repositories;
 public class GameRepository : IGameRepository
 {
     private readonly GamestoreContext _context;
-    private readonly DataBaseLogger _logger;
+    private readonly IDataBaseLogger _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GameRepository"/> class.
     /// </summary>
     /// <param name="context">The database context for interacting with the underlying data store.</param>
-    public GameRepository(GamestoreContext context)
+    public GameRepository(GamestoreContext context, IDataBaseLogger logger)
     {
         _context = context;
-        _logger = new DataBaseLogger();
+        _logger = logger;
     }
 
     /// <inheritdoc />
@@ -77,14 +77,13 @@ public class GameRepository : IGameRepository
     /// <inheritdoc />
     public async Task AddGameWithDependencies(Game game, int[] genresId, int[] platformsId, int publisherId)
     {
-        var clonedGame = (Game)game.Clone();
         game.Genres = _context.Genres.Where(g => genresId.Contains(g.Id)).ToList();
         game.Platforms = _context.Platforms.Where(p => platformsId.Contains(p.Id)).ToList();
         game.Publisher = _context.Publishers.Find(publisherId);
 
         _context.Games.Add(game);
 
-        await SaveChangesAsync("Error when adding the game to the database.", CrudOperation.Add, null, clonedGame.ToBsonDocument());
+        await SaveChangesAsync("Error when adding the game to the database.", CrudOperation.Add, null, game.ToBsonDocument());
     }
 
     /// <inheritdoc />

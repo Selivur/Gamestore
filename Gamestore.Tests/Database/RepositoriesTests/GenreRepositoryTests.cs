@@ -1,10 +1,14 @@
-﻿namespace Gamestore.Tests.Database.RepositoriesTests;
+﻿using Gamestore.Database.Services.Interfaces;
+using Moq;
+
+namespace Gamestore.Tests.Database.RepositoriesTests;
 
 public class GenreRepositoryTests : IDisposable
 {
     private readonly DbContextOptions<GamestoreContext> _options;
     private readonly GamestoreContext _context;
     private readonly GenreRepository _repository;
+    private readonly Mock<IDataBaseLogger> _mockLogger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GenreRepositoryTests"/> class.
@@ -15,8 +19,9 @@ public class GenreRepositoryTests : IDisposable
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 
+        _mockLogger = new Mock<IDataBaseLogger>();
         _context = new GamestoreContext(_options);
-        _repository = new GenreRepository(_context);
+        _repository = new GenreRepository(_context, _mockLogger.Object);
 
         InitializeTestData();
     }

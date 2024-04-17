@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Gamestore.Database.Entities;
 
@@ -36,5 +37,6 @@ public class Genre
     /// <summary>
     /// Gets or sets the collection of games associated with the genre.
     /// </summary>
+    [BsonIgnore]
     public ICollection<Game> Games { get; set; }
 }

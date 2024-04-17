@@ -1,4 +1,6 @@
 ﻿using Gamestore.Database.Entities.Enums;
+using Gamestore.Database.Services.Interfaces;
+using Moq;
 
 namespace Gamestore.Tests.Database.RepositoriesTests;
 
@@ -10,6 +12,7 @@ public class CommentRepositoryTests : IDisposable
     private readonly DbContextOptions<GamestoreContext> _options;
     private readonly GamestoreContext _context;
     private readonly CommentRepository _repository;
+    private readonly Mock<IDataBaseLogger> _mockLogger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CommentRepositoryTests"/> class.
@@ -20,8 +23,9 @@ public class CommentRepositoryTests : IDisposable
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 
+        _mockLogger = new Mock<IDataBaseLogger>();
         _context = new GamestoreContext(_options);
-        _repository = new CommentRepository(_context);
+        _repository = new CommentRepository(_context, _mockLogger.Object);
 
         InitializeTestData();
     }

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Gamestore.Database.Entities;
 
@@ -25,5 +26,6 @@ public class Platform
     /// <summary>
     /// Gets or sets the collection of games associated with the platform.
     /// </summary>
+    [BsonIgnore]
     public ICollection<Game> Games { get; set; }
 }

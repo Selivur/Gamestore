@@ -3,7 +3,7 @@ using Gamestore.Database.Entities;
 using Gamestore.Database.Entities.Enums;
 using Gamestore.Database.Entities.MongoDB;
 using Gamestore.Database.Repositories.Interfaces;
-using Gamestore.Database.Services;
+using Gamestore.Database.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
 
@@ -16,16 +16,16 @@ namespace Gamestore.Database.Repositories;
 public class CommentRepository : ICommentRepository
 {
     private readonly GamestoreContext _context;
-    private readonly DataBaseLogger _logger;
+    private readonly IDataBaseLogger _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CommentRepository"/> class.
     /// </summary>
     /// <param name="context">The database context.</param>
-    public CommentRepository(GamestoreContext context)
+    public CommentRepository(GamestoreContext context, IDataBaseLogger logger)
     {
         _context = context;
-        _logger = new DataBaseLogger();
+        _logger = logger;
     }
 
     /// <inheritdoc />
@@ -46,11 +46,7 @@ public class CommentRepository : ICommentRepository
     public async Task AddAsync(Comment comment)
     {
         _context.Comments.Add(comment);
-
-        var clonedComment = (Comment)comment.Clone();
-        clonedComment.Game = null;
-
-        await SaveChangesAsync("Error when adding the comment to the database.", CrudOperation.Add, null, clonedComment.ToBsonDocument());
+        await SaveChangesAsync("Error when adding the comment to the database.", CrudOperation.Add, null, comment.ToBsonDocument());
     }
 
     /// <inheritdoc />
@@ -61,11 +57,7 @@ public class CommentRepository : ICommentRepository
 
         _context.Comments.Remove(comment);
 
-        var clonedComment = (Comment)comment.Clone();
-        clonedComment.Game = null;
-        clonedComment.ChildComments = null;
-
-        await SaveChangesAsync("Error when deleting the game from the database.", CrudOperation.Delete, clonedComment.ToBsonDocument(), null);
+        await SaveChangesAsync("Error when deleting the game from the database.", CrudOperation.Delete, comment.ToBsonDocument(), null);
     }
 
     /// <inheritdoc />
@@ -74,14 +66,9 @@ public class CommentRepository : ICommentRepository
         _context.Entry(comment).State = EntityState.Modified;
 
         var oldObject = await _context.Comments.AsNoTracking().FirstAsync(o => o.Id == comment.Id);
-        oldObject.Game = null;
-        oldObject.ChildComments = null;
+        var bsonObject = oldObject.ToBsonDocument();
 
-        var clonedComment = (Comment)comment.Clone();
-        clonedComment.Game = null;
-        clonedComment.ChildComments = null;
-
-        await SaveChangesAsync("Error when updating the comment in the database.", CrudOperation.Update, oldObject.ToBsonDocument(), clonedComment.ToBsonDocument());
+        await SaveChangesAsync("Error when updating the comment in the database.", CrudOperation.Update, bsonObject, comment.ToBsonDocument());
     }
 
     /// <inheritdoc />

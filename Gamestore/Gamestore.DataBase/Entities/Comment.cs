@@ -1,13 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Gamestore.Database.Entities.Enums;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Gamestore.Database.Entities;
 
 /// <summary>
 /// Represents a comment in the database.
 /// </summary>
-public class Comment : ICloneable
+public class Comment
 {
     /// <summary>
     /// Gets or sets the unique identifier for the comment.
@@ -46,19 +47,12 @@ public class Comment : ICloneable
     /// <summary>
     /// Gets or sets the сhild comments of this comment.
     /// </summary>
+    [BsonIgnore]
     public ICollection<Comment>? ChildComments { get; set; }
 
     /// <summary>
     /// Gets or sets the game associated with the comment.
     /// </summary>
+    [BsonIgnore]
     public Game Game { get; set; }
-
-    /// <summary>
-    /// Creates a shallow copy of the current object.
-    /// </summary>
-    /// <returns>A shallow copy of the current object.</returns>
-    public object Clone()
-    {
-        return MemberwiseClone();
-    }
 }

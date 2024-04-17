@@ -1,4 +1,6 @@
 ﻿using Gamestore.Database.Entities.MongoDB;
+using Gamestore.Database.Services.Interfaces;
+using Moq;
 
 namespace Gamestore.Tests.Database.RepositoriesTests;
 
@@ -10,6 +12,7 @@ public class SQLProductRepositoryTests : IDisposable
     private readonly DbContextOptions<GamestoreContext> _options;
     private readonly GamestoreContext _context;
     private readonly SQLProductRepository _repository;
+    private readonly Mock<IDataBaseLogger> _mockLogger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SQLProductRepositoryTests"/> class.
@@ -20,8 +23,10 @@ public class SQLProductRepositoryTests : IDisposable
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 
+        _mockLogger = new Mock<IDataBaseLogger>();
+
         _context = new GamestoreContext(_options);
-        _repository = new SQLProductRepository(_context);
+        _repository = new SQLProductRepository(_context, _mockLogger.Object);
 
         InitializeTestData();
     }

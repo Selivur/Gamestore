@@ -1,9 +1,13 @@
-﻿namespace Gamestore.Tests.Database.RepositoriesTests;
+﻿using Gamestore.Database.Services.Interfaces;
+using Moq;
+
+namespace Gamestore.Tests.Database.RepositoriesTests;
 public class GameRepositoryTests : IDisposable
 {
     private readonly DbContextOptions<GamestoreContext> _options;
     private readonly GamestoreContext _context;
     private readonly GameRepository _gameRepository;
+    private readonly Mock<IDataBaseLogger> _mockLogger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GameRepositoryTests"/> class.
@@ -14,8 +18,9 @@ public class GameRepositoryTests : IDisposable
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 
+        _mockLogger = new Mock<IDataBaseLogger>();
         _context = new GamestoreContext(_options);
-        _gameRepository = new GameRepository(_context);
+        _gameRepository = new GameRepository(_context, _mockLogger.Object);
 
         InitializeTestData();
     }
@@ -301,7 +306,7 @@ public class GameRepositoryTests : IDisposable
     public async Task GetByPlatformTypeAsync_ReturnsGamesByPlatformType()
     {
         // Arrange
-        var platformType = "PlatformType1"; // replace with an actual platform type from your test data.
+        var platformType = "PlatformType1";
 
         // Act
         var games = await _gameRepository.GetByPlatformTypeAsync(platformType);

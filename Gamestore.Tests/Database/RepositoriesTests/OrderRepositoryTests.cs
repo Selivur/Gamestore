@@ -1,10 +1,13 @@
 ﻿using Gamestore.Database.Entities.Enums;
+using Gamestore.Database.Services.Interfaces;
+using Moq;
 
 namespace Gamestore.Tests.Database.RepositoriesTests;
 public class OrderRepositoryTests : IDisposable
 {
     private readonly OrderRepository _repository;
     private readonly GamestoreContext _context;
+    private readonly Mock<IDataBaseLogger> _mockLogger;
 
     private Order _testOrder;
 
@@ -14,8 +17,9 @@ public class OrderRepositoryTests : IDisposable
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
 
+        _mockLogger = new Mock<IDataBaseLogger>();
         _context = new GamestoreContext(options);
-        _repository = new OrderRepository(_context);
+        _repository = new OrderRepository(_context, _mockLogger.Object);
 
         InitializeTestData();
     }
