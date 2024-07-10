@@ -1,4 +1,6 @@
-﻿namespace Gamestore.Database.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Gamestore.Database.Entities;
 public class Role
 {
     /// <summary>
@@ -14,5 +16,6 @@ public class Role
     /// <summary>
     /// Gets or sets the Role permissions contract.
     /// </summary>
+    [NotMapped]
     public string[] RolePermissionContract { get; set; }
 }
