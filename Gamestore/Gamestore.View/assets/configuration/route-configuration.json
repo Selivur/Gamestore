@@ -24,7 +24,22 @@
   "AddPublisher": "publisher/add",
 
   "Order": "order",
+  "UpdateOrder": "",
+  "History": "",
   "Orders": "orders",
   "Basket": "order/details",
-  "MakeOrder": "order/make"
+  "MakeOrder": "order/make",
+
+  "Users": "",
+  "User": "",
+  "UpdateUser": "",
+  "DeleteUser": "",
+  "AddUser": "",
+  "Login": "",
+
+  "Roles": "",
+  "Role": "",
+  "UpdateRole": "",
+  "DeleteRole": "",
+  "AddRole": ""
 }

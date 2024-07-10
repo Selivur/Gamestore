@@ -3,11 +3,12 @@
 
   "gameApiUrl": "/games/getByAlias/{key}",
   "gameByIdApiUrl": "/games/getById/{id}",
+  "gamesAllApiUrl": "/games",
   "gamesApiUrl": "/games",
   "gamesByGenreApiUrl": "/games/genre/{id}",
   "gamesByPublisherApiUrl": "/games/publisher/{id}",
   "gamesByPlatformApiUrl": "/games/platform/{id}",
-  "getGameFile": "/games/{key}/download",
+  "getGameFileApiUrl": "/games/{key}/download",
   "updateGameApiUrl": "/games/update",
   "addGameApiUrl": "/games/new",
   "deleteGameApiUrl": "/games/remove/{key}",
@@ -38,6 +39,7 @@
   "updatePublisherApiUrl": "/publishers/update",
 
   "orderApiUrl": "/orders/{id}",
+  "ordersApiUrl": "/",
   "historyApiUrl": "/orders",
   "orderDetailsApiUrl": "/cart/{id}",
   "buyGameApiUrl": "/game/{key}/buy",
@@ -45,10 +47,31 @@
   "basketApiUrl": "/cart",
   "makeOrderInfoApiUrl": "/orders/payment",
   "payApiUrl": "/orders/invoice-pdf",
-  
+  "updateOrderDetailCountApiUrl": "",
+  "deleteOrderDetailApiUrl": "/",
+  "addOrderDetailApiUrl": "/",
+  "shipOrderApiUrl": "/",
+
   "addCommentApiUrl": "/games/{key}/comments",
   "commentsByGameApiUrl": "/games/{key}/comments",
   "deleteCommentApiUrl": "/games/{key}/deleteComment/{id}",
   "getBanDurationsApiUrl": "/games/getBanDurations",
-  "banUserApiUrl": "/games/banUser"
+  "banUserApiUrl": "/games/banUser",
+
+  "userApiUrl": "/",
+  "usersApiUrl": "/",
+  "addUserApiUrl": "/",
+  "updateUserApiUrl": "/",
+  "deleteUserApiUrl": "/",
+  "loginApiUrl": "/",
+  "checkAccessApiUrl": "/",
+
+  "roleApiUrl": "/",
+  "rolesApiUrl": "/",
+  "addRoleApiUrl": "/",
+  "updateRoleApiUrl": "/",
+  "deleteRoleApiUrl": "/",
+  "userRolesApiUrl": "/",
+  "rolePermissionsApiUrl": "/",
+  "permissionsApiUrl": "/"
 }
