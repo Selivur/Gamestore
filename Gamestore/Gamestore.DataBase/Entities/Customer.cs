@@ -14,4 +14,9 @@ public class Customer
     /// Gets or sets the name of the customer.
     /// </summary>
     public string Name { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Role of the customer.
+    /// </summary>
+    public Role Role { get; set; }
 }
