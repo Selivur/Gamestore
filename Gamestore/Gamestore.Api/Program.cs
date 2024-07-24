@@ -39,6 +39,7 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddHttpClient<IPaymentService, PaymentService>();
+builder.Services.AddHttpClient<IAuthenticationService, AuthenticationService>();
 
 builder.Services.AddScoped<IGameRepository, GameRepository>();
 builder.Services.AddScoped<IGenreRepository, GenreRepository>();
